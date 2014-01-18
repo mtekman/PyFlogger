@@ -21,13 +21,15 @@ class WeightLog:
                 
 		f.readline()	#Skip header
 		for weight in f:
+			if len(weight)< 5:
+				continue
 			date, morn, nigh = weight.split('\t')
 			self.weightlogmap[date] = Weight(int(morn),int(nigh))
 		f.close()
 
 	def write(self):
 		f=open(self.path,'w')
-		print >> f, "\tDate\tMorn\tNight"	#print header
+		print >> f, "Date     \tMorn\tNight\n"	#header
 
 		for date in sorted(self.weightlogmap.keys()):
 			w = self.weightlogmap[date]
@@ -37,7 +39,9 @@ class WeightLog:
 
 	def display(self):
 		w = self.weightlogmap[self.date]
-		print >> sys.stderr, "\n\n%s\t%s\t%s" % (self.date, w.morn, w.night)
+		print >> sys.stderr, '='*39
+		print >> sys.stderr, "Date     \tMorn\tNight"	#print header
+		print >> sys.stderr, "%s\t%d\t%d" % (self.date, w.morn, w.night)
 
 
 	def log(self,lbls):
@@ -47,24 +51,28 @@ class WeightLog:
 
 			if w.night==-1 and w.morn==-1:
         				self.weightlogmap[self.date].morn = lbls
-	        			print >> sys.stderr, "Morning lb:", lbls
+	        			print >> sys.stderr, "[Logged Morning lb]"
 
 			if w.night==-1 and w.morn!=-1:
 					self.weightlogmap[self.date].night = lbls
-	        			print >> sys.stderr, "Night lb:", lbls
+	        			print >> sys.stderr, "[Logged Night lb]"
 			else:
-				print >> sys.stderr, "\
-Already logged weight for today!:",\
- self.weightlogmap[self.date].morn,\
- self.weightlogmap[self.date].night
-				ans = input("Remove?\n")
-				if ans[0].lower() == 'Y':
-					self.weightlogmap.remove(self.date)
+			        self.display()
+				print >> sys.stderr, "Already logged weight for today!",
+				ans = raw_input(" Remove? ")
+				if ans[0].lower() == 'y':
+					self.weightlogmap.pop(self.date)
+					print >> sys.stderr, "\rDeleted record"
+					self.log(lbls)
+					return
+				else:
+					print >> sys.stderr, "\rUnchanged"
+
 
 		#Weight does not exist for that date
 		else:
 			self.weightlogmap[self.date] = Weight(lbls)
-       			print >> sys.stderr, "Morning lb:", lbls
+      			print >> sys.stderr, "[Logged Morning lb]"
 
 		self.write()
 		self.display()
