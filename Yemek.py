@@ -1,23 +1,16 @@
 #!/usr/bin/env python
 
 class Yemek:
+
 	def __init__(self, name, kC, carb, prot, fat, per, unit, amount=0):
-		self.settokens([name, kC, carb, prot, fat, per, unit, amount])
-
-	def __init__(self, line_data):
-		self.settokens(line_data.split('\t'))
-
-	def settokens(self, tokes):
-		self.name = tokes[0].strip()
-		self.kC = int(tokes[1].strip())
-		self.carb = int(tokes[2].strip())
-		self.prot = int(tokes[3].strip())
-		self.fat = int(tokes[4].strip())
-		self.per = int(tokes[5].strip())
-		self.unit = tokes[6].strip()
-		self.amount = "  "
-		if len(tokes) == 8:
-			self.amount = int(tokes[7].strip())
+		self.name = name
+		self.kC = int(kC)
+		self.carb = int(carb)
+		self.prot = int(prot)
+		self.fat = int(fat)
+		self.per = int(per)
+		self.unit = unit
+		self.amount = int(amount)
 
 	def printout(self,header=True, headeronly=False):
 		text=""

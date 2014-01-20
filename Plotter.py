@@ -53,8 +53,7 @@ class WeightPlot:
         if x==self.marg:
           self.screen.grid[y][x] = '|'
           if y%3==0:
-             self.screen.writeText(\
-str(self.max_y - ((y+1)*self.yspace_per_int)), y, x-2)
+             self.screen.writeText(str(self.max_y - ((y+1)*self.yspace_per_int)), y, x-2)
 
 
   def determineRanges(self, tuples):
