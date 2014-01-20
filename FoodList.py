@@ -2,9 +2,10 @@
 
 import sys
 from Yemek import Yemek
+from os import path
 
 class FoodList:
-	def __init__(self,file="/home/user/.config/keto/foodlist.txt"):
+	def __init__(self,file=path.expanduser("~/")+".config/keto_foodlist.txt"):
 		self.foodmap={}
 		self.path= file
 		self.read()
@@ -16,98 +17,140 @@ class FoodList:
 			f=open(self.path,'w')
 			f.write(" ")
 			f.close()
-			return	
-	
-		# Strip Header
-		f.readline()
+			return
+
+		# Strip Headers
+		f.readline(); f.readline()
+		
 		for foodentry in f:
 			if len(foodentry)< 5:
 				continue
-			food = Yemek(foodentry.split('\t'))
+			name, kC, carb, prot, fat, per, unit = foodentry.split('\t')
+			food = Yemek(name.lower(), kC, carb, prot, fat, per, unit)
 			self.foodmap[food.name]= food
 		f.close()
 
 	def write(self):
 		f=open(self.path,'w')
 
-		print >> f, Yemek('a','1','2','3','4','5','6','7').printout(headeronly=True)
-
+		print >> f, Yemek.printheader()
+		
 		for food in sorted(self.foodmap.keys()):
 			fooditem = self.foodmap[food]
-			print >> f, fooditem.printout(header=False)
+			print >> f, fooditem.printout()
 		f.close()
 
 
 	def printlist(self):
 		keys = sorted(self.foodmap.keys())
-		print >> sys.stderr, self.foodmap[keys[0]].printout(headeronly=True)	
-
+		print >> sys.stderr, Yemek.printheader()
 		for food in keys:
 			fooditem = self.foodmap[food]
-			print >> f, fooditem.printout(header=False)
+			print >> sys.stderr, fooditem.printout() #.strip()
 
 	@staticmethod
 	def amountsplit(text):
+		text= text.strip()
 		index_let=0
 		for a in text:
-		        if not(ord(a) >= 48 and ord(a) <= 57):
-		                break
-        	index_let +=1
-		return text[0:index_let], text[index_let:]
+			if not(48 <= ord(a) <= 57):
+				break
+			index_let +=1
+		return text[0:index_let].strip(), text[index_let:].splitlines()[0].strip()
 
+
+	def insertAll(self, name, kc, carb, prot, fat ,per, unit):
+		name = name.strip().lower()
+		self.foodmap[name] = Yemek(name,kc,carb,prot,fat,per,unit)
+		print >> sys.stderr, "Inserted", name
+		self.write()
 
 	def insert(self,name):
 		per,unit = FoodList.amountsplit(raw_input("Per,Unit (e.g. '100g'): ").strip())
 		kc, carb, prot, fat = raw_input("kCal, Carb, Protein, Fat: ").split(',')
-			
-		self.foodmap[name] = Yemek(name,kc,carb,prot,fat,per,unit)
-		print >> sys.stderr, "Inserted", name
-		self.write()
+		
+		self.insertAll(name, kc, carb, prot, fat, per, unit)
 
 
 	def removeprompt(self):
 		name = raw_input('Food Name: ').strip()
 
 		if name in self.foodmap:
-			self.foodmap.remove(name)
-			print >> sys.stderr, "Removed"
+			del self.foodmap[name]
+			print >> sys.stderr, "[Removed]"
 		else:
-			print >> sys.stderr, "does not exist"
-		write()
+			print >> sys.stderr, "[Does not exist!]"
+		self.write()
 
 	def insertprompt(self):
 		name = raw_input('Food Name: ').strip()
 
 		if name in self.foodmap:
-			print >> sys.stderr, "Food already exists!\n"
-			print >> sys.stderr,  self.foodmap[name].printout()
+			print >> sys.stderr, "[Food already exists!]"
+			print >> sys.stderr,  self.foodmap[name].printout(header=True)
 			exit(-1)
 		self.insert(name)
 
-
+	#This is the main insertion method
 	def updateprompt(self):
-		name = raw_input('Food Name:').strip()
+		name = raw_input('Food: ').strip()
 
 		if name in self.foodmap:
 			print >> sys.stderr, "Currently:"
-			print >> sys.stderr,  self.foodmap[name].printout()
+			print >> sys.stderr,  self.foodmap[name].printout(header=True)
+			edit = raw_input('Edit? ')
+			if edit[0].lower() != 'y':
+				exit(-1)
 		else:
-			print >> sys.stderr, "New Food:"
+			print >> sys.stderr, "[New Food]"
 		self.insert(name)
+	
+	def search(self,name):
+		foods = self.foodmap.keys()
+		searchfoods = map(lambda x: x.split(), foods)
+		searchname = name.split()[0].strip()
+		#print searchfoods, searchname
+			
+		found=[]; index=0;
+		for sf in searchfoods:
+			for s in sf:
+				if searchname.strip() in s.strip():
+					found.append(foods[index])
+			index +=1
+		return found, len(found)
+
 	
 	def info(self,name):
 		if name in self.foodmap:
-			print >> sys.stderr,  self.foodmap[name].printout()
+			print >> sys.stderr,  self.foodmap[name].printout(header=True)
 		else:
-			print >> sys.stderr, "Cannot find:", name
-			ans = raw_input('insert?').strip()
-			if ans[0].lower() == 'y':
-				self.insert(name)
+			#Search keys for closest match
+			found, res = self.search(name)
 
+			if res == 0:
+				print >> sys.stderr, "\nCannot find:", "\"%s\"" % name,
+				ans = raw_input(', insert? ').strip()
+				if ans[0].lower() == 'y':
+					self.insert(name)
+				else:
+					exit(-1)
+			
+			elif res > 0:
+				print >> sys.stderr, "\nDid you mean:\n *",
+				if res==1:
+					print >> sys.stderr, found[0],
+					ans = raw_input(' ? ')
+					if ans[0].lower()=='y':
+						name = found[0]
+						print >> sys.stderr,  self.foodmap[name].printout(header=True)
+						return name
+				else:
+					print >> sys.stderr, '\n * '.join(found)
+					exit(-1)
+			else:
+				exit(-1)
 
-w = FoodList()
-w.write()
-exit(0)
-#w.insertprompt()
-print >> sys.stderr, w.foodmap
+#w = FoodList()
+#  w.updateprompt()
+#  w.removeprompt()
 #w.printlist()

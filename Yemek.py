@@ -4,20 +4,22 @@ class Yemek:
 
 	def __init__(self, name, kC, carb, prot, fat, per, unit, amount=0):
 		self.name = name
-		self.kC = int(kC)
-		self.carb = int(carb)
-		self.prot = int(prot)
-		self.fat = int(fat)
-		self.per = int(per)
-		self.unit = unit
-		self.amount = int(amount)
+		self.kC = float(kC)
+		self.carb = float(carb)
+		self.prot = float(prot)
+		self.fat = float(fat)
+		self.per = float(per)
+		self.unit = unit.strip()
+		self.amount = float(amount)
 
-	def printout(self,header=True, headeronly=False):
+	@staticmethod
+	def printheader():
+		return "     \tkC\tC\tP\tF\tper\tunit\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+	def printout(self,header=False):
 		text=""
 		if header:
-			text="\t\tkCal\tCarb\tProt\tFat\tPer\n"
-			if headeronly:
-				return text
+			text=Yemek.printheader()+'\n'
 
 		text += "%s\t%s\t%s\t%s\t%s\t%s\t%s" % (
 			self.name, self.kC, self.carb,
@@ -35,4 +37,3 @@ class Yemek:
 		scalef.per *= multip
 
 		return scalef;
-

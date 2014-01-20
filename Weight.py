@@ -2,6 +2,7 @@
 
 import sys
 from time import localtime as time
+from os import path
 
 class Weight:
 	def __init__(self,morning=-1,night=-1):
@@ -10,9 +11,9 @@ class Weight:
 
 class WeightLog:
 
-	def __init__(self,path="/home/user/.config/keto/weightlog.txt"):
+	def __init__(self,file=path.expanduser("~/")+".config/keto/weightlog.txt"):
 		self.weightlogmap={}
-		self.path = path
+		self.path = file
 		self.date = "%04d/%02d/%02d" % time()[0:3]
 		self.read()
 		

@@ -1,25 +1,41 @@
 #!/usr/bin/env python
 
+from os import path
+from time import localtime as time
+import sys
+
+from FoodList import FoodList
+from Yemek import Yemek
+from copy import copy
+
 class FoodLogger:
-	def __init__(self, FoodL,  file="~/.config/keto/foodlog.txt"):
+	def __init__(self, file=path.expanduser("~/")+".config/keto_foodlog.txt"):
 		self.foodlog=[]
 		self.path= file
-		self.foodlist = FoodL # i.e. ref FoodList cobj
+		self.foodlist = FoodList() # i.e. ref FoodList cobj
 		self.date = "%04d/%02d/%02d--%02d:%02d" % time()[0:5]
-		read(self.date)
+		self.read(self.date)
 
 	# any date
 	def read(self,date):
-		f=open(self.path,'r')
+		try:
+			f=open(self.path,'r')
+		except IOError:
+			f=open(self.path,'w')
+			f.write(" ")
+			f.close()
+			return
 		
-		# Strip Header
-		f.readline()
+		f.readline()   # Strip Header
 
 		for line in f:
-			ddate, amount, yemek = line.split('|')
-
-			if date == ddate:
-				food = Yemek(yemek,amount)
+			if len(line) < 5:
+				continue
+			ddate, amount, name = line.split('|')
+			if date[0:10] == ddate[0:10]:
+				#Find food if date matches
+				food = copy(self.foodlist.foodmap[name.strip()])
+				food.amount = amount
 				self.foodlog.append(food)
 		f.close()
 
@@ -36,7 +52,7 @@ class FoodLogger:
 			print >> sys.stderr, "nothing logged for that day!"
 			exit(-1)
 
-		print >> sys.stderr, self.foodlog[0].printout(headeronly=True)
+		print >> sys.stderr, Yemek.printheader()
 
 		for y in self.foodlog:
 			scale = y.amount 
@@ -47,18 +63,22 @@ class FoodLogger:
 			fat_total += y.fat
 
 			print >> sys.stderr, y.printout(False)
-		print >> sys.stderr, "Totals:\t%s\t%s\t%s\t%s\t%s" % (kC_total, carb_total, protein_total, fat_total)
+		print >> sys.stderr, "Totals:\t%s\t%s\t%s\t%s" % (kC_total, carb_total, protein_total, fat_total)
 
 
 	def log(self):
-		name = input("Food:").strip()
-		self.foodlist.info(name)
+		name = raw_input("Food: ").strip()
+		name = self.foodlist.info(name) # find match
 		
-		am = int(input("amount consumed?").strip())
-		yemk = Yemek(self.foodmap[name],am)
-		
+		am = float(raw_input("amount consumed? ").strip())
 		dater = "%04d/%02d/%02d--%02d:%02d" % time()[0:5]
 
 		f=open(self.path,'a')
-		print >> f, "%s|%d|%s" % (dater,am,newy.printout(False))
+		print >> f, "%s|%f|%s" % (dater,am,name)
 		f.close()
+		
+		self.showTotals(self.date)
+
+w=FoodLogger()
+w.log()
+#w.showTotals(w.date)
