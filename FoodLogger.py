@@ -22,7 +22,7 @@ class FoodLogger:
 			f=open(self.path,'r')
 		except IOError:
 			f=open(self.path,'w')
-			f.write("Date            \tAmn\tFood Name ")
+			f.write("Date            \tAmn\tFood Name\n")
 			f.close()
 			return
 		
@@ -32,6 +32,8 @@ class FoodLogger:
 			if len(line) < 5:
 				continue
 			ddate, amount, name = line.split('\t')
+			print line, date[0:10], "==", ddate[0:10]
+
 			if date[0:10] == ddate[0:10]:
 				#Find food if date matches
 				food = copy(self.foodlist.foodmap[name.strip()])
@@ -54,6 +56,8 @@ class FoodLogger:
 
 		maxlen_foodname=len(reduce(lambda x,y: ( x if (len(x.name) > len(y.name)) else y ), self.foodlog).name)
 		print >> sys.stderr, ' '*maxlen_foodname, Yemek.printheader()
+		
+		print self.foodlog
 
 		for y in self.foodlog:
 			scyem = y.scaled()
@@ -63,13 +67,13 @@ class FoodLogger:
 			protein_total += scyem.prot
 			fat_total += scyem.fat
 
-			print >> sys.stderr, scyem.printout(buffer=maxlen_foodname), "\tam=%2f" % float(y.amount)
+			print >> sys.stderr, scyem.printout(buffer=maxlen_foodname), float(y.amount)
 
 		print >> sys.stderr, "\nTotals:\t%d\t%s\t%s\t%s" % (int(kC_total), carb_total, protein_total, fat_total)
 
 
 	def log(self):
-		name = raw_input("Food: ").strip()
+		name = raw_input("Food: ").strip().lower()
 		name = self.foodlist.info(name) # find match
 		
 		am = float(raw_input("\nAmount Consumed? ").strip())
