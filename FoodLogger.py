@@ -9,12 +9,12 @@ from Yemek import Yemek
 from copy import copy
 
 class FoodLogger:
-	def __init__(self, file=abspath("../")+"/logs/keto_foodlog.txt"):
+	def __init__(self, file=abspath("../")+"/logs/keto_foodlog.txt",
+						file2=abspath("../")+"/logs/keto_target_macros.txt"):
 		self.foodlog=[]
 		self.path= file
 		self.foodlist = FoodList() # i.e. ref FoodList cobj
 		self.date = "%04d/%02d/%02d--%02d:%02d" % time()[0:5]
-		self.read(self.date)
 
 	# any date
 	def read(self,date):
@@ -22,7 +22,7 @@ class FoodLogger:
 			f=open(self.path,'r')
 		except IOError:
 			f=open(self.path,'w')
-			f.write("Date            \tAmn\tFood Name\n")
+			f.write("Date             \tAmn\tFood Name\n")
 			f.close()
 			return
 		
@@ -32,7 +32,6 @@ class FoodLogger:
 			if len(line) < 5:
 				continue
 			ddate, amount, name = line.split('\t')
-			print line, date[0:10], "==", ddate[0:10]
 
 			if date[0:10] == ddate[0:10]:
 				#Find food if date matches
@@ -57,8 +56,6 @@ class FoodLogger:
 		maxlen_foodname=len(reduce(lambda x,y: ( x if (len(x.name) > len(y.name)) else y ), self.foodlog).name)
 		print >> sys.stderr, ' '*maxlen_foodname, Yemek.printheader()
 		
-		print self.foodlog
-
 		for y in self.foodlog:
 			scyem = y.scaled()
 		
@@ -67,9 +64,11 @@ class FoodLogger:
 			protein_total += scyem.prot
 			fat_total += scyem.fat
 
-			print >> sys.stderr, scyem.printout(buffer=maxlen_foodname), float(y.amount)
+			print >> sys.stderr, scyem.printout(buffer=maxlen_foodname), "%.1f" % float(y.amount)
 
-		print >> sys.stderr, "\nTotals:\t%d\t%s\t%s\t%s" % (int(kC_total), carb_total, protein_total, fat_total)
+		print >> sys.stderr,'\n',' '*(maxlen_foodname-8),
+		print >> sys.stderr, "Totals:\t%d\t%s\t%s\t%s" % (int(kC_total), carb_total, protein_total, fat_total)
+		self.foodlog = [] # clear until next
 
 
 	def log(self):
@@ -80,7 +79,7 @@ class FoodLogger:
 		dater = "%04d/%02d/%02d--%02d:%02d" % time()[0:5]
 
 		f=open(self.path,'a')
-		print >> f, "%s\t%f\t%s" % (dater,am,name)
+		print >> f, "%s\t%.1f\t%s" % (dater,am,name)
 		f.close()
 		
 		self.showTotals(self.date)
