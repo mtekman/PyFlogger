@@ -2,10 +2,10 @@
 
 import sys
 from Yemek import Yemek
-from os import path
+from os.path import abspath
 
 class FoodList:
-	def __init__(self,file=path.expanduser("~/")+".config/keto_foodlist.txt"):
+	def __init__(self,file=abspath("../")+"/logs/keto_foodlist.txt"):
 		self.foodmap={}
 		self.path= file
 		self.read()
@@ -26,7 +26,7 @@ class FoodList:
 			if len(foodentry)< 5:
 				continue
 			name, kC, carb, prot, fat, per, unit = foodentry.split('\t')
-			food = Yemek(name.lower(), kC, carb, prot, fat, per, unit)
+			food = Yemek(name.strip().lower(), kC, carb, prot, fat, per, unit)
 			self.foodmap[food.name]= food
 		f.close()
 
@@ -93,16 +93,18 @@ class FoodList:
 
 	#This is the main insertion method
 	def updateprompt(self):
-		name = raw_input('Food: ').strip()
-
+	
+	   # Print details if exists, else insert, else return close match
+		name = self.info(raw_input('Food: ').strip())
+		
+		# Name exists by now, or prog exited
+      
 		if name in self.foodmap:
-			print >> sys.stderr, "Currently:"
-			print >> sys.stderr,  self.foodmap[name].printout(header=True)
-			edit = raw_input('Edit? ')
+			edit = raw_input('\nEdit? ')
 			if edit[0].lower() != 'y':
 				exit(-1)
 		else:
-			print >> sys.stderr, "[New Food]"
+			print >> sys.stderr, "\n[New Food: \"%s\"]" % name
 		self.insert(name)
 	
 	def search(self,name):
@@ -123,34 +125,48 @@ class FoodList:
 	def info(self,name):
 		if name in self.foodmap:
 			print >> sys.stderr,  self.foodmap[name].printout(header=True)
-		else:
-			#Search keys for closest match
-			found, res = self.search(name)
+			return name
 
-			if res == 0:
-				print >> sys.stderr, "\nCannot find:", "\"%s\"" % name,
-				ans = raw_input(', insert? ').strip()
-				if ans[0].lower() == 'y':
-					self.insert(name)
-				else:
-					exit(-1)
+		#Search keys for closest match
+		found, res = self.search(name)
+
+		if res == 0:
+			print >> sys.stderr, "\nCannot find:", "\"%s\"" % name,
+			ans = raw_input(', insert? ').strip()
+			if ans[0].lower() == 'y':
+				self.insert(name)
+				return name
+			exit(0)
 			
-			elif res > 0:
-				print >> sys.stderr, "\nDid you mean:\n *",
-				if res==1:
-					print >> sys.stderr, found[0],
-					ans = raw_input(' ? ')
-					if ans[0].lower()=='y':
-						name = found[0]
-						print >> sys.stderr,  self.foodmap[name].printout(header=True)
-						return name
-				else:
-					print >> sys.stderr, '\n * '.join(found)
-					exit(-1)
-			else:
-				exit(-1)
+		# Found
+		print >> sys.stderr, "\nDid you mean ",
+		
+		# One result
+		if res==1:
+			print >> sys.stderr, "\"%s\"" % found[0],
+			ans = raw_input(' ? ')
+			if ans[0].lower()=='y':
+				name = found[0]
+				print >> sys.stderr,  self.foodmap[name].printout(header=True)
+			return name
+	
+		# Multiple results
+		print >> sys.stderr, ": "
+		
+		cnt=1
+		for f in found:
+			print >> sys.stderr, ' *%d:' % cnt, f
+			cnt += 1
+
+		ans = int(raw_input('Enter Number (0 to cancel): '))
+		if ans != 0:
+			name = found[ans-1]
+			print >> sys.stderr,  self.foodmap[name].printout(header=True)
+
+		return name
+				
 
 #w = FoodList()
-#  w.updateprompt()
+#w.updateprompt()
 #  w.removeprompt()
 #w.printlist()

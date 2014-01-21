@@ -4,7 +4,7 @@ class Yemek:
 
 	def __init__(self, name, kC, carb, prot, fat, per, unit, amount=0):
 		self.name = name
-		self.kC = float(kC)
+		self.kC = int(kC)
 		self.carb = float(carb)
 		self.prot = float(prot)
 		self.fat = float(fat)
@@ -14,26 +14,34 @@ class Yemek:
 
 	@staticmethod
 	def printheader():
-		return "     \tkC\tC\tP\tF\tper\tunit\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+		return "\tkC\tC\tP\tF\tper\tunit\n"
 
-	def printout(self,header=False):
+	def printout(self,header=False, buffer=0):
 		text=""
+		outname=self.name
+		
 		if header:
 			text=Yemek.printheader()+'\n'
 
-		text += "%s\t%s\t%s\t%s\t%s\t%s\t%s" % (
-			self.name, self.kC, self.carb,
+		if buffer!=0:
+			fill = buffer-len(self.name)
+			outname = self.name+(' '*fill)
+
+#		text += "%s\t%d\t%4f\t%4f\t%4f\t%3f\t%s" % (
+		text += "%s\t%d\t%s\t%s\t%s\t%s\t%s" % (
+			outname, int(self.kC), self.carb,
 			self.prot, self.fat, self.per, self.unit)
 		return text
 	
 	def scaled(self):
-		scalef = Yemek(self) # dupe
-		multip = float(amount)/self.per	
+		multip = float(self.amount)/self.per
+		# Dupe, never edit self
+		selfy = Yemek(self.name, self.kC, self.carb, self.prot, self.fat, self.per, self.unit)
 		
-		scalef.kC *= multip
-		scalef.carb *= multip
-		scalef.prot *= multip
-		scalef.fat *= multip
-		scalef.per *= multip
+		selfy.kC = int( selfy.kC * multip)
+		selfy.carb *= multip
+		selfy.prot *= multip
+		selfy.fat *= multip
+		selfy.per *= multip
 
-		return scalef;
+		return selfy

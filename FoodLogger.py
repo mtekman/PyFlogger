@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from os import path
+from os.path import expanduser, abspath
 from time import localtime as time
 import sys
 
@@ -9,7 +9,7 @@ from Yemek import Yemek
 from copy import copy
 
 class FoodLogger:
-	def __init__(self, file=path.expanduser("~/")+".config/keto_foodlog.txt"):
+	def __init__(self, file=abspath("../")+"/logs/keto_foodlog.txt"):
 		self.foodlog=[]
 		self.path= file
 		self.foodlist = FoodList() # i.e. ref FoodList cobj
@@ -22,7 +22,7 @@ class FoodLogger:
 			f=open(self.path,'r')
 		except IOError:
 			f=open(self.path,'w')
-			f.write(" ")
+			f.write("Date            \tAmn\tFood Name ")
 			f.close()
 			return
 		
@@ -31,7 +31,7 @@ class FoodLogger:
 		for line in f:
 			if len(line) < 5:
 				continue
-			ddate, amount, name = line.split('|')
+			ddate, amount, name = line.split('\t')
 			if date[0:10] == ddate[0:10]:
 				#Find food if date matches
 				food = copy(self.foodlist.foodmap[name.strip()])
@@ -52,33 +52,35 @@ class FoodLogger:
 			print >> sys.stderr, "nothing logged for that day!"
 			exit(-1)
 
-		print >> sys.stderr, Yemek.printheader()
+		maxlen_foodname=len(reduce(lambda x,y: ( x if (len(x.name) > len(y.name)) else y ), self.foodlog).name)
+		print >> sys.stderr, ' '*maxlen_foodname, Yemek.printheader()
 
 		for y in self.foodlog:
-			scale = y.amount 
+			scyem = y.scaled()
+		
+			kC_total += scyem.kC
+			carb_total += scyem.carb
+			protein_total += scyem.prot
+			fat_total += scyem.fat
 
-			kC_total += y.kC
-			carb_total += y.carb
-			protein_total += y.prot
-			fat_total += y.fat
+			print >> sys.stderr, scyem.printout(buffer=maxlen_foodname), "\tam=%2f" % float(y.amount)
 
-			print >> sys.stderr, y.printout(False)
-		print >> sys.stderr, "Totals:\t%s\t%s\t%s\t%s" % (kC_total, carb_total, protein_total, fat_total)
+		print >> sys.stderr, "\nTotals:\t%d\t%s\t%s\t%s" % (int(kC_total), carb_total, protein_total, fat_total)
 
 
 	def log(self):
 		name = raw_input("Food: ").strip()
 		name = self.foodlist.info(name) # find match
 		
-		am = float(raw_input("amount consumed? ").strip())
+		am = float(raw_input("\nAmount Consumed? ").strip())
 		dater = "%04d/%02d/%02d--%02d:%02d" % time()[0:5]
 
 		f=open(self.path,'a')
-		print >> f, "%s|%f|%s" % (dater,am,name)
+		print >> f, "%s\t%f\t%s" % (dater,am,name)
 		f.close()
 		
 		self.showTotals(self.date)
 
 w=FoodLogger()
-w.log()
-#w.showTotals(w.date)
+#w.log()
+w.showTotals(w.date)
