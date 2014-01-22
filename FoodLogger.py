@@ -54,7 +54,11 @@ class FoodLogger:
 			exit(-1)
 
 		maxlen_foodname=len(reduce(lambda x,y: ( x if (len(x.name) > len(y.name)) else y ), self.foodlog).name)
-		print >> sys.stderr, ' '*maxlen_foodname, Yemek.printheader()
+		print >> sys.stderr, '\n'*10
+
+
+		print >> sys.stderr, ' '*maxlen_foodname,Yemek.printheader().strip()
+		print >> sys.stderr, '-'*50
 		
 		for y in self.foodlog:
 			scyem = y.scaled()
@@ -82,6 +86,7 @@ class FoodLogger:
 		print >> f, "%s\t%.1f\t%s" % (dater,am,name)
 		f.close()
 		
+		print >> sys.stderr, "\n\n"
 		self.showTotals(self.date)
 
 w=FoodLogger()
