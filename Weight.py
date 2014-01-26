@@ -4,11 +4,70 @@ import sys
 from time import localtime, time
 from os.path import abspath
 
+#Global method
+def ynprompt(message):
+	ans = raw_input(message)
+	return (ans[0].lower()=='y')
+
 class Weight:
 	def __init__(self,morning=-1,night=-1):
 		self.morn = morning
 		self.night = night
+		
+	def overwriteprompt(self,morning, lbls):
+		print "Weight already exists for", ("morning" if morning else "night"),":"
+		print >> sys.stderr, self.printout()
+		if ynprompt("Overwrite?"):
+			if morning:
+				self.morn = lbls
+			else:
+				self.night = lbls
+			print >> sys.stderr, self.printout()
+		else:
+			print "not overwritten"
 
+	def set(self,lbls, morning):
+		if morning:
+			if self.morn==-1:
+				self.morn = lbls
+			else:
+				overwriteprompt(morning,lbls)
+		else:
+			if self.night==-1:
+				self.night = lbls
+			else:
+				overwriteprompt(not(morning),lbls)
+		print self.printout(True)
+####Public Methods ####
+	@staticmethod
+	def printheader():
+		return '\n'+('='*39)+\
+			"\nDate     \tMorn\tNight"	#print header
+
+	def printout(self, header=False):
+		resil=""
+		if header:
+			resil=Weight.printheader()+'\n'
+		return resil+("\t%d\t%d" % (self.morn, self.night))
+				
+	def update(self,lbls,manual=False,morning=False):
+		if manual:
+			self.set(lbls,morning)
+		else:
+			if self.morn==-1:
+				self.set(lbls,True)
+			elif self.night==-1:
+				self.set(lbls,False)
+			else:
+				print "Weight complete for this day"
+				self.printout()
+				if ynprompt("Overwrite day?"):
+					self.morn=-1
+					self.night=-1
+					self.update(lbls,manual,morning)
+
+
+		
 class WeightLog:
 	def __init__(self,file=abspath("../")+"/logs/keto_weightlog.txt"):
 		self.weightlogmap={}
@@ -55,17 +114,13 @@ class WeightLog:
 		
 		#Start point
 		index = availdates.index(date)
-
-		print >> sys.stderr, '\n'
-		print >> sys.stderr, '='*39
-		print >> sys.stderr, "Date     \tMorn\tNight"	#print header
+		print >> sys.stderr, Weight.printheader()	#print header
 
 		# Print all dates from that day forward
 		# For today it is a single date
 		for dated in availdates[index:]:
 			w = self.weightlogmap[dated]
-			print >> sys.stderr, "%s\t%d\t%d%s" % (dated, w.morn, w.night,\
-				"   <--" if date==dated else "")
+			print >> sys.stderr, w.printout(), ("   <--" if date==dated else " ")
 
 
 
@@ -133,6 +188,7 @@ class WeightLog:
 
 			if self.nighttime==False:
 				if w.morn==-1:
+					w.update(lbls)
 					self.weightlogmap[date].morn = lbls
 					print >> sys.stderr, "[Logged Morning lb]"
 					return 0
@@ -144,7 +200,7 @@ class WeightLog:
 				
 
 			if w.night==-1 and self.nighttime:
-				self.weightlogmap[date].night = lbls
+				self.weightlogmap[date].update(lbls,True,False)
 				print >> sys.stderr, "[Logged Night lb]"
 				return 0
 				
