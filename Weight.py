@@ -9,41 +9,19 @@ def ynprompt(message):
 	ans = raw_input(message)
 	return (ans[0].lower()=='y')
 
+
+
 class Weight:
 	def __init__(self,morning=-1,night=-1):
 		self.morn = morning
 		self.night = night
 		
-	def overwriteprompt(self,morning, lbls):
-		print "Weight already exists for", ("morning" if morning else "night"),":"
-		print >> sys.stderr, self.printout()
-		if ynprompt("Overwrite?"):
-			if morning:
-				self.morn = lbls
-			else:
-				self.night = lbls
-			print >> sys.stderr, self.printout()
-		else:
-			print "not overwritten"
 
-	def set(self,lbls, night):
-		if not(night):
-			if self.morn==-1:
-				self.morn = lbls
-			else:
-				self.overwriteprompt(night,lbls)
-		else:
-			if self.night==-1:
-				self.night = lbls
-			else:
-				self.overwriteprompt(not(night),lbls)
-#		print self.printout(True)
-	
-	####Public Methods ####
 	@staticmethod
 	def printheader():
 		return '\n'+('='*39)+\
 			"\nDate     \tMorn\tNight"	#print header
+
 
 	def printout(self, header=False):
 		resil=""
@@ -51,21 +29,27 @@ class Weight:
 			resil=Weight.printheader()+'\n'
 		return resil+("%d\t%d" % (self.morn, self.night))
 				
-	def update(self,lbls,isNighttime):
-		if isNighttime:
-			if self.morn==-1:
-				print "Daytime Weight not set"
-				if ynprompt("Set morning lbls instead? "):
-					self.set(lbls,False)
-					return
-					
-			self.set(lbls,True)
-			return
-			
-		#Otherwise it's daytime
-		self.set(lbls,True)
-		return
-		
+				
+	def set(lbls, setmorn):
+		if setmorn:
+			if self.morn!=-1:
+				print "Morning already set:"
+				print printout
+				if (ynmprompt('Overwrite? '):
+					self.morn = lbls
+			else:
+				self.morn = lbls
+		else:
+			if self.night!=-1:
+				print "Night already set:"
+				print printout
+				if (ynmprompt('Overwrite? '):
+					self.night = lbls
+			else:
+				self.night = lbls
+		self.printout(True)
+	
+	
 		
 class WeightLog:
 	def __init__(self,file=abspath("../")+"/logs/keto_weightlog.txt"):
@@ -78,36 +62,8 @@ class WeightLog:
 		self.nighttime= (self.date[4] > 20)
 
 		self.read()
+
 		
-	def logprompt(self):
-		self.checkYesterNight()
-		print >> sys.stderr, "\nToday's log:"
-	
-		self.log(self.today, self.nighttime)
-
-
-	def log(self, date, nightime, lbls=-1):	
-		d_str=""
-		if date==self.today:
-			d_str="this morning" if (not nightime) else "tonight"
-		elif date==self.yesterday:
-			d_str="yesterday morning" if (not nightime) else "last night"
-		else:
-			d_str=date
-
-		if lbls==-1:
-			lbls=float(raw_input('Please give input for %s : ' % d_str))
-		
-		if date in self.weightlogmap:
-			self.weightlogmap[date].update(lbls,nightime)			
-		else:
-			w=Weight()
-			w.update(lbls,nightime)
-			self.weightlogmap[date]=w
-
-		self.write()
-		self.display(date)
-
 	def read(self):
 		try:
 			f=open(self.path,'r')
@@ -116,7 +72,6 @@ class WeightLog:
 			f.write("")
 			f.close()
 			return
-		
 		
 		f.readline()	#Skip header
 		for weight in f:
@@ -136,6 +91,7 @@ class WeightLog:
 			print >> f, "%s\t%s\t%s" % (date, w.morn, w.night)
 		f.close()
 
+
 	def display(self, date):
 		# Dates in order
 		availdates= sorted(self.weightlogmap.keys())
@@ -151,47 +107,51 @@ class WeightLog:
 			print >> sys.stderr, "%s\t%s %s" % (dated, w.printout(), ("   <--" if date==dated else " "))
 
 
-
 	def nextDay(self, date):
 		return ("%04d/%02d/%02d" % localtime(time()+(24*60*60))[0:3])
 
 
-	def checkYesterNight(self):
-		# only checking for INCOMPLETE yesterdays (i.e no yesterday, no problem)
-		if self.yesterday in self.weightlogmap:
-			w = self.weightlogmap[self.yesterday]
-			if w.night==-1:
-				print >> sys.stderr, "Nothing logged for last night,",
-				if ynprompt(" log that instead? "):
-					self.log(self.yesterday,True)
-				else:
-					print >> sys.stderr, "Ignoring"
-					self.log(self.yesterday,True,0)
-#					self.weightlogmap[self.yesterday].night=0
+	def log(self, date, lbls, ismorning):
+		w=""
 
-	def checkTodayGaps(self):
-		if self.today in self.weightlogmap:
-			w = self.weightlogmap[self.today]
+		if date in self.weightlogmap:
+			w = self.weightlogmap[date]
+		else:
+			w = Weight()
+	
+		w.set(lbls, ismorning )
+		self.weightlogmap[date] = w
+		self.write()
+	
 
-			if w.morn!=-1 and w.night!=-1:
-				print >> sys.stderr, "Date logged already:"
-				self.display(self.today)
-				if ynprompt("Delete? "):
-					self.weightlogmap.pop(self.today)
-					print >> sys.stderr, "\rDeleted record"
-					return 0
-				return -1
-
-
-			if w.morn==-1 and self.nighttime:
-				print >> sys.stderr, "Nothing logged for this morning.",
-				if ynprompt("Prepend? "):
-					self.log(self.today,morning=True)
-					return 0
+	def logprompt(date=self.date, isDay=not(self.nighttime) ):
+		#Get day string
+		day=date
+		if date==self.date:
+			day="today"
+		elif date==self.yesterday
+			day="yesterday"
+		
+		#Get time of day string
+		tod= "night" if not(isDay) else "morning"
+		
+		#Input
+		lbls= float(raw_input('Please enter weight for %s %s: ' % (day,tod)).strip())
+		
+		self.log(date, lbls, isDay)
 
 
-
+###to implement##
+	def checkGaps(self):
+		self.checkLastNight()
+		
+		if not(self.nighttime):
+			self.checkThisMorning()
+		else:
+			self.checkToday()
+	
 
 
 wl = WeightLog()
 wl.logprompt()
+
