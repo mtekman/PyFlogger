@@ -66,6 +66,7 @@ class FoodList:
 		self.write()
 
 	def insert(self,name):
+		print "Inserting new food:", name
 		per,unit = FoodList.amountsplit(raw_input("Per,Unit (e.g. '100g'): ").strip())
 		kc, carb, prot, fat = raw_input("kCal, Carb, Protein, Fat: ").split(',')
 		
@@ -148,6 +149,8 @@ class FoodList:
 			if ans[0].lower()=='y':
 				name = found[0]
 				print >> sys.stderr,  self.foodmap[name].printout(header=True)
+			else:
+				self.insert(name)
 			return name
 	
 		# Multiple results
@@ -162,7 +165,8 @@ class FoodList:
 		if ans != 0:
 			name = found[ans-1]
 			print >> sys.stderr,  self.foodmap[name].printout(header=True)
-
+		else:
+				self.insert(name)
 		return name
 				
 

@@ -1,13 +1,7 @@
 #!/usr/bin/env python
 
-import sys
 from time import localtime, time
-from os.path import abspath
-
-#Global method
-def ynprompt(message):
-	ans = raw_input(message)
-	return (ans[0].lower()=='y')
+from Common import *
 
 
 class Weight:
@@ -62,7 +56,7 @@ class WeightLog:
 		self.date = localtime()
 		self.today = "%04d/%02d/%02d" % self.date[0:3]
 		self.yesterday= "%04d/%02d/%02d" % localtime(time()-(24*60*60))[0:3]
-		self.nighttime= (self.date[3] > 20)
+		self.nighttime= (self.date[3] >= 19)
 		self.read()
 
 		

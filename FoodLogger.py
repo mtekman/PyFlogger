@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-from os.path import expanduser, abspath
-from time import localtime as time
-import sys
+from Common import *
 
 from FoodList import FoodList
 from Yemek import Yemek
@@ -14,7 +12,7 @@ class FoodLogger:
 		self.foodlog=[]
 		self.path= file
 		self.foodlist = FoodList() # i.e. ref FoodList cobj
-		self.date = "%04d/%02d/%02d--%02d:%02d" % time()[0:5]
+		self.date = "%04d/%02d/%02d--%02d:%02d" % localtime()[0:5]
 
 	# any date
 	def read(self,date):
@@ -80,7 +78,7 @@ class FoodLogger:
 		name = self.foodlist.info(name) # find match
 		
 		am = float(raw_input("\nAmount Consumed? ").strip())
-		dater = "%04d/%02d/%02d--%02d:%02d" % time()[0:5]
+		dater = "%04d/%02d/%02d--%02d:%02d" % localtime()[0:5]
 
 		f=open(self.path,'a')
 		print >> f, "%s\t%.1f\t%s" % (dater,am,name)
@@ -90,5 +88,5 @@ class FoodLogger:
 		self.showTotals(self.date)
 
 w=FoodLogger()
-#w.log()
-w.showTotals(w.date)
+w.log()
+#w.showTotals(w.date)

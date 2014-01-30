@@ -66,8 +66,8 @@ class WeightPlot:
     self.max_y = ysorted[-1][1]
 
   def determineGrid(self):
-     self.xspace_per_int = (self.cols-(2*self.marg))/(self.max_x - self.min_x)
-     self.yspace_per_int = (self.rows-(2*self.marg))/(self.max_y - self.min_y)
+     self.xspace_per_int = ((self.cols-(2*self.marg))/(self.max_x - self.min_x))
+     self.yspace_per_int = ((self.rows-(2*self.marg))/(self.max_y - self.min_y))
 
                                                          
 w = WeightPlot([[2,5],\
