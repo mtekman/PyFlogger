@@ -21,10 +21,13 @@ class Printer:
 		ylen= len(self.exgrid)
 		xlen= len(self.exgrid[0])
 		
-		print '#'* len(self.exgrid[0])
+		
+		#title
+		print ' '*((self.columns/2)-5),"W/T chart",' '*((self.columns/2)-9)
+		print "    ", '='*(self.columns), ' '*4
+
 		for row in reversed(self.exgrid):
 			print "".join(row)
-		print '#'* len(self.exgrid[0])
 
 		
 class Point:
@@ -70,6 +73,51 @@ class XYGraph:
 			print "Dupe point", x,y
 
 
+	def text2Array(self, text, array, start=0):
+		if len(array) < len(text):
+			array += [' ']* (len(text)-len(array))
+	
+		for x in xrange(len(text)):
+			try:
+				array[start+x] = text[x]
+			except IndexError:
+				pass
+
+
+	
+	def setAxes(self):
+
+		#Y-axis
+		for r in xrange(len(self.grid)):
+			self.grid[r] = [' ',' ',' ',' ','|'] + self.grid[r]
+			
+			if r%3==1:
+				coordY = "%.2f" % (self.minY + (float(r) / self.scaleY)) 
+				self.text2Array(' '+str(coordY)+'_', self.grid[r] )
+
+
+		#X-axis
+		grid_row	= ['-'] * (len(self.grid[0])-3)
+		hyphen_row = [' '] * (len(self.grid[0]))
+		number_row = [' '] * (len(self.grid[0]))
+
+		for r in xrange(len(self.grid[0])):
+		
+			if r%5==0:
+				hyphen_row[r] = '\\'
+				coordX = int(self.minX + (float(r) / self.scaleX)) 
+				self.text2Array( str(coordX), number_row, r )
+		
+		# Add margins
+		grid_row	= ([' ']*5) + grid_row
+		hyphen_row	= ([' ']*5) + hyphen_row
+		number_row	= ([' ']*5) + number_row
+		
+		self.grid = [grid_row] + self.grid
+		self.grid = [hyphen_row] + self.grid
+		self.grid = [number_row] + self.grid
+				
+
 	def scaleGrid(self, rows,cols):
 
 		self.grid=[]
@@ -83,31 +131,31 @@ class XYGraph:
 		xlen= self.maxX-self.minX
 		ylen= self.maxY-self.minY
 		
-		scaleX = (float(cols-1)/xlen)  #(float(xlen)/cols)
-		scaleY = (float(rows-1)/ylen)  #(float(ylen)/rows)+1
+		self.scaleX = (float(cols-1)/xlen)  #(float(xlen)/cols)
+		self.scaleY = (float(rows-1)/ylen)  #(float(ylen)/rows)+1
 
 		for p in self.points:
-			coordX = int(float(p.x - self.minX) * scaleX )
-			coordY = int(float(p.y - self.minY) * scaleY )
+			coordX = int(float(p.x - self.minX) * self.scaleX )
+			coordY = int(float(p.y - self.minY) * self.scaleY )
 			
-			print '(',p.x,',',p.y,')--D', coordX, coordY, p.val
-			
-			if coordX > cols-4:
-				plotval="[%s]__." % p.val
-				self.grid[coordY][coordX-len(plotval)] = plotval
+			row_i = self.grid[coordY]
+#			plotval = "[%s=%.1f,%.1f]" % (p.val, p.x, p.y)
+			plotval = "%s" % p.val
+
+			if coordX > cols-10:
+				plotval += "__."
+				self.text2Array( plotval, row_i, coordX-len(plotval) )
 			else:
-				self.grid[coordY][coordX] = ".__[%s]" % p.val
+				plotval = ".__" + plotval
+				self.text2Array( plotval, row_i, coordX )
 		
-		
+		self.setAxes()
 				
 
 		
-
-
-xy = XYGraph()
-xy.addPoint(10,10,"a")
-xy.addPoint(20,20,"b")
-xy.addPoint(30,30,"c")
-xy.addPoint(40,40,"d")
-
-p = Printer(xy)
+#xy = XYGraph()
+#xy.addPoint(10.9,10,"a")
+#xy.addPoint(20,20.2,"b")
+#xy.addPoint(30.3,30,"c")
+#xy.addPoint(40,40.4,"d")
+#p = Printer(xy)

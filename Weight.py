@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from time import localtime, time
+from Plotter import *
 from Common import *
 
 
@@ -181,5 +182,23 @@ class WeightLog:
 	def checkToday(self):
 		wl.logprompt(self.today, isDay=not(self.nighttime))
 
+
 wl = WeightLog()
-wl.checkGaps()
+#wl.checkGaps()
+
+xy = XYGraph()
+
+for date in sorted(wl.weightlogmap.keys()):
+	y,m,d = map(lambda x: int(x), date.split('/'))
+	y = y*10000
+	m = m*100
+	total= y + m + d
+	
+	w = wl.weightlogmap[date]
+	if w.morn>0:
+		xy.addPoint(total,w.morn,"x")
+	if w.night>0:
+		xy.addPoint(total+.5,w.night,"x")
+	
+p = Printer(xy)
+
