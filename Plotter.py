@@ -103,9 +103,10 @@ class XYGraph:
 
 		for r in xrange(len(self.grid[0])):
 		
-			if r%5==0:
+			coordX = int(self.minX + (float(r) / self.scaleX)) 
+			
+			if r%(len(str(coordX))+2)==0:
 				hyphen_row[r] = '\\'
-				coordX = int(self.minX + (float(r) / self.scaleX)) 
 				self.text2Array( str(coordX), number_row, r )
 		
 		# Add margins

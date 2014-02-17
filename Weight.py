@@ -104,6 +104,17 @@ class WeightLog:
 			print >> sys.stderr, "%s\t%s %s" % (dated, w.printout(), ("   <--" if date==dated else " "))
 
 
+	def daysSince(self, date1,date2):
+		y1,m1,d1 = map(lambda x: int(x), date.split('/'))
+		y2,m2,d2 = map(lambda x: int(x), date.split('/'))
+	
+		dayyears= (y2-y1)*365.25
+		daymonth= (m2-m1)*(float(365.25)/12)
+		dayday = (d2-d1)
+		
+		return dayday+daymonth+dayyears
+
+
 	def nextDay(self, date):
 		return ("%04d/%02d/%02d" % localtime(time()+(24*60*60))[0:3])
 
@@ -188,11 +199,14 @@ wl = WeightLog()
 
 xy = XYGraph()
 
+startdate=""
 for date in sorted(wl.weightlogmap.keys()):
-	y,m,d = map(lambda x: int(x), date.split('/'))
-	y = y*10000
-	m = m*100
-	total= y + m + d
+
+	if startdate=="":
+		startdate=date
+
+	days_since = wl.daysSince(startdate,date)
+	total = days_since
 	
 	w = wl.weightlogmap[date]
 	if w.morn>0:
