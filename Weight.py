@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from time import localtime, time
+from time import localtime, time, mktime
 from Plotter import *
 from Common import *
 
@@ -24,7 +24,7 @@ class Weight:
 			
 		if filler:
 			resil += "             \t"
-		return resil+("%d\t%d" % (self.morn, self.night))
+		return resil+("%.1f\t%.1f" % (self.morn, self.night))
 	
 				
 	def set(self, lbls, setmorn, finalprint=False):
@@ -89,12 +89,19 @@ class WeightLog:
 		f.close()
 
 
-	def display(self, date):
+	def display(self, date, lastSeven=False):
 		# Dates in order
 		availdates= sorted(self.weightlogmap.keys())
 		
 		#Start point
 		index = availdates.index(date)
+		
+		#Last7
+		if lastSeven:
+			index -= 7
+			if index < 0:
+				index = 0
+		
 		print >> sys.stderr, Weight.printheader()	#print header
 
 		# Print all dates from that day forward
@@ -105,15 +112,14 @@ class WeightLog:
 
 
 	def daysSince(self, date1,date2):
-		y1,m1,d1 = map(lambda x: int(x), date.split('/'))
-		y2,m2,d2 = map(lambda x: int(x), date.split('/'))
-	
-		dayyears= (y2-y1)*365.25
-		daymonth= (m2-m1)*(float(365.25)/12)
-		dayday = (d2-d1)
+		y1,m1,d1 = map(lambda x: int(x), date1.split('/'))
+		y2,m2,d2 = map(lambda x: int(x), date2.split('/'))
 		
-		return dayday+daymonth+dayyears
-
+		seconds1 = mktime((y1,m1,d1,0,0,0,0,0,-1))
+		seconds2 = mktime((y2,m2,d2,0,0,0,0,0,-1))
+		
+		diff = seconds2 - seconds1
+		return float(diff)/(24*60*60)
 
 	def nextDay(self, date):
 		return ("%04d/%02d/%02d" % localtime(time()+(24*60*60))[0:3])
@@ -143,16 +149,16 @@ class WeightLog:
 		#Input
 		lbls= float(raw_input('Please enter input for %s%s: ' % (day,tod)).strip())		
 		self.log(date, lbls, isDay)
-		self.display(date)
+		self.display(date, lastSeven=True)
 
 
 	def checkGaps(self):
 		if self.checkLastNight():
 			return
 		
-		if not(self.nighttime):
-			if self.checkThisMorning():
-				return
+#		if not(self.nighttime):
+		if self.checkThisMorning():
+			return
 			
 		self.checkToday()
 
@@ -169,7 +175,16 @@ class WeightLog:
 			if not(self.nighttime) and w.morn!=-1:
 				self.logprompt(self.today, isDay=True)
 				return True
-		return False #nothing changed
+		
+			return False #nothing changed
+
+		#Else log a new morning at night
+		if self.nighttime:
+				print "Night now, morning not set"
+				if (ynprompt('Set morning? ')):
+					self.logprompt(self.today, isDay=True)
+					return True
+		return False #nothing changed		
 
 	def checkLastNight(self):
 		if self.yesterday in self.weightlogmap:
@@ -194,9 +209,13 @@ class WeightLog:
 		wl.logprompt(self.today, isDay=not(self.nighttime))
 
 
-wl = WeightLog()
-#wl.checkGaps()
 
+
+
+wl = WeightLog()
+wl.checkGaps()
+
+exit(0)
 xy = XYGraph()
 
 startdate=""
@@ -204,9 +223,12 @@ for date in sorted(wl.weightlogmap.keys()):
 
 	if startdate=="":
 		startdate=date
-
+		continue
+		
 	days_since = wl.daysSince(startdate,date)
 	total = days_since
+	
+#	print date,total
 	
 	w = wl.weightlogmap[date]
 	if w.morn>0:
