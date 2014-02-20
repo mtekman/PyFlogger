@@ -206,35 +206,35 @@ class WeightLog:
 		return False #nothing changed
 
 	def checkToday(self):
-		wl.logprompt(self.today, isDay=not(self.nighttime))
+		self.logprompt(self.today, isDay=not(self.nighttime))
 
 
 
 
 
-wl = WeightLog()
-wl.checkGaps()
+#wl = WeightLog()
+#wl.checkGaps()
 
-exit(0)
-xy = XYGraph()
+#exit(0)
+#xy = XYGraph()
 
-startdate=""
-for date in sorted(wl.weightlogmap.keys()):
-
-	if startdate=="":
-		startdate=date
-		continue
-		
-	days_since = wl.daysSince(startdate,date)
-	total = days_since
+#startdate=""
+#for date in sorted(wl.weightlogmap.keys()):
+#
+#	if startdate=="":
+#		startdate=date
+#		continue
+#		
+#	days_since = wl.daysSince(startdate,date)
+#	total = days_since
 	
 #	print date,total
 	
-	w = wl.weightlogmap[date]
-	if w.morn>0:
-		xy.addPoint(total,w.morn,"x")
-	if w.night>0:
-		xy.addPoint(total+.5,w.night,"x")
+#	w = wl.weightlogmap[date]
+#	if w.morn>0:
+#		xy.addPoint(total,w.morn,"x")
+#	if w.night>0:
+#		xy.addPoint(total+.5,w.night,"x")
 	
-p = Printer(xy)
+#p = Printer(xy)
 

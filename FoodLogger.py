@@ -70,6 +70,16 @@ class FoodLogger:
 
 		print >> sys.stderr,'\n',' '*(maxlen_foodname-8),
 		print >> sys.stderr, "Totals:\t%d\t%s\t%s\t%s" % (int(kC_total), carb_total, protein_total, fat_total)
+		
+		#Allowed
+		#1350	18	76	75
+		kC_total -= 1350
+		carb_total -= 18
+		protein_total -= 76
+		fat_total -= 75
+		
+		print >> sys.stderr,'\n',' '*(maxlen_foodname-8),
+		print >> sys.stderr, "Allow:\t%d\t%s\t%s\t%s" % (int(-kC_total), -carb_total, -protein_total, -fat_total)		
 		self.foodlog = [] # clear until next
 
 
@@ -87,6 +97,6 @@ class FoodLogger:
 		print >> sys.stderr, "\n\n"
 		self.showTotals(self.date)
 
-w=FoodLogger()
-w.log()
+#w=FoodLogger()
+#w.log()
 #w.showTotals(w.date)

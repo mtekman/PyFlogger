@@ -92,7 +92,7 @@ class XYGraph:
 			self.grid[r] = [' ',' ',' ',' ','|'] + self.grid[r]
 			
 			if r%3==1:
-				coordY = "%.2f" % (self.minY + (float(r) / self.scaleY)) 
+				coordY = "%.1f" % (self.minY + (float(r) / self.scaleY)) 
 				self.text2Array(' '+str(coordY)+'_', self.grid[r] )
 
 
@@ -143,17 +143,19 @@ class XYGraph:
 #			plotval = "[%s=%.1f,%.1f]" % (p.val, p.x, p.y)
 			plotval = "%s" % p.val
 
-			if coordX > cols-10:
-				plotval += "__."
-				self.text2Array( plotval, row_i, coordX-len(plotval) )
-			else:
-				plotval = ".__" + plotval
-				self.text2Array( plotval, row_i, coordX )
+#			if coordX > cols-10:
+#				plotval += "__."
+#				self.text2Array( plotval, row_i, coordX-len(plotval) )
+#			else:
+#				plotval = ".__" + plotval
+#				self.text2Array( plotval, row_i, coordX )
+			self.text2Array( plotval, row_i, coordX )
 		
 		self.setAxes()
 				
 
-		
+
+
 #xy = XYGraph()
 #xy.addPoint(10.9,10,"a")
 #xy.addPoint(20,20.2,"b")
