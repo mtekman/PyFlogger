@@ -2,7 +2,7 @@
 
 class Yemek:
 
-	def __init__(self, name, kC, carb, prot, fat, per, unit, amount=0):
+	def __init__(self, name, kC, carb, prot, fat, per, unit, amount=0, url=""):
 		self.name = name
 		self.kC = int(kC)
 		self.carb = float(carb)
@@ -11,6 +11,7 @@ class Yemek:
 		self.per = float(per)
 		self.unit = unit.strip()
 		self.amount = float(amount)
+		self.url = url
 
 	@staticmethod
 	def printheader():
