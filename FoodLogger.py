@@ -55,8 +55,8 @@ class FoodLogger:
 		print >> sys.stderr, '\n'*10
 
 
-		print >> sys.stderr, ' '*maxlen_foodname,Yemek.printheader().strip()
-		print >> sys.stderr, '-'*50
+		print >> sys.stderr, Yemek.printheader(buffer=maxlen_foodname)
+		print >> sys.stderr, '-'*70
 		
 		for y in self.foodlog:
 			scyem = y.scaled()
@@ -66,7 +66,7 @@ class FoodLogger:
 			protein_total += scyem.prot
 			fat_total += scyem.fat
 
-			print >> sys.stderr, scyem.printout(buffer=maxlen_foodname), "%.1f" % float(y.amount)
+			print >> sys.stderr, scyem.printout(buffer=maxlen_foodname)
 
 		print >> sys.stderr,'\n',' '*(maxlen_foodname-8),
 		print >> sys.stderr, "Totals:\t%d\t%s\t%s\t%s" % (int(kC_total), carb_total, protein_total, fat_total)

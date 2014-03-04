@@ -8,14 +8,18 @@ class Yemek:
 		self.carb = float(carb)
 		self.prot = float(prot)
 		self.fat = float(fat)
-		self.per = float(per)
+		try:
+			self.per = float(per)
+		except ValueError:
+			up,down = map(lambda x: float(x), per.split('/'))
+			self.per = up/down
 		self.unit = unit.strip()
 		self.amount = float(amount)
 		self.url = url
 
 	@staticmethod
-	def printheader():
-		return "\tkC\tC\tP\tF\tper\tunit\n"
+	def printheader(buffer=0):
+		return (' '*buffer)+"\tkC\tC\tP\tF\tper\tunit\n"
 
 	def printout(self,header=False, buffer=0):
 		text=""
@@ -28,8 +32,7 @@ class Yemek:
 			fill = buffer-len(self.name)
 			outname = self.name+(' '*fill)
 
-#		text += "%s\t%d\t%4f\t%4f\t%4f\t%3f\t%s" % (
-		text += "%s\t%d\t%s\t%s\t%s\t%s\t%s" % (
+		text += "%s\t%d\t%.1f\t%.1f\t%.1f\t%.1f\t%s" % (
 			outname, int(self.kC), self.carb,
 			self.prot, self.fat, self.per, self.unit)
 		return text
