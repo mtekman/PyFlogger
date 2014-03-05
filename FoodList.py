@@ -3,6 +3,7 @@
 import sys
 from Yemek import Yemek
 from os.path import abspath
+import Common
 
 class FoodList:
 	def __init__(self,file=abspath("../")+"/logs/keto_foodlist.txt"):
@@ -48,16 +49,6 @@ class FoodList:
 			fooditem = self.foodmap[food]
 			print >> sys.stderr, fooditem.printout() #.strip()
 
-	@staticmethod
-	def amountsplit(text):
-		text= text.strip()
-		index_let=0
-		for a in text:
-			if not(48 <= ord(a) <= 57):
-				break
-			index_let +=1
-		return text[0:index_let].strip(), text[index_let:].splitlines()[0].strip()
-
 
 	def insertAll(self, name, kc, carb, prot, fat ,per, unit):
 		name = name.strip().lower()
@@ -67,7 +58,7 @@ class FoodList:
 
 	def insert(self,name):
 		print "Inserting new food:", name
-		per,unit = FoodList.amountsplit(raw_input("Per,Unit (e.g. '100g'): ").strip())
+		per,unit = Common.amountsplit(raw_input("Per,Unit (e.g. '100g'): ").strip())
 		kc, carb, prot, fat = raw_input("kCal, Carb, Protein, Fat: ").split(',')
 		
 		self.insertAll(name, kc, carb, prot, fat, per, unit)

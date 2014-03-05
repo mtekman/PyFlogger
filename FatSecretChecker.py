@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-import sys, re
+import sys, re, Common
 from Yemek import Yemek
-from urllib2 import urlopen as uopen
+from urllib2 import urlopen as uopen, URLError
 
 class HTMLMethods:
 	@staticmethod
@@ -21,32 +21,49 @@ class FHandler:
 	def __init__(self, query):
 		print >> sys.stderr, "Checking online...",
 		self.query = HTMLMethods.toHTMLChars(query)
-		self.pagedata = uopen(FHandler.static_url+query).read()
-		# offline saved
-#		self.pagedata = open("/home/user/MyDocs/.documents/mcds.html").read()
+
+#		print FHandler.static_url+query
+
+#		try:
+#			self.pagedata = uopen(FHandler.static_url+query).read()
+#		except URLError:
+#			print " stopped, no connection?"
+#			exit(-1)
+
+#		# offline saved
+		self.pagedata = open("test2.html").read()
 		print >> sys.stderr, "found results:",
 		self.results = self.ParseResults()
 		print >> sys.stderr, len(self.results)
 		res = self.resHandler()
 		print "chose:",res.printout()
 
-	def resHandler(self):
+	def resHandler(self, max_split=30):
 		if len(self.results)==0:
 			print "No matches"
 			return
 	
-		maxlen_foodname=len(reduce(lambda x,y: ( x if (len(x.name) > len(y.name)) else y ), self.results).name)
+#		maxlen_foodname=len(reduce(lambda x,y: ( x if (len(x.name) > len(y.name)) else y ), self.results).name)
+		maxlen_foodname=30
 
-		hhh = "%s\t%s" % (' '*maxlen_foodname, Yemek.printheader().strip())
+		hhh = "%s   \t%s" % (' '*maxlen_foodname, Yemek.printheader().strip())
 		print >> sys.stderr, hhh
 		hhh = hhh.replace('\t','    ')
 		print >> sys.stderr, '-'*(len(hhh)-1)
 			    
 		choose=1
 		for x in self.results:
-			print choose,':', x.printout(buffer=maxlen_foodname)
+			res_lines = x.printout(buffer=maxlen_foodname, maxsplit=max_split).split('\n')
+			choose_s = "%d :" % choose
+			print choose_s, res_lines[0]
+
+			del res_lines[0]
+			while len(res_lines)>0:
+				print ' '*(len(choose_s)), res_lines[0]
+				del res_lines[0]
+
 			choose +=1
-		ind = int(raw_input('Please pick a number:'))
+		ind = int(raw_input('Please pick a number: '))
 		return self.results[ind-1]
 	
 	@staticmethod
@@ -55,7 +72,10 @@ class FHandler:
 	
 	@staticmethod
 	def getFacts(meta):
-		n,a = meta.split('per')
+		try:
+			n,a = meta.split("per ")
+		except ValueError:
+			return -1
 		
 		#name
 		n = n.split('>')[1].split('<')[0].strip().replace('\n',"")
@@ -72,8 +92,11 @@ class FHandler:
 		cal = int(cal.split('kc')[0])
 		farc, ca, prot = (float(x.split('g')[0]) for x in (farc,ca,prot))
 		
-		per = per.split()[0].strip()
-		unit = " ".join(per.split()[1:]).strip()
+		per,unit = Common.amountsplit(per)
+
+
+#		per = per.split()[0].strip()
+#		unit = " ".join(per.split()[1:]).strip()
 		
 		return Yemek(n, cal, farc, ca, prot, per, unit)
 	
@@ -94,4 +117,4 @@ class FHandler:
 		return res
 
 
-f = FHandler("macaroni")
+f = FHandler(sys.argv[1])
