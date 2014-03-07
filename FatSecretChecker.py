@@ -24,19 +24,21 @@ class FHandler:
 
 #		print FHandler.static_url+query
 
-#		try:
-#			self.pagedata = uopen(FHandler.static_url+query).read()
-#		except URLError:
-#			print " stopped, no connection?"
-#			exit(-1)
+		try:
+			self.pagedata = uopen(FHandler.static_url+query).read()
+		except URLError:
+			print " stopped, no connection?"
+			exit(-1)
 
 #		# offline saved
-		self.pagedata = open("test2.html").read()
+#		self.pagedata = open("test2.html").read()
+
 		print >> sys.stderr, "found results:",
 		self.results = self.ParseResults()
 		print >> sys.stderr, len(self.results)
 		res = self.resHandler()
-		print "chose:",res.printout()
+		self.found = res
+#		print "chose:",res.printout()
 
 	def resHandler(self, max_split=30):
 		if len(self.results)==0:
@@ -117,4 +119,4 @@ class FHandler:
 		return res
 
 
-f = FHandler(sys.argv[1])
+#f = FHandler(sys.argv[1])

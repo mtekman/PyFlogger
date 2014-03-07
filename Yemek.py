@@ -48,7 +48,8 @@ class Yemek:
 				ind = maxsplit
 				printname = printname[ind:]
 			name_split.append(printname)
-			
+		else:	
+			name_split.append(printname)
 
 		if buffer!=0:
 			fill = buffer-len(name_split[0])

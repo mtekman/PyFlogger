@@ -71,7 +71,7 @@ OPTS:		foodname, lbs
 				return
 
 			if self.list:
-				wl.display( w.weightlogmap.keys()[0] )
+				wl.display( wl.weightlogmap.keys()[0] )
 				return
 			
 			if self.plot:

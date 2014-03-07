@@ -4,6 +4,7 @@ import sys
 from Yemek import Yemek
 from os.path import abspath
 import Common
+import FatSecretChecker
 
 class FoodList:
 	def __init__(self,file=abspath("../")+"/logs/keto_foodlist.txt"):
@@ -127,6 +128,11 @@ class FoodList:
 			ans = raw_input(', insert? ').strip()
 			if ans[0].lower() == 'y':
 				self.insert(name)
+				return name
+			if raw_input('Search online? ').strip()[0].lower()=='y':
+				f = FatSecretChecker.FHandler(name).found
+				self.insertAll(f.name, f.kC, f.carb, f.prot, 
+					f.fat , f.per, f.unit)
 				return name
 			exit(0)
 			
