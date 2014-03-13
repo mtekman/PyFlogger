@@ -146,6 +146,10 @@ class FoodList:
 			if ans[0].lower()=='y':
 				name = found[0]
 				print >> sys.stderr,  self.foodmap[name].printout(header=True)
+			elif raw_input('Search online? ').strip()[0].lower()=='y':
+				f = FatSecretChecker.FHandler(name).found
+				self.insertAll(f.name, f.kC, f.carb, f.prot, 
+					f.fat , f.per, f.unit)
 			else:
 				self.insert(name)
 			return name
@@ -162,6 +166,10 @@ class FoodList:
 		if ans != 0:
 			name = found[ans-1]
 			print >> sys.stderr,  self.foodmap[name].printout(header=True)
+		elif raw_input('Search online? ').strip()[0].lower()=='y':
+			f = FatSecretChecker.FHandler(name).found
+			self.insertAll(f.name, f.kC, f.carb, f.prot, 
+				f.fat , f.per, f.unit)
 		else:
 				self.insert(name)
 		return name

@@ -83,8 +83,9 @@ class FoodLogger:
 		self.foodlog = [] # clear until next
 
 
-	def log(self):
-		name = raw_input("Food: ").strip().lower()
+	def log(self, name=""):
+		if name=="":
+			name = raw_input("Food: ").strip().lower()
 		name = self.foodlist.info(name) # find match
 		
 		am = float(raw_input("\nAmount Consumed? ").strip())

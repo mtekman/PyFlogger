@@ -22,10 +22,10 @@ class FHandler:
 		print >> sys.stderr, "Checking online...",
 		self.query = HTMLMethods.toHTMLChars(query)
 
-#		print FHandler.static_url+query
+#		print FHandler.static_url+self.query
 
 		try:
-			self.pagedata = uopen(FHandler.static_url+query).read()
+			self.pagedata = uopen(FHandler.static_url+self.query).read()
 		except URLError:
 			print " stopped, no connection?"
 			exit(-1)
@@ -117,6 +117,3 @@ class FHandler:
 			res.append(y)
 		
 		return res
-
-
-#f = FHandler(sys.argv[1])

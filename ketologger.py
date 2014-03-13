@@ -11,7 +11,7 @@ class Args:
 		print >> sys.stderr, '''
 Records progress during keto; weight and food consumption
 		
-		%s <command> <task> [OPT]
+		%s <command> <task> [OPT
 
 commands:  	insert, remove, list, plot
 tasks:    	weight, food
@@ -55,10 +55,13 @@ OPTS:		foodname, lbs
 			self.food=True
 		elif arg.startswith('weight'):
 			self.weight=True
+
+		self.opts = " ".join(self.argv[3:])
 	
-
-
+	
+	
 	def callProgs(self):
+
 		if self.weight:
 			wl = WeightLog()
 		
@@ -106,7 +109,7 @@ OPTS:		foodname, lbs
 			fl = FoodLogger()
 			
 			if self.insert:
-				fl.log()
+				fl.log(self.opts)
 				return
 			
 			if self.remove:
@@ -118,4 +121,8 @@ OPTS:		foodname, lbs
 				return
 
 
-a = Args(sys.argv)
+try:
+	Args(sys.argv)
+except KeyboardInterrupt:
+	print "\nQuit"
+	exit(-1)
