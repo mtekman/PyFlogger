@@ -33,9 +33,9 @@ class FHandler:
 #		# offline saved
 #		self.pagedata = open("test2.html").read()
 
-		print >> sys.stderr, "found results:",
 		self.results = self.ParseResults()
-		print >> sys.stderr, len(self.results)
+		print >> sys.stderr, "found results: %d" % len(self.results)
+
 		res = self.resHandler()
 		self.found = res
 #		print "chose:",res.printout()
@@ -96,10 +96,6 @@ class FHandler:
 		
 		per,unit = Common.amountsplit(per)
 
-
-#		per = per.split()[0].strip()
-#		unit = " ".join(per.split()[1:]).strip()
-		
 		return Yemek(n, cal, farc, ca, prot, per, unit)
 	
 	

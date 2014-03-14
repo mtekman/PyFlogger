@@ -67,8 +67,10 @@ class Yemek:
 
 		return text
 	
-	def scaled(self):
-		multip = float(self.amount)/self.per
+	def scaled(self, multip=1):
+		if multip==1:
+			multip = float(self.amount)/self.per
+
 		# Dupe, never edit self
 		selfy = Yemek(self.name, self.kC, self.carb, self.prot, self.fat, self.per, self.unit)
 		
