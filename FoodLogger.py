@@ -5,6 +5,7 @@ from Common import *
 from FoodList import FoodList
 from Yemek import Yemek
 from copy import copy
+from PieChart import PieChart
 
 class FoodLogger:
 	def __init__(self, file=abspath("../")+"/logs/keto_foodlog.txt",
@@ -69,7 +70,9 @@ class FoodLogger:
 			print >> sys.stderr, scyem.printout(buffer=maxlen_foodname)
 
 		print >> sys.stderr,'\n',' '*(maxlen_foodname-8),
-		print >> sys.stderr, "Totals:\t%d\t%s\t%s\t%s" % (int(kC_total), carb_total, protein_total, fat_total)
+		print >> sys.stderr, "Totals:\t%d\t%s\t%s\t%s" % (int(kC_total), carb_total, protein_total, fat_total),
+		
+		PieChart(carb_total, protein_total, fat_total, kC_total, maxlen_foodname-8)
 		
 		#Allowed
 		#1350	18	76	75
