@@ -96,7 +96,7 @@ class FHandler:
 		
 		per,unit = Common.amountsplit(per)
 
-		return Yemek(n, cal, farc, ca, prot, per, unit)
+		return Yemek(n, cal, ca, prot, farc, per, unit)
 	
 	
 	def ParseResults(self):

@@ -69,20 +69,9 @@ class FoodLogger:
 
 			print >> sys.stderr, scyem.printout(buffer=maxlen_foodname)
 
-		print >> sys.stderr,'\n',' '*(maxlen_foodname-8),
-		print >> sys.stderr, "Totals:\t%d\t%s\t%s\t%s" % (int(kC_total), carb_total, protein_total, fat_total),
+		PieChart(carb_total, protein_total, fat_total, kC_total, 
+			maxlen_foodname-8, 8)
 		
-		PieChart(carb_total, protein_total, fat_total, kC_total, maxlen_foodname-8)
-		
-		#Allowed
-		#1350	18	76	75
-		kC_total -= 1350
-		carb_total -= 18
-		protein_total -= 76
-		fat_total -= 75
-		
-		print >> sys.stderr,' '*(maxlen_foodname-8),
-		print >> sys.stderr, "Allow:\t%d\t%s\t%s\t%s" % (int(-kC_total), -carb_total, -protein_total, -fat_total)		
 		self.foodlog = [] # clear until next
 
 
@@ -91,7 +80,13 @@ class FoodLogger:
 			name = raw_input("Food: ").strip().lower()
 		name = self.foodlist.info(name) # find match
 		
-		am = float(raw_input("\nAmount Consumed? ").strip())
+		am_amount = raw_input("\nAmount Consumed? ").strip()
+		try:
+			am = float(am_amount)
+		except ValueError:
+			spl = am_amount.split('/')
+			am = float(spl[0])/float(spl[1])
+
 		dater = "%04d/%02d/%02d--%02d:%02d" % localtime()[0:5]
 
 		f=open(self.path,'a')
