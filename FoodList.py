@@ -59,8 +59,8 @@ class FoodList:
 
 	def insert(self,name):
 		print "Inserting new food:", name
-		per,unit = Common.amountsplit(raw_input("Per,Unit (e.g. '100g'): ").strip())
-		kc, carb, prot, fat = raw_input("kCal, Carb, Protein, Fat: ").split(',')
+		per,unit = Common.amountsplit(raw_input("Per Unit (e.g. '100g'): ").strip())
+		kc, carb, prot, fat = raw_input("kCal Carb(g) Protein(g) Fat(g): ").split()
 		
 		self.insertAll(name, kc, carb, prot, fat, per, unit)
 
@@ -131,9 +131,10 @@ class FoodList:
 				return name
 			if raw_input('Search online? ').strip()[0].lower()=='y':
 				f = FatSecretChecker.FHandler(name).found
+				
 				self.insertAll(f.name, f.kC, f.carb, f.prot, 
 					f.fat , f.per, f.unit)
-				return name
+				return f.name
 			exit(0)
 			
 		# Found
@@ -148,6 +149,10 @@ class FoodList:
 				print >> sys.stderr,  self.foodmap[name].printout(header=True)
 			elif raw_input('Search online? ').strip()[0].lower()=='y':
 				f = FatSecretChecker.FHandler(name).found
+				
+				if f==-1:
+					exit(-1)
+				
 				self.insertAll(f.name, f.kC, f.carb, f.prot, 
 					f.fat , f.per, f.unit)
 			else:

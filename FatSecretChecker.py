@@ -22,8 +22,6 @@ class FHandler:
 		print >> sys.stderr, "Checking online...",
 		self.query = HTMLMethods.toHTMLChars(query)
 
-#		print FHandler.static_url+self.query
-
 		try:
 			self.pagedata = uopen(FHandler.static_url+self.query).read()
 		except URLError:
@@ -36,16 +34,14 @@ class FHandler:
 		self.results = self.ParseResults()
 		print >> sys.stderr, "found results: %d" % len(self.results)
 
-		res = self.resHandler()
-		self.found = res
-#		print "chose:",res.printout()
+		self.found = self.resHandler()
+
 
 	def resHandler(self, max_split=30):
 		if len(self.results)==0:
 			print "No matches"
-			return
+			return -1
 	
-#		maxlen_foodname=len(reduce(lambda x,y: ( x if (len(x.name) > len(y.name)) else y ), self.results).name)
 		maxlen_foodname=30
 
 		hhh = "%s   \t%s" % (' '*maxlen_foodname, Yemek.printheader().strip())
@@ -68,9 +64,6 @@ class FHandler:
 		ind = int(raw_input('Please pick a number: '))
 		return self.results[ind-1]
 	
-	@staticmethod
-	def stripAll(list):
-		return map(lambda x: x.strip(), list)
 	
 	@staticmethod
 	def getFacts(meta):
@@ -80,15 +73,15 @@ class FHandler:
 			return -1
 		
 		#name
-		n = n.split('>')[1].split('<')[0].strip().replace('\n',"")
+		n = n.split('>')[1].split('<')[0].strip().replace('\n',"").lower()
 		
 		#amounts
 		a = a.split('<')[0]
-		a_tokes = FHandler.stripAll(a.split('|'))
+		a_tokes = Common.stripAll(a.split('|'))
 		if len(a_tokes)!=4:
 			return -1
 		
-		per, cal= FHandler.stripAll(a_tokes[0].split('-'))
+		per, cal= Common.stripAll(a_tokes[0].split('-'))
 		cal, farc, ca, prot = map(lambda x: x.split(':')[-1], [cal] + a_tokes[1:])
 		
 		cal = int(cal.split('kc')[0])
