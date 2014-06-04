@@ -41,6 +41,10 @@ class FoodLogger:
 
 
 	def showTotals(self,date):
+		self.makeTotals(date, printme=True)		
+
+
+	def makeTotals(self,date, printme=False):
 		self.read(date)
 		
 		kC_total=0
@@ -52,12 +56,12 @@ class FoodLogger:
 			print >> sys.stderr, "nothing logged for that day!"
 			exit(-1)
 
-		maxlen_foodname=len(reduce(lambda x,y: ( x if (len(x.name) > len(y.name)) else y ), self.foodlog).name)
-		print >> sys.stderr, '\n'*10
+#		self.maxlen_foodname=len(reduce(lambda x,y: ( x if (len(x.name) > len(y.name)) else y ), self.foodlog).name)
 
-
-		print >> sys.stderr, Yemek.printheader(buffer=maxlen_foodname)
-		print >> sys.stderr, '-'*70
+		if printme:
+			print >> sys.stderr, '\n'*10
+			print >> sys.stderr, Yemek.printheader()
+			print >> sys.stderr, '-'*70
 		
 		for y in self.foodlog:
 			scyem = y.scaled()
@@ -67,10 +71,11 @@ class FoodLogger:
 			protein_total += scyem.prot
 			fat_total += scyem.fat
 
-			print >> sys.stderr, scyem.printout(buffer=maxlen_foodname)
+			if printme:
+				print >> sys.stderr, scyem.printout()
 
-		PieChart(carb_total, protein_total, fat_total, kC_total, 
-			maxlen_foodname-8, 8)
+		self.pie = PieChart(carb_total, protein_total, fat_total, kC_total, 
+			Yemek.buffer-8, 8, printme)
 		
 		self.foodlog = [] # clear until next
 

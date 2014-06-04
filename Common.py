@@ -21,7 +21,7 @@ def amountsplit(text):
 		if not(47 <= ord(a) <= 57):
 			break
 		index_let +=1
-	return text[0:index_let].strip(), text[index_let+1:].splitlines()[0].strip()
+	return text[0:index_let].strip(), text[index_let:].splitlines()[0].strip()
 
 
 def stripAll(list):

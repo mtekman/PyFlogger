@@ -43,6 +43,7 @@ class FoodList:
 		f.close()
 
 
+
 	def printlist(self):
 		keys = sorted(self.foodmap.keys())
 		print >> sys.stderr, Yemek.printheader()
@@ -51,11 +52,13 @@ class FoodList:
 			print >> sys.stderr, fooditem.printout() #.strip()
 
 
+
 	def insertAll(self, name, kc, carb, prot, fat ,per, unit):
 		name = name.strip().lower()
 		self.foodmap[name] = Yemek(name,kc,carb,prot,fat,per,unit)
 		print >> sys.stderr, "Inserted", name
 		self.write()
+
 
 	def insert(self,name):
 		print "Inserting new food:", name
@@ -75,6 +78,7 @@ class FoodList:
 			print >> sys.stderr, "[Does not exist!]"
 		self.write()
 
+
 	def insertprompt(self):
 		name = raw_input('Food Name: ').strip()
 
@@ -83,6 +87,7 @@ class FoodList:
 			print >> sys.stderr,  self.foodmap[name].printout(header=True)
 			exit(-1)
 		self.insert(name)
+
 
 	#This is the main insertion method
 	def updateprompt(self):

@@ -1,6 +1,53 @@
 #!/usr/bin/env python
 
 class Yemek:
+	buffer = 30
+
+	def printout(self,header=False):
+
+		buffer = Yemek.buffer
+		text=""
+		outname=self.name
+
+		if header:
+			text=Yemek.printheader(buffer)+'\n'
+
+		name_split=[]
+		printname = self.name
+		words = printname.split()
+
+		while len(words) > 0:
+			fword = words[0]
+			joiner = ""
+
+			while len(joiner+fword+' ') < buffer:
+				joiner += fword+' '
+				del words[0]
+				if len(words)==0:break
+				fword = words[0]
+
+			name_split.append( '  '+joiner )
+		name_split[0] = '*'+name_split[0][1:]
+
+		fill = buffer-len(name_split[0])
+		outname = name_split[0]+(' '*fill)
+
+		text += "%s\t%d\t%.1f\t%.1f\t%.1f\t%.1f\t%s" % (
+			outname, int(self.kC), self.carb,
+			self.prot, self.fat, self.per, self.unit)
+
+#		text += "%s\t%.3s\t%.3s\t%.3s\t%.3s\t%.3s\t%.2s" % (
+#			outname, int(self.kC), self.carb,
+#			self.prot, self.fat, self.per, self.unit)
+
+		if len(name_split)>0:
+			del name_split[0]
+		while len(name_split)>0:
+			text += "\n%s" % name_split[0]
+			del name_split[0]
+
+		return text
+	
 
 	def __init__(self, name, kC, carb, prot, fat, per, unit, amount=0, url=""):
 		self.name = name
@@ -8,6 +55,7 @@ class Yemek:
 		self.carb = float(carb)
 		self.prot = float(prot)
 		self.fat = float(fat)
+
 		try:
 			self.per = float(per)
 		except ValueError:
@@ -28,45 +76,11 @@ class Yemek:
 		self.url = url
 
 	@staticmethod
-	def printheader(buffer=0):
+	def printheader():
+		buffer = Yemek.buffer
 		return (' '*buffer)+"\tkC\tC\tP\tF\tper\tunit\n"
 
-	def printout(self,header=False, buffer=0, maxsplit=-1):
-		text=""
-		outname=self.name
-		
-		if header:
-			text=Yemek.printheader()+'\n'
 
-		name_split=[]
-		ind=0
-		printname = self.name
-
-		if maxsplit!=-1:
-			while len(printname) > maxsplit:
-				name_split.append( printname[ind:ind+maxsplit] )
-				ind = maxsplit
-				printname = printname[ind:]
-			name_split.append(printname)
-		else:	
-			name_split.append(printname)
-
-		if buffer!=0:
-			fill = buffer-len(name_split[0])
-			outname = name_split[0]+(' '*fill)
-
-		text += "%s\t%d\t%.1f\t%.1f\t%.1f\t%.1f\t%s" % (
-			outname, int(self.kC), self.carb,
-			self.prot, self.fat, self.per, self.unit)
-
-		if len(name_split)>0:
-			del name_split[0]
-		while len(name_split)>0:
-			text += "\n%s" % name_split[0]
-			del name_split[0]
-
-		return text
-	
 	def scaled(self, multip=1):
 		if multip==1:
 			multip = float(self.amount)/self.per

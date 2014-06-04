@@ -4,6 +4,7 @@ import sys
 from FoodLogger import FoodLogger
 from Weight import WeightLog
 from Plotter import *
+from Suggest import Suggest
 
 class Args:
 
@@ -13,7 +14,7 @@ Records progress during keto; weight and food consumption
 		
 		%s <command> <task> [OPT
 
-commands:  	insert, remove, list, plot
+commands:  	insert, remove, list, plot, suggest
 tasks:    	weight, food
 
 OPTS:		foodname, lbs
@@ -36,6 +37,7 @@ OPTS:		foodname, lbs
 		self.remove = False
 		self.list = False
 		self.plot = False
+		self.suggest = False
 		self.food = self.weight = False
 		self.task = ""
 		
@@ -49,6 +51,8 @@ OPTS:		foodname, lbs
 			self.list=True
 		elif arg.startswith('plot'):
 			self.plot=True
+		elif arg.startswith('suggest'):
+			self.suggest=True
 	
 		arg=self.argv[2].lower()	
 		if arg.startswith('food'):
@@ -118,6 +122,12 @@ OPTS:		foodname, lbs
 			
 			if self.list:
 				fl.showTotals(fl.date)
+				return
+
+			if self.suggest:
+				fl.makeTotals(fl.date)
+				p = fl.pie
+				Suggest(fl.foodlist, p.kc_total, p.carb_total, p.protein_total, p.fat_total, fl.maxlen_foodname)				
 				return
 
 

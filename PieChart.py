@@ -41,27 +41,32 @@ class PieChart:
 		print ""
 
 
-	def __init__(self, c,p,f,kc, lmargin = 6, radius=6):
+	def __init__(self, c,p,f,kc, lmargin = 6, radius=8, printme=True):
 
-		colors="/-|"
+		if printme:
+
+			colors="/-|"
+
+			self.circle = []
+			self.rad = radius/2
+			lmarginal = lmargin - 20
 
 		self.total = c + p + f
-		self.circle = []
-		self.rad = radius/2
-
 		self.kc_total = kc
 		self.carb_total = c
 		self.protein_total = p
 		self.fat_total = f
 		
-		lmarginal = lmargin - 20
 
-		self.totals_line = ' ' * lmarginal
-		self.totals_line += "Totals :\t%d\t%s\t%s\t%s" % (
-			int(self.kc_total),
-			self.carb_total,
-			self.protein_total,
-			self.fat_total)
+		if printme:
+
+			self.totals_line = ' ' * lmarginal
+			self.totals_line += "Totals :\t%d\t%s\t%s\t%s" % (
+				int(self.kc_total),
+				self.carb_total,
+				self.protein_total,
+				self.fat_total)
+
 
                 #Allowed
                 #1350   18      76      75
@@ -70,33 +75,45 @@ class PieChart:
                 self.protein_total -= 76
                 self.fat_total -= 75
 
-		self.allows_line = ' ' * lmarginal
-		self.allows_line += " Allow :\t%d\t%s\t%s\t%s" % (
-			int(-self.kc_total), 
-			-self.carb_total,
-			-self.protein_total,
-			-self.fat_total)    
+
+                self.kc_total *= -1
+                self.carb_total *= -1
+                self.protein_total *= -1
+                self.fat_total *= -1
+
+
+		if printme:
+
+			self.allows_line = ' ' * lmarginal
+			self.allows_line += " Allow :\t%d\t%s\t%s\t%s" % (
+				int(self.kc_total), 
+				self.carb_total,
+				self.protein_total,
+				self.fat_total)    
 		
 		self.c = float(c)/self.total
 		self.p = float(p)/self.total
 		self.f = float(f)/self.total
 
-		self.make(colors,[self.c,self.p,self.f],radius)
 
-		mid_x, mid_y = (len(self.circle[0])/2)+1, len(self.circle)/2
-		mid_y = (mid_y - 1) if mid_y % 2 == 0 else mid_y
-		kc_text = '[' + str(kc) + ']'
+		if printme:
+			self.make(colors,[self.c,self.p,self.f],radius)
 
-		offset_x = len(kc_text)
-		mid_x -= offset_x		
+			mid_x, mid_y = (len(self.circle[0])/2)+1, len(self.circle)/2
+			mid_y = (mid_y - 1) if mid_y % 2 == 0 else mid_y
+			kc_text = '[' + str(kc) + ']'
 
-		self.cpf_line = ' ' * lmarginal
-		self.cpf_line += "  CPF  :\t      \t%.1f%%\t%.1f%%\t%.1f%%" % (
-			100*self.c, 100*self.p, 100*self.f)
+			offset_x = len(kc_text)
+			mid_x -= offset_x		
 
-		self.circle[mid_y] = self.circle[mid_y][:mid_x+2] + kc_text + self.circle[mid_y][mid_x+offset_x+2:]
-		self.printout(lmargin+20)
+			self.cpf_line = ' ' * lmarginal
+			self.cpf_line += "  CPF  :\t      \t%.1f%%\t%.1f%%\t%.1f%%" % (
+				100*self.c, 100*self.p, 100*self.f)
+
+			self.circle[mid_y] = self.circle[mid_y][:mid_x+2] + kc_text + self.circle[mid_y][mid_x+offset_x+2:]
+			self.printout(lmargin+20)
 
 
 
-#pc = PieChart(10,60,70,190)
+#pc = PieChart(10,60,70,190, 8,8,True)
+#print pc.kc_total, pc.carb_total, pc.protein_total, pc.fat_total
