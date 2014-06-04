@@ -10,8 +10,8 @@ class Suggest:
 		self.allowed_prot = prot
 		self.allowed_fat = fat
 
-		
 		self.suggestSomething()
+
 
 	def suggestSomething(self):
 		res=[]
