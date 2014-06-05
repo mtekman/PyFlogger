@@ -23,6 +23,7 @@ class PieChart:
 				else:t=t+" "
 			self.circle.append(t)
 
+
 	def printout(self, lmargin):
 		l_count=0
 		print ""
@@ -41,10 +42,31 @@ class PieChart:
 		print ""
 
 
-	def __init__(self, c,p,f,kc, lmargin = 6, radius=8, printme=True):
+
+	def setMacros(self, macrofile):
+		periodmap = {'day':1, 'week':5}
+
+		def parseLine(var,text):
+			if line.startswith(text):
+				junk, eqs = line.split('=')
+				var, period = eqs.split('/')
+				var = float(var)/periodmap[period.strip()]
+
+
+		f = open( macrofile ,'r')
+		for line in f:
+			parseLine(self.macro_kc, 'kc_total')
+			parseLine(self.macro_carb, 'carb_total')
+			parseLine(self.macro_prot, 'protein_total')
+			parseLine(self.macro_fat, 'fat_total')
+		f.close()
+		
+		
+
+
+	def __init__(self, c,p,f,kc, macrofile, lmargin = 6, radius=8, printme=True):
 
 		if printme:
-
 			colors="/-|"
 
 			self.circle = []
@@ -59,7 +81,6 @@ class PieChart:
 		
 
 		if printme:
-
 			self.totals_line = ' ' * lmarginal
 			self.totals_line += "Totals :\t%d\t%s\t%s\t%s" % (
 				int(self.kc_total),
@@ -68,13 +89,15 @@ class PieChart:
 				self.fat_total)
 
 
+		self.setMacros(macrofile)
+
+
                 #Allowed
                 #1350   18      76      75
-                self.kc_total -= 1350
-                self.carb_total -= 18
-                self.protein_total -= 76
-                self.fat_total -= 75
-
+                self.kc_total -= self.macro_kc
+                self.carb_total -= self.maco_carb
+                self.protein_total -= self.macro_prot
+                self.fat_total -= self.macro_fat
 
                 self.kc_total *= -1
                 self.carb_total *= -1
@@ -83,7 +106,6 @@ class PieChart:
 
 
 		if printme:
-
 			self.allows_line = ' ' * lmarginal
 			self.allows_line += " Allow :\t%d\t%s\t%s\t%s" % (
 				int(self.kc_total), 

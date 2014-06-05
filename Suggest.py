@@ -75,8 +75,8 @@ class Suggest:
 
 
 
-#w = FoodLogger()
-#w.makeTotals(w.date)
-#p = w.pie
-#s = Suggest(w.foodlist, p.kc_total, p.carb_total, p.protein_total, p.fat_total)
+w = FoodLogger()
+w.makeTotals(w.date)
+p = w.pie
+s = Suggest(w.foodlist, p.kc_total, p.carb_total, p.protein_total, p.fat_total)
 #s = Suggest(w.foodlist, 300, p.carb_total, p.protein_total, p.fat_total)

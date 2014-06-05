@@ -8,8 +8,8 @@ from copy import copy
 from PieChart import PieChart
 
 class FoodLogger:
-	def __init__(self, file=abspath("../")+"/logs/keto_foodlog.txt",
-						file2=abspath("../")+"/logs/keto_target_macros.txt"):
+	def __init__(self, 	file=abspath("../")+"/logs/keto_foodlog.txt",
+				file2=abspath("../")+"/logs/keto_target_macros.txt"):
 		self.foodlog=[]
 		self.path= file
 		self.foodlist = FoodList() # i.e. ref FoodList cobj
@@ -54,9 +54,7 @@ class FoodLogger:
 
 		if len(self.foodlog)==0:
 			print >> sys.stderr, "nothing logged for that day!"
-			exit(-1)
-
-#		self.maxlen_foodname=len(reduce(lambda x,y: ( x if (len(x.name) > len(y.name)) else y ), self.foodlog).name)
+#			exit(-1)
 
 		if printme:
 			print >> sys.stderr, '\n'*10
@@ -74,7 +72,7 @@ class FoodLogger:
 			if printme:
 				print >> sys.stderr, scyem.printout()
 
-		self.pie = PieChart(carb_total, protein_total, fat_total, kC_total, 
+		self.pie = PieChart(carb_total, protein_total, fat_total, kC_total, self.macrofile
 			Yemek.buffer-8, 8, printme)
 		
 		self.foodlog = [] # clear until next
