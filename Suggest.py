@@ -51,8 +51,13 @@ class Suggest:
 			
 			new_scale = yem.scaled(amount_to_scale)
 			
-			if new_scale.per < 20.0 or new_scale.per > 700:
-				continue
+			if new_scale.unit == 'g':
+				if new_scale.per < 20.0 or new_scale.per > 350:
+					continue
+
+			if new_scale.unit == 'ml':
+				if new_scale.per < 100.0 or new_scale.per > 1000:
+					continue
 			
 			self.portions[name] = new_scale
 
@@ -61,7 +66,16 @@ class Suggest:
 	def sortOpts(self):
 
 		def perSort(x):
-			return float(x[1].prot)
+			yem = x[1]
+			f = float(yem.fat)
+			c = float(yem.carb)
+
+			if f == 0:f = 0.0001
+			if c == 0:c = 0.0001
+
+			p_f_rat = float(yem.prot)/f
+			return p_f_rat/c
+
 
 		for x,v in self.singles.iteritems():
 			self.portions[x] = v
