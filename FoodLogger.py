@@ -9,9 +9,10 @@ from PieChart import PieChart
 
 class FoodLogger:
 	def __init__(self, 	file=abspath("../")+"/logs/keto_foodlog.txt",
-				file2=abspath("../")+"/logs/keto_target_macros.txt"):
+				file2=abspath("../")+"/logs/targets.txt"):
 		self.foodlog=[]
 		self.path= file
+		self.macrofile=file2
 		self.foodlist = FoodList() # i.e. ref FoodList cobj
 		self.date = "%04d/%02d/%02d--%02d:%02d" % localtime()[0:5]
 
@@ -72,7 +73,7 @@ class FoodLogger:
 			if printme:
 				print >> sys.stderr, scyem.printout()
 
-		self.pie = PieChart(carb_total, protein_total, fat_total, kC_total, self.macrofile
+		self.pie = PieChart(carb_total, protein_total, fat_total, kC_total, self.macrofile,
 			Yemek.buffer-8, 8, printme)
 		
 		self.foodlog = [] # clear until next

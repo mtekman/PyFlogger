@@ -10,6 +10,36 @@ class PieChart:
 		if a<=v[0]:return k[0]
 		return PieChart.s(k[1:],v[1:],a-v[0])
 
+
+	def setMacros(self, macrofile):
+		periodmap = {'day':1, 'week':5}
+
+		def parseText(line):
+			junk, eqs = line.split('=')
+			value, period = eqs.split('/')
+			return float(value)/periodmap[period.strip()]
+			
+
+		f = open( macrofile ,'r')
+
+
+		for line in f:
+			if line.startswith('kc_total'):
+				self.macro_kc = parseText(line)
+			elif line.startswith('carb_total'):
+				self.macro_carb = parseText(line)
+			elif line.startswith('protein_total'):
+				self.macro_prot = parseText(line)
+			elif line.startswith('fat_total'):
+				self.macro_fat = parseText(line)
+			
+		f.close()
+		
+
+
+
+
+
 	def make(self,k,v,r):
 		d=range(-r,r)
 		for y in d:
@@ -41,26 +71,6 @@ class PieChart:
 			print ""
 		print ""
 
-
-
-	def setMacros(self, macrofile):
-		periodmap = {'day':1, 'week':5}
-
-		def parseLine(var,text):
-			if line.startswith(text):
-				junk, eqs = line.split('=')
-				var, period = eqs.split('/')
-				var = float(var)/periodmap[period.strip()]
-
-
-		f = open( macrofile ,'r')
-		for line in f:
-			parseLine(self.macro_kc, 'kc_total')
-			parseLine(self.macro_carb, 'carb_total')
-			parseLine(self.macro_prot, 'protein_total')
-			parseLine(self.macro_fat, 'fat_total')
-		f.close()
-		
 		
 
 
@@ -73,53 +83,51 @@ class PieChart:
 			self.rad = radius/2
 			lmarginal = lmargin - 20
 
-		self.total = c + p + f
-		self.kc_total = kc
-		self.carb_total = c
-		self.protein_total = p
-		self.fat_total = f
+
+		self.kc_current = kc
+		self.carb_current = c
+		self.protein_current = p
+		self.fat_current = f
 		
 
 		if printme:
 			self.totals_line = ' ' * lmarginal
 			self.totals_line += "Totals :\t%d\t%s\t%s\t%s" % (
-				int(self.kc_total),
-				self.carb_total,
-				self.protein_total,
-				self.fat_total)
+				int(self.kc_current),
+				self.carb_current,
+				self.protein_current,
+				self.fat_current)
 
 
 		self.setMacros(macrofile)
 
+#		print "kc,carb,prot,fat", self.macro_kc, self.macro_carb, self.macro_prot, self.macro_fat
 
-                #Allowed
-                #1350   18      76      75
-                self.kc_total -= self.macro_kc
-                self.carb_total -= self.maco_carb
-                self.protein_total -= self.macro_prot
-                self.fat_total -= self.macro_fat
+		#Allowed
+		self.macro_kc -= self.kc_current
+		self.macro_carb -= self.carb_current
+ 		self.macro_prot -= self.protein_current
+		self.macro_fat -= self.fat_current
 
-                self.kc_total *= -1
-                self.carb_total *= -1
-                self.protein_total *= -1
-                self.fat_total *= -1
 
+#		print "kc,carb,prot,fat", self.macro_kc, self.macro_carb, self.macro_prot, self.macro_fat
+		total_fract = self.macro_carb + self.macro_prot + self.macro_fat
 
 		if printme:
 			self.allows_line = ' ' * lmarginal
 			self.allows_line += " Allow :\t%d\t%s\t%s\t%s" % (
-				int(self.kc_total), 
-				self.carb_total,
-				self.protein_total,
-				self.fat_total)    
+				int(self.macro_kc), 
+				self.macro_carb,
+				self.macro_prot,
+				self.macro_fat)    
 		
-		self.c = float(c)/self.total
-		self.p = float(p)/self.total
-		self.f = float(f)/self.total
+		c = self.macro_carb/total_fract
+		p = self.macro_prot/total_fract
+		f = self.macro_fat/total_fract
 
 
 		if printme:
-			self.make(colors,[self.c,self.p,self.f],radius)
+			self.make(colors,[c,p,f],radius)
 
 			mid_x, mid_y = (len(self.circle[0])/2)+1, len(self.circle)/2
 			mid_y = (mid_y - 1) if mid_y % 2 == 0 else mid_y
@@ -130,7 +138,7 @@ class PieChart:
 
 			self.cpf_line = ' ' * lmarginal
 			self.cpf_line += "  CPF  :\t      \t%.1f%%\t%.1f%%\t%.1f%%" % (
-				100*self.c, 100*self.p, 100*self.f)
+				100*c, 100*p, 100*f)
 
 			self.circle[mid_y] = self.circle[mid_y][:mid_x+2] + kc_text + self.circle[mid_y][mid_x+offset_x+2:]
 			self.printout(lmargin+20)

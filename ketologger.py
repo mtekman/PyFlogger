@@ -127,7 +127,11 @@ OPTS:		foodname, lbs
 			if self.suggest:
 				fl.makeTotals(fl.date)
 				p = fl.pie
-				Suggest(fl.foodlist, p.kc_total, p.carb_total, p.protein_total, p.fat_total, fl.maxlen_foodname)				
+				Suggest(fl.foodlist, 
+					p.macro_kc, 
+					p.macro_carb,
+					p.macro_prot, 
+					p.macro_fat)				
 				return
 
 

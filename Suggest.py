@@ -40,17 +40,18 @@ class Suggest:
 			yem = portions[name]
 			amount_to_scale = float(self.allowed_kc)/yem.kC
 			
-#			if amount_to_scale < 0:
+#			if amount_to_scale == 0:
 #				continue
 
 			#nearest round fraction
 			if amount_to_scale < 1:
 				temp_scale = int(float(1)/amount_to_scale)
+				print >> sys.stderr, amount_to_scale
 				amount_to_scale = float(1)/temp_scale
 			
 			new_scale = yem.scaled(amount_to_scale)
 			
-			if new_scale.per < 20.0:
+			if new_scale.per < 20.0 or new_scale.per > 700:
 				continue
 			
 			self.portions[name] = new_scale
@@ -75,8 +76,8 @@ class Suggest:
 
 
 
-w = FoodLogger()
-w.makeTotals(w.date)
-p = w.pie
-s = Suggest(w.foodlist, p.kc_total, p.carb_total, p.protein_total, p.fat_total)
+#w = FoodLogger()
+#w.makeTotals(w.date)
+#p = w.pie
+#s = Suggest(w.foodlist, p.macro_kc, p.macro_carb, p.macro_prot, p.macro_fat)
 #s = Suggest(w.foodlist, 300, p.carb_total, p.protein_total, p.fat_total)
