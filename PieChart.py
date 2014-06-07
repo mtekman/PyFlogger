@@ -96,9 +96,9 @@ class PieChart:
 			self.totals_line = ' ' * lmarginal
 			
 			outnow = "Totals :   %s" % Yemek.outformat
-			outnow = '{'.join(outnow.split('{')[:-2])
+			outnow = '%'.join(outnow.split('%')[:-2])
 			
-			self.totals_line += outnow.format(
+			self.totals_line += outnow % (
 				int(self.kc_current),
 				self.carb_current.total, self.carb_current.fibre, self.carb_current.sugar, self.carb_current.bad,
 				self.protein_current,
@@ -117,7 +117,7 @@ class PieChart:
 
 		if printme:
 			self.allows_line = ' ' * lmarginal
-			self.allows_line += " Allow :   {:5d}  {:5.1f} [{:5.1f},{:5.1f}] = {:4.1f}  {:4.1f}  {:4.1f}".format(
+			self.allows_line += " Allow :   %5d  %5.1f [%5.1f,%5.1f] = %4.1f  %4.1f  %4.1f" % (
 				int(self.macro_kc), 
 				self.macro_carb.total, self.macro_carb.fibre, self.macro_carb.sugar, self.macro_carb.bad,
 				self.macro_prot,
@@ -148,7 +148,7 @@ class PieChart:
 			mid_x -= offset_x		
 
 			self.cpf_line = ' ' * lmarginal
-			self.cpf_line += "  CPF  :                                {:3.1f}%  {:3.1f}% {:3.1f}%".format(
+			self.cpf_line += "  CPF  :                                %3.1f%%  %3.1f%% %3.1f%%" % (
 				100*c, 100*p, 100*f)
 
 			self.circle[mid_y] = self.circle[mid_y][:mid_x+2] + kc_text + self.circle[mid_y][mid_x+offset_x+2:]

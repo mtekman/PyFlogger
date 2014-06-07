@@ -68,15 +68,13 @@ class Portion:
 
 class Yemek:
 	buffer = 30
-	outformat = "{:5d}  {:5.1f} [{:5.1f},{:5.1f}] = {:4.1f}  {:4.1f}  {:4.1f}  {:5.1f} {:s}"
+	outformat = "%5d  %5.1f [%5.1f,%5.1f] = %4.1f  %4.1f  %4.1f  %5.1f %s"
 	
 	headformat = ""
 	c = 0
 	while c < len(outformat):
 		out = outformat[c]
-		if out==':':
-			out = ":>"
-		elif out=='.':
+		if out=='.':
 			c += 2
 			continue
 			
@@ -146,8 +144,8 @@ class Yemek:
 		outname = name_split[0]+(' '*fill)
 
 		if carbinfo:
-			form = "{:s}|"+Yemek.outformat
-			text += form.format(
+			form = "%s|"+Yemek.outformat
+			text += form % (
 				outname, int(self.kC), self.carb.total, 
 				self.carb.fibre, self.carb.sugar, self.carb.bad,
 				self.prot, self.fat, self.per, self.unit)
@@ -178,7 +176,7 @@ class Yemek:
 	def printheader(buffer=0, carbinfo=True):
 		if buffer ==0:buffer=Yemek.buffer
 		
-		return ("{:s} |%s" % Yemek.headformat).format(
+		return ("%s |" + Yemek.headformat) % (
 			(' '*buffer), "kC", "Carb", "Fibre", "Sugar", "Bad", "Prot", "Fat", "per", "unit"
 			)
 
