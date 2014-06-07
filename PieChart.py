@@ -109,10 +109,6 @@ class PieChart:
  		self.macro_prot -= self.protein_current
 		self.macro_fat -= self.fat_current
 
-
-#		print "kc,carb,prot,fat", self.macro_kc, self.macro_carb, self.macro_prot, self.macro_fat
-		total_fract = self.macro_carb + self.macro_prot + self.macro_fat
-
 		if printme:
 			self.allows_line = ' ' * lmarginal
 			self.allows_line += " Allow :\t%d\t%s\t%s\t%s" % (
@@ -121,9 +117,18 @@ class PieChart:
 				self.macro_prot,
 				self.macro_fat)    
 		
-		c = self.macro_carb/total_fract
-		p = self.macro_prot/total_fract
-		f = self.macro_fat/total_fract
+
+		total_fract = self.carb_current + self.protein_current + self.fat_current
+		if total_fract==0:
+			total_fract=3
+			self.carb_current = 1.0
+			self.protein_current = 1.0
+			self.fat_current = 1.0
+
+
+		c = self.carb_current/total_fract
+		p = self.protein_current/total_fract
+		f = self.fat_current/total_fract
 
 
 		if printme:

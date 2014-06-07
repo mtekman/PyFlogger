@@ -27,19 +27,26 @@ class FoodList:
 		for foodentry in f:
 			if len(foodentry)< 5:
 				continue
+
 			name, kC, carb, prot, fat, per, unit = foodentry.split('\t')
+
 			food = Yemek(name.strip().lower(), kC, carb, prot, fat, per, unit)
 			self.foodmap[food.name]= food
 		f.close()
 
+
 	def write(self):
 		f=open(self.path,'w')
+		
+		maxlen_name = reduce(lambda x,y: x if len(x) > len(y) else y, self.foodmap.keys())
+		maxlen_name = len(maxlen_name)+5
+		print "max:", maxlen_name
 
-		print >> f, Yemek.printheader()
+		print >> f, Yemek.printheader(buffer=maxlen_name)
 		
 		for food in sorted(self.foodmap.keys()):
 			fooditem = self.foodmap[food]
-			print >> f, fooditem.printout()
+			print >> f, fooditem.printout(buffer=maxlen_name)
 		f.close()
 
 
@@ -117,7 +124,7 @@ class FoodList:
 				if searchname.strip() in s.strip():
 					found.append(foods[index])
 			index +=1
-		return found, len(found)
+		return found
 
 	
 	def info(self,name):
@@ -126,7 +133,8 @@ class FoodList:
 			return name
 
 		#Search keys for closest match
-		found, res = self.search(name)
+		found = self.search(name)
+		res = len(found)
 
 		if res == 0:
 			print >> sys.stderr, "\nCannot find:", "\"%s\"" % name,
@@ -160,6 +168,7 @@ class FoodList:
 				
 				self.insertAll(f.name, f.kC, f.carb, f.prot, 
 					f.fat , f.per, f.unit)
+				name = f.name
 			else:
 				self.insert(name)
 			return name
@@ -180,6 +189,7 @@ class FoodList:
 			f = FatSecretChecker.FHandler(name).found
 			self.insertAll(f.name, f.kC, f.carb, f.prot, 
 				f.fat , f.per, f.unit)
+			name = f.name
 		else:
 				self.insert(name)
 		return name

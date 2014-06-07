@@ -3,9 +3,12 @@
 class Yemek:
 	buffer = 30
 
-	def printout(self,header=False):
+	def printout(self,header=False, buffer=0):
+		pre=""
+		if buffer ==0:
+			buffer=Yemek.buffer
+			pre="* "
 
-		buffer = Yemek.buffer
 		text=""
 		outname=self.name
 
@@ -27,7 +30,7 @@ class Yemek:
 				fword = words[0]
 
 			name_split.append( '  '+joiner )
-		name_split[0] = '*'+name_split[0][1:]
+		name_split[0] = (pre+name_split[0][1:]).strip()
 
 		fill = buffer-len(name_split[0])
 		outname = name_split[0]+(' '*fill)
@@ -76,8 +79,8 @@ class Yemek:
 		self.url = url
 
 	@staticmethod
-	def printheader():
-		buffer = Yemek.buffer
+	def printheader(buffer=0):
+		if buffer ==0:buffer=Yemek.buffer
 		return (' '*buffer)+"\tkC\tC\tP\tF\tper\tunit\n"
 
 

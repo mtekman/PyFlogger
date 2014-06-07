@@ -2,7 +2,23 @@
 
 import sys, re, Common
 from Yemek import Yemek
-from urllib2 import urlopen as uopen, URLError
+from urllib2 import urlopen as uopen, URLError, build_opener as bo, Request as req, HTTPRedirectHandler as hredh
+
+
+class SmartRedirectHandler(hredh):
+    def http_error_301(self, req, fp, code, msg, headers):  
+        result = hredh.http_error_301(
+            self, req, fp, code, msg, headers)              
+        result.status = code                                
+        return result                                       
+
+    def http_error_302(self, req, fp, code, msg, headers):  
+        result = hredh.http_error_302(
+            self, req, fp, code, msg, headers)              
+        result.status = code                                
+        return result
+
+
 
 class HTMLMethods:
 	@staticmethod
@@ -17,6 +33,7 @@ class HTMLMethods:
 
 class FHandler:
 	static_url="http://www.fatsecret.co.uk/calories-nutrition/search?q="
+	mobile_url="http://m.fatsecret.com"
 
 	def __init__(self, query):
 		print >> sys.stderr, "Checking online...",
@@ -29,6 +46,8 @@ class FHandler:
 			exit(-1)
 
 #		# offline saved
+#		print self.pagedata
+#		exit(0)
 #		self.pagedata = open("test2.html").read()
 
 		self.results = self.ParseResults()
@@ -64,6 +83,26 @@ class FHandler:
 		ind = int(raw_input('Please pick a number: '))
 		return self.results[ind-1]
 	
+
+	@staticmethod
+	def getFoodInfo(url):
+		try:
+			newurl = FHandler.mobile_url + url
+			print newurl
+			re = req(newurl)
+			pp = bo(SmartRedirectHandler())
+			f = pp.open(re)
+			print f.headers
+			print f.url
+			exit(0)
+#			tempdata = uopen(newurl).read()
+		except URLError:
+			print " stopped, no connection?"
+			exit(-1)
+
+		print tempdata
+		exit(0)
+
 	
 	@staticmethod
 	def getFacts(meta):
@@ -74,6 +113,8 @@ class FHandler:
 		
 		#name
 		n = n.split('>')[1].split('<')[0].strip().replace('\n',"").lower()
+
+#		FHandler.getFoodInfo(url)
 		
 		#amounts
 		a = a.split('<')[0]
@@ -101,8 +142,13 @@ class FHandler:
 			y = FHandler.getFacts(meta)
 			if y==-1:
 				continue
+
 			
 			y.url = url
+			print meta,"\n"
 			res.append(y)
 		
 		return res
+
+f = FHandler("chicken")
+print f.found
