@@ -3,7 +3,7 @@
 from Common import *
 
 from FoodList import FoodList
-from Yemek import Yemek
+from Yemek import Yemek, Carb
 from copy import copy
 from PieChart import PieChart
 
@@ -49,7 +49,7 @@ class FoodLogger:
 		self.read(date)
 		
 		kC_total=0
-		carb_total=0
+		carb_total=Carb(0,0,0)
 		protein_total=0
 		fat_total=0
 
@@ -59,14 +59,13 @@ class FoodLogger:
 
 		if printme:
 			print >> sys.stderr, '\n'*10
-			print >> sys.stderr, Yemek.printheader()
-			print >> sys.stderr, '-'*70
+			Yemek.printFullHeader()
 		
 		for y in self.foodlog:
 			scyem = y.scaled()
-		
+			
 			kC_total += scyem.kC
-			carb_total += scyem.carb
+			carb_total.add(scyem.carb)
 			protein_total += scyem.prot
 			fat_total += scyem.fat
 
@@ -84,12 +83,15 @@ class FoodLogger:
 			name = raw_input("Food: ").strip().lower()
 		name = self.foodlist.info(name) # find match
 		
+		print "\nAmount consumed?"
+		ports = self.foodlist.foodmap[name].portions.avail
+		if len(ports)!=0:
+			print "Avail:"
+			for p,v in prots.iteritems():
+				print p
+		
 		am_amount = raw_input("\nAmount Consumed? ").strip()
-		try:
-			am = float(am_amount)
-		except ValueError:
-			spl = am_amount.split('/')
-			am = float(spl[0])/float(spl[1])
+		am = fraction(am_amount)
 
 		dater = "%04d/%02d/%02d--%02d:%02d" % localtime()[0:5]
 

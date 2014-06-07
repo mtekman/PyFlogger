@@ -2,6 +2,8 @@
 from math import*
 import sys
 
+from Yemek import Yemek, Carb
+
 class PieChart:
 
 	@staticmethod
@@ -27,7 +29,8 @@ class PieChart:
 			if line.startswith('kc_total'):
 				self.macro_kc = parseText(line)
 			elif line.startswith('carb_total'):
-				self.macro_carb = parseText(line)
+				bad = parseText(line)
+				self.macro_carb = Carb(bad,0,bad)
 			elif line.startswith('protein_total'):
 				self.macro_prot = parseText(line)
 			elif line.startswith('fat_total'):
@@ -77,26 +80,29 @@ class PieChart:
 	def __init__(self, c,p,f,kc, macrofile, lmargin = 6, radius=8, printme=True):
 
 		if printme:
-			colors="/-|"
+			colors=".%F"
 
 			self.circle = []
 			self.rad = radius/2
 			lmarginal = lmargin - 20
 
-
 		self.kc_current = kc
-		self.carb_current = c
+		self.carb_current = c # carb obj
 		self.protein_current = p
 		self.fat_current = f
 		
 
 		if printme:
 			self.totals_line = ' ' * lmarginal
-			self.totals_line += "Totals :\t%d\t%s\t%s\t%s" % (
+			
+			outnow = "Totals :   %s" % Yemek.outformat
+			outnow = '{'.join(outnow.split('{')[:-2])
+			
+			self.totals_line += outnow.format(
 				int(self.kc_current),
-				self.carb_current,
+				self.carb_current.total, self.carb_current.fibre, self.carb_current.sugar, self.carb_current.bad,
 				self.protein_current,
-				self.fat_current)
+				self.fat_current,)
 
 
 		self.setMacros(macrofile)
@@ -105,28 +111,28 @@ class PieChart:
 
 		#Allowed
 		self.macro_kc -= self.kc_current
-		self.macro_carb -= self.carb_current
+		self.macro_carb.sub(self.carb_current)
  		self.macro_prot -= self.protein_current
 		self.macro_fat -= self.fat_current
 
 		if printme:
 			self.allows_line = ' ' * lmarginal
-			self.allows_line += " Allow :\t%d\t%s\t%s\t%s" % (
+			self.allows_line += " Allow :   {:5d}  {:5.1f} [{:5.1f},{:5.1f}] = {:4.1f}  {:4.1f}  {:4.1f}".format(
 				int(self.macro_kc), 
-				self.macro_carb,
+				self.macro_carb.total, self.macro_carb.fibre, self.macro_carb.sugar, self.macro_carb.bad,
 				self.macro_prot,
 				self.macro_fat)    
 		
 
-		total_fract = self.carb_current + self.protein_current + self.fat_current
+		total_fract = self.carb_current.bad + self.protein_current + self.fat_current
 		if total_fract==0:
 			total_fract=3
-			self.carb_current = 1.0
+			self.carb_current.bad = 1.0
 			self.protein_current = 1.0
 			self.fat_current = 1.0
 
 
-		c = self.carb_current/total_fract
+		c = self.carb_current.bad/total_fract
 		p = self.protein_current/total_fract
 		f = self.fat_current/total_fract
 
@@ -142,7 +148,7 @@ class PieChart:
 			mid_x -= offset_x		
 
 			self.cpf_line = ' ' * lmarginal
-			self.cpf_line += "  CPF  :\t      \t%.1f%%\t%.1f%%\t%.1f%%" % (
+			self.cpf_line += "  CPF  :                                {:3.1f}%  {:3.1f}% {:3.1f}%".format(
 				100*c, 100*p, 100*f)
 
 			self.circle[mid_y] = self.circle[mid_y][:mid_x+2] + kc_text + self.circle[mid_y][mid_x+offset_x+2:]

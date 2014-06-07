@@ -4,7 +4,7 @@ import sys
 from Yemek import Yemek
 from os.path import abspath
 import Common
-import FatSecretChecker
+import MiniFSChecker
 
 class FoodList:
 	def __init__(self,file=abspath("../")+"/logs/keto_foodlist.txt"):
@@ -28,9 +28,24 @@ class FoodList:
 			if len(foodentry)< 5:
 				continue
 
-			name, kC, carb, prot, fat, per, unit = foodentry.split('\t')
+#                                                             |   kC   Carb [Fibre,Sugar] =   Bad   Prot    Fat    per unit
+#almond milk unsweetened                                      |   13    0.1 [  0.0,  0.0] =   0.1    0.4    1.1  100.0 ml
+			name, data = foodentry.split('|')
+			name = name.strip().lower()
+			
+			# No sscanf in python :(
+			tokes = data.split()
+			kC = tokes[0]
+			carb_total = tokes[1]
+			fibre = tokes[3].rsplit(',')[0]
+			sugar=tokes[4].rsplit(']')[0]
+			#carb_bad = tokes[6] # unused
+			prot = tokes[7]
+			fat = tokes[8]
+			per = tokes[9]
+			unit = ' '.join(tokes[10:])
 
-			food = Yemek(name.strip().lower(), kC, carb, prot, fat, per, unit)
+			food = Yemek(name, kC, (carb_total, fibre, sugar), prot, fat, per, unit)
 			self.foodmap[food.name]= food
 		f.close()
 
@@ -43,10 +58,11 @@ class FoodList:
 		print "max:", maxlen_name
 
 		print >> f, Yemek.printheader(buffer=maxlen_name)
+		print >> f, ""
 		
 		for food in sorted(self.foodmap.keys()):
 			fooditem = self.foodmap[food]
-			print >> f, fooditem.printout(buffer=maxlen_name)
+			print >> f, fooditem.printout(buffer=maxlen_name, pre="")
 		f.close()
 
 
@@ -60,9 +76,9 @@ class FoodList:
 
 
 
-	def insertAll(self, name, kc, carb, prot, fat ,per, unit):
+	def insertAll(self, name, kc, carb_info , prot, fat ,per, unit):
 		name = name.strip().lower()
-		self.foodmap[name] = Yemek(name,kc,carb,prot,fat,per,unit)
+		self.foodmap[name] = Yemek(name,kc, carb_info, prot,fat,per,unit)
 		print >> sys.stderr, "Inserted", name
 		self.write()
 
@@ -70,9 +86,9 @@ class FoodList:
 	def insert(self,name):
 		print "Inserting new food:", name
 		per,unit = Common.amountsplit(raw_input("Per Unit (e.g. '100g'): ").strip())
-		kc, carb, prot, fat = raw_input("kCal Carb(g) Protein(g) Fat(g): ").split()
+		kc, carb_total, carb_sugar, carb_fibre , prot, fat = raw_input("kCal Carb Sug Fibr Prot Fat: ").split()
 		
-		self.insertAll(name, kc, carb, prot, fat, per, unit)
+		self.insertAll(name, kc, (carb_total, carb_fibre, carb_sugar), prot, fat, per, unit)
 
 
 	def removeprompt(self):
@@ -143,9 +159,9 @@ class FoodList:
 				self.insert(name)
 				return name
 			if raw_input('Search online? ').strip()[0].lower()=='y':
-				f = FatSecretChecker.FHandler(name).found
+				f = MiniFSChecker.FHandler(name).found
 				
-				self.insertAll(f.name, f.kC, f.carb, f.prot, 
+				self.insertAll(f.name, f.kC, (f.carb.total, f.carb.fibre, f.carb.sugar), f.prot, 
 					f.fat , f.per, f.unit)
 				return f.name
 			exit(0)
@@ -161,12 +177,13 @@ class FoodList:
 				name = found[0]
 				print >> sys.stderr,  self.foodmap[name].printout(header=True)
 			elif raw_input('Search online? ').strip()[0].lower()=='y':
-				f = FatSecretChecker.FHandler(name).found
+				f = MiniFSChecker.FHandler(name).found
+				print f.carb.total
 				
 				if f==-1:
 					exit(-1)
 				
-				self.insertAll(f.name, f.kC, f.carb, f.prot, 
+				self.insertAll(f.name, f.kC, (f.carb.total, f.carb.fibre, f.carb.sugar), f.prot, 
 					f.fat , f.per, f.unit)
 				name = f.name
 			else:
@@ -186,7 +203,7 @@ class FoodList:
 			name = found[ans-1]
 			print >> sys.stderr,  self.foodmap[name].printout(header=True)
 		elif raw_input('Search online? ').strip()[0].lower()=='y':
-			f = FatSecretChecker.FHandler(name).found
+			f = MiniFSChecker.FHandler(name).found
 			self.insertAll(f.name, f.kC, f.carb, f.prot, 
 				f.fat , f.per, f.unit)
 			name = f.name

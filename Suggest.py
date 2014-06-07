@@ -68,13 +68,17 @@ class Suggest:
 		def perSort(x):
 			yem = x[1]
 			f = float(yem.fat)
-			c = float(yem.carb)
-
-			if f == 0:f = 0.0001
+			c = float(yem.carb.bad)
+			
+			
+			# Fibre is taken care of intrinsically by checking only bad
 			if c == 0:c = 0.0001
+			if f == 0:f = 0.0001
 
-			p_f_rat = float(yem.prot)/f
-			return p_f_rat/c
+			prot_2_fat = float(yem.prot)/f
+			
+			# Overall, should have a good score on both
+			return prot_2_fat/c
 
 
 		for x,v in self.singles.iteritems():
@@ -82,7 +86,7 @@ class Suggest:
 
 		sorted_ports = sorted(self.portions.iteritems(), key=perSort, reverse=True)
 
-		print Yemek.printheader()
+		Yemek.printFullHeader()
 		for x,v in sorted_ports:
 			print v.printout()
 
