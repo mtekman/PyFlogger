@@ -22,7 +22,7 @@ class FHandler:
 	query_url=base_url+"/calories-nutrition/search?q="
 	
 
-	def __init__(self, query):
+	def __init__(self, query, foodobj=0):
 		print >> sys.stderr, "\rChecking online...",
 		self.query = HTMLMethods.toHTMLChars(query)
 
@@ -38,9 +38,72 @@ class FHandler:
 ##		self.pagedata = open("test2.html").read()
 
 		self.results = self.ParseResults()
-#		print >> sys.stderr, "found results: %d" % len(self.results)
+		if foodobj==0:
+			self.found = self.resHandler()
+		else:
+			#Check current food obj against results list
+			self.found = self.checkFoodHomology(foodobj)
 
-		self.found = self.resHandler()
+
+	def checkFoodHomology(self,fobj):
+		if len(self.results)==0:
+			print "No matches"
+			return -1
+		
+		good_results = []
+
+		for fo in self.results:
+			diff = fobj.kC - fo.kC
+			if diff < 0:diff *=-1
+
+			if diff < 10:
+				good_results.append(fo)
+				continue
+
+
+			th_prot = fobj.prot
+			th_fat = fobj.fat
+			if th_prot==0:th_prot=0.00001
+			if th_fat==0:th_fat=0.00001
+
+			my_prot = fo.prot
+			my_fat = fo.fat
+			if my_prot==0:my_prot=0.00001
+			if my_fat==0:my_fat=0.00001
+
+			my_rat = my_prot/my_fat
+			th_rat = th_prot/th_fat
+
+			diff = th_rat - my_rat
+			if diff<0:diff*=-1
+
+			if diff < 0.1:
+				good_results.append(fo)
+
+		return FHandler.choice(good_results)		
+
+
+	@staticmethod
+	def choice(array):
+		print ""
+		choose = 1
+		for x in array:
+			res_lines = x.printout(pre="").split('\n')
+			choose_s = "%2d:" % choose
+			print choose_s, res_lines[0]
+
+			del res_lines[0]
+			while len(res_lines)>0:
+				print ' '*(len(choose_s)-2), res_lines[0]
+				del res_lines[0]
+
+			choose +=1
+		ind = int(raw_input('Please pick a number (0 to cancel): '))-1
+		if ind==-1:
+			return -1
+		return array[ind]
+
+
 
 
 	def resHandler(self, max_split=30):
@@ -56,23 +119,7 @@ class FHandler:
 		hhh = hhh.replace('\t','    ')
 		print >> sys.stderr, '-'*(len(hhh)-1)
 			    
-		choose=1
-		for x in self.results:
-			res_lines = x.printout(pre="").split('\n')
-			choose_s = "%2d:" % choose
-			print choose_s, res_lines[0]
-
-			del res_lines[0]
-			while len(res_lines)>0:
-				print ' '*(len(choose_s)-2), res_lines[0]
-				del res_lines[0]
-
-			choose +=1
-		ind = int(raw_input('Please pick a number (0 to cancel): '))-1
-		if ind==-1:
-			return -1
-		return self.results[ind-1]
-
+		return FHandler.choice(self.results)
 
 
 	@staticmethod
@@ -141,7 +188,7 @@ class FHandler:
 		
 		car = Carb(carbs, fibre, sugar)
 
-		return calories, car, fat, protein, per, unit
+		return calories, car, protein, fat, per, unit
 
 
 

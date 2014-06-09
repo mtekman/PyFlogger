@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import sys
-from Yemek import Yemek, Carb
+from Yemek import Yemek, Carb, Portion
 from os.path import abspath
 import Common
 import MiniFSChecker
@@ -28,43 +28,50 @@ class FoodList:
 			if len(foodentry)< 5:
 				continue
 
-			name, data = foodentry.split('|')
+			dd = foodentry.split('|')
+			name = dd[0]
+			data = dd[1]
+			portions = ""
+			if len(dd)==3:portions = dd[2]
+			
 			name = name.strip().lower()
 			
-#                                                             |   kC   Carb [Fibre,Sugar] =   Bad   Prot    Fat    per unit
-#almond milk unsweetened                                      |   13    0.1 [  0.0,  0.0] =   0.1    0.4    1.1  100.0 ml
-			# No sscanf in python :(
 			tokes = data.split()
-			kC = tokes[0]
-			carb_total = tokes[1]
-			fibre = tokes[3].rsplit(',')[0]
-			sugar=tokes[4].rsplit(']')[0]
-			#carb_bad = tokes[6] # unused
-			prot = tokes[7]
-			fat = tokes[8]
-			per = tokes[9]
+			#629      11.6   [     7.4,   4.2]   =                4.2  21.1  55.8 100.0 g
+			kC, carb_total, junk, fibre, sugar, junk, carb_bad_unused, prot, fat, per = tokes[0:10]
 			unit = ' '.join(tokes[10:])
 
-			carbs = Carb(carb_total, fibre, sugar)
-
+			carbs = Carb(carb_total, fibre[:-1], sugar[:-1])
 			food = Yemek(name, kC, carbs, prot, fat, per, unit)
+			
+			# Handle avail portions
+			if portions!="":
+				p_data = portions.split(Portion.start_delim)[1:]
+				for pv in p_data:
+					p,v = pv.split(Portion.end_delim)
+					food.portions.insert(p.strip(), int(v))
+
 			self.foodmap[food.name] = food
 		f.close()
 
 
 	def write(self):
+		
 		f=open(self.path,'w')
 		
 		maxlen_name = reduce(lambda x,y: x if len(x) > len(y) else y, self.foodmap.keys())
 		maxlen_name = len(maxlen_name)+5
-		print "max:", maxlen_name
-
-		print >> f, Yemek.printheader(buffer=maxlen_name)
+		
+		maxport_name = reduce(lambda x,y: x if len(self.foodmap[x].unit) > len(self.foodmap[y].unit) else y, self.foodmap.keys())
+		maxport_name = len(self.foodmap[maxport_name].unit)+5
+		
+		
+		print >> f, Yemek.printheader(buffer=maxlen_name, portions_buff=(maxport_name-len('unit')))
 		print >> f, ""
 		
 		for food in sorted(self.foodmap.keys()):
 			fooditem = self.foodmap[food]
-			print >> f, fooditem.printout(buffer=maxlen_name, pre="")
+			print >> f, fooditem.printout(buffer=maxlen_name, pre="", portions_buff=(maxport_name-len(fooditem.unit)))
 		f.close()
 
 
@@ -151,15 +158,15 @@ class FoodList:
 	def updateListInfo(self):
 		for name in self.foodmap:
 			food = self.foodmap[name]
-			print food.printout()
-			f = MiniFSChecker.FHandler(food.name).found
-			if f==-1:
-				continue
-			else:
+			print "Check:", food.printout()
+			f = MiniFSChecker.FHandler(food.name, food).found
+			if f!=-1:
 				del self.foodmap[name]
 				self.foodmap[f.name.lower()] = f
-#			return
-			
+			print "\n\n"
+		
+		if raw_input("Commit all changes?").strip().lower()=='y':
+			self.write()
 
 
 	
@@ -230,6 +237,3 @@ class FoodList:
 
 #w = FoodList()
 #w.updateListInfo()
-#w.updateprompt()
-#  w.removeprompt()
-#w.printlist()

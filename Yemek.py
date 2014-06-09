@@ -52,11 +52,26 @@ class Carb:
 
 
 class Portion:
+	start_delim="$$"
+	end_delim="::"
+	
 	def __init__(self):
 		self.avail = {}
 
-	def printout(self):
-		return str(self.avail)
+	@staticmethod
+	def makewhitespace(lbuff):
+		return (' '*lbuff)
+
+	@staticmethod
+	def printheader(lbuff):
+		return Portion.makewhitespace(lbuff)+"| Other Portions"
+
+	def printout(self, lbuff):
+		strr = Portion.makewhitespace(lbuff)+'|'
+		for p,v in self.avail.iteritems():
+			strr += Portion.start_delim + p + Portion.end_delim +str(v)
+
+		return strr
 	
 	def insert(self, name, calorie):
 		
@@ -89,10 +104,10 @@ class Yemek:
 	
 #	print headformat
 	
-	def __init__(self, name, kC, carb, prot, fat, per, unit, amount=0, url=""):
+	def __init__(self, name, kC, carb_obj, prot, fat, per, unit, amount=0, url=""):
 		self.name = name
 		self.kC = int(kC)
-		self.carb = carb
+		self.carb = carb_obj
 		self.prot = float(prot)
 		self.fat = float(fat)
 		self.portions = Portion()
@@ -116,7 +131,7 @@ class Yemek:
 		self.amount = float(amount)
 		self.url = url
 
-	def printout(self,header=False, buffer=0, pre="*"):
+	def printout(self,header=False, buffer=0, pre="*", portions_buff=0):
 		if buffer ==0:
 			buffer=Yemek.buffer
 
@@ -152,6 +167,10 @@ class Yemek:
 				self.carb.fibre, self.carb.sugar, self.carb.bad,
 				self.prot, self.fat, self.per, self.unit)
 
+		if portions_buff!=0:
+			text += self.portions.printout(portions_buff)
+
+
 		if len(name_split)>0:
 			del name_split[0]
 		while len(name_split)>0:
@@ -171,12 +190,16 @@ class Yemek:
 
 
 	@staticmethod
-	def printheader(buffer=0):
+	def printheader(buffer=0, portions_buff=0):
 		if buffer ==0:buffer=Yemek.buffer
 		
-		return ("%s |" + Yemek.headformat) % (
+		strr= ("%s |" + Yemek.headformat) % (
 			(' '*buffer), "kC", "Carb", "Fibre", "Sugar", "Bad", "Prot", "Fat", "per", "unit"
 			)
+		
+		if portions_buff!=0:
+			strr += Portion.printheader(portions_buff)
+		return strr
 
 
 	def scaled(self, multip=1):
