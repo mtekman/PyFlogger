@@ -87,7 +87,7 @@ class FoodLogger:
 		ports = self.foodlist.foodmap[name].portions.avail
 		if len(ports)!=0:
 			print "Avail:"
-			for p,v in prots.iteritems():
+			for p,v in ports.iteritems():
 				print p
 		
 		am_amount = raw_input("\nAmount Consumed? ").strip()

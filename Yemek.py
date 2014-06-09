@@ -54,6 +54,9 @@ class Carb:
 class Portion:
 	def __init__(self):
 		self.avail = {}
+
+	def printout(self):
+		return str(self.avail)
 	
 	def insert(self, name, calorie):
 		
@@ -86,10 +89,10 @@ class Yemek:
 	
 #	print headformat
 	
-	def __init__(self, name, kC, (carb, fibre, sugar), prot, fat, per, unit, amount=0, url=""):
+	def __init__(self, name, kC, carb, prot, fat, per, unit, amount=0, url=""):
 		self.name = name
 		self.kC = int(kC)
-		self.carb = Carb(carb, fibre, sugar)
+		self.carb = carb
 		self.prot = float(prot)
 		self.fat = float(fat)
 		self.portions = Portion()
@@ -113,7 +116,7 @@ class Yemek:
 		self.amount = float(amount)
 		self.url = url
 
-	def printout(self,header=False, buffer=0, pre="*", carbinfo=True):
+	def printout(self,header=False, buffer=0, pre="*"):
 		if buffer ==0:
 			buffer=Yemek.buffer
 
@@ -143,16 +146,11 @@ class Yemek:
 		fill = buffer-len(name_split[0])+1
 		outname = name_split[0]+(' '*fill)
 
-		if carbinfo:
-			form = "%s|"+Yemek.outformat
-			text += form % (
+		form = "%s|"+Yemek.outformat
+		text += form % (
 				outname, int(self.kC), self.carb.total, 
 				self.carb.fibre, self.carb.sugar, self.carb.bad,
 				self.prot, self.fat, self.per, self.unit)
-#		else:
-#			text += "%s\t%d\t%.1f\t%.1f\t%.1f\t%.1f\t%s" % (
-#				outname, int(self.kC), self.carb.total,
-#				self.prot, self.fat, self.per, self.unit)
 
 		if len(name_split)>0:
 			del name_split[0]
@@ -164,16 +162,16 @@ class Yemek:
 
 
 	@staticmethod
-	def printFullHeader(buffer=0, carbinfo=True):
+	def printFullHeader(buffer=0):
 		if buffer ==0:buffer=Yemek.buffer
-		hhh = Yemek.printheader(buffer, carbinfo)
+		hhh = Yemek.printheader(buffer)
 		print hhh
 		print '-' * buffer, '|', '-' * (len(hhh)-buffer)
 		print ' ' * buffer, '|'
 
 
 	@staticmethod
-	def printheader(buffer=0, carbinfo=True):
+	def printheader(buffer=0):
 		if buffer ==0:buffer=Yemek.buffer
 		
 		return ("%s |" + Yemek.headformat) % (
@@ -186,7 +184,7 @@ class Yemek:
 			multip = float(self.amount)/self.per
 
 		# Dupe, never edit self
-		selfy = Yemek(self.name, self.kC, (self.carb.total,self.carb.fibre,self.carb.sugar), self.prot, self.fat, self.per, self.unit)
+		selfy = Yemek(self.name, self.kC, Carb(self.carb.total,self.carb.fibre,self.carb.sugar), self.prot, self.fat, self.per, self.unit)
 		
 		selfy.kC = int( selfy.kC * multip)
 		selfy.carb.multiply(multip)

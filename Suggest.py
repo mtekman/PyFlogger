@@ -4,10 +4,39 @@ from FoodLogger import *
 
 class Suggest:
 
+	def sortOpts(self):
+		def perSort(x):
+			yem = x[1]
+			f = float(yem.fat)
+			c = float(yem.carb.bad)
+			
+			
+			# Fibre is taken care of intrinsically by checking only bad
+			if c == 0:c = 0.0001
+			if f == 0:f = 0.0001
+
+			prot_2_fat = float(yem.prot)/f
+			
+			# Overall, should have a good score on both
+			return (prot_2_fat/c) + yem.carb.fibre
+
+
+		for x,v in self.singles.iteritems():
+			self.portions[x] = v
+
+		sorted_ports = sorted(self.portions.iteritems(), key=perSort, reverse=True)
+
+		Yemek.printFullHeader()
+		for x,v in sorted_ports:
+			print v.printout()
+
+
+
 	def __init__(self, foodlist_obj, kc, carb, prot, fat):
 		self.flist = foodlist_obj.foodmap
 		self.allowed_kc = kc
 		self.allowed_carb = carb
+		print carb
 		self.allowed_prot = prot
 		self.allowed_fat = fat
 
@@ -61,34 +90,6 @@ class Suggest:
 			
 			self.portions[name] = new_scale
 
-
-
-	def sortOpts(self):
-
-		def perSort(x):
-			yem = x[1]
-			f = float(yem.fat)
-			c = float(yem.carb.bad)
-			
-			
-			# Fibre is taken care of intrinsically by checking only bad
-			if c == 0:c = 0.0001
-			if f == 0:f = 0.0001
-
-			prot_2_fat = float(yem.prot)/f
-			
-			# Overall, should have a good score on both
-			return prot_2_fat/c
-
-
-		for x,v in self.singles.iteritems():
-			self.portions[x] = v
-
-		sorted_ports = sorted(self.portions.iteritems(), key=perSort, reverse=True)
-
-		Yemek.printFullHeader()
-		for x,v in sorted_ports:
-			print v.printout()
 
 
 

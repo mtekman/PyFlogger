@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import sys, re, Common
-from Yemek import Yemek
+from Yemek import Yemek, Carb
 from urllib2 import urlopen as uopen, URLError
 
 
@@ -51,14 +51,14 @@ class FHandler:
 		maxlen_foodname=30
 
 		print >> sys.stderr, '\n', 
-		hhh = Yemek.printheader(buffer=maxlen_foodname+4, carbinfo=True)
+		hhh = Yemek.printheader(buffer=maxlen_foodname+4)
 		print >> sys.stderr, hhh
 		hhh = hhh.replace('\t','    ')
 		print >> sys.stderr, '-'*(len(hhh)-1)
 			    
 		choose=1
 		for x in self.results:
-			res_lines = x.printout(pre="",carbinfo=True).split('\n')
+			res_lines = x.printout(pre="").split('\n')
 			choose_s = "%2d:" % choose
 			print choose_s, res_lines[0]
 
@@ -68,7 +68,9 @@ class FHandler:
 				del res_lines[0]
 
 			choose +=1
-		ind = int(raw_input('Please pick a number: '))
+		ind = int(raw_input('Please pick a number (0 to cancel): '))-1
+		if ind==-1:
+			return -1
 		return self.results[ind-1]
 
 
@@ -137,7 +139,9 @@ class FHandler:
 #		print "protein", protein
 		if unit=="grams":unit='g'
 		
-		return calories, (carbs, fibre, sugar), fat, protein, per, unit
+		car = Carb(carbs, fibre, sugar)
+
+		return calories, car, fat, protein, per, unit
 
 
 
