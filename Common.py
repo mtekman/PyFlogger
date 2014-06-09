@@ -5,6 +5,17 @@ from os.path import abspath, expanduser
 from time import localtime, time
 
 
+#Taken from r/slowcooking
+conversion = {}
+conversion['teaspoon'] = conversion['tsp'] = conversion['teaspoons'] = conversion['tsps'] = float(5) #ml
+conversion['tablespoon'] = conversion['tbsp'] = conversion['tablespoons'] = conversion['tbsps'] = float(15) #ml
+conversion['fluid ounce'] = conversion['fluid ounces'] = conversion['fluid oz'] = float(30) #ml
+conversion['oz'] = conversion['ounce'] = conversion['ounces'] = float(28) #grams
+conversion['pound'] = conversion['pounds'] = conversion['lb'] = conversion['lbs'] = float(454) #grams
+conversion['cup'] = conversion['cups'] = float(237) #ml
+conversion['pint'] = conversion['pints'] = 2*conversion['cups']
+conversion['quart'] = conversion['quarts'] = 4*conversion['cups']
+conversion['gallon'] = 4*conversion['quart']
 
 
 #Global method

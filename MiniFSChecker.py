@@ -53,11 +53,16 @@ class FHandler:
 		good_results = []
 
 		for fo in self.results:
+			#ignore meaningless foods
+			if fo.kC==0:
+				continue
+
 			diff = fobj.kC - fo.kC
+			scale = float(fobj.kC)/float(fo.kC)
 			if diff < 0:diff *=-1
 
 			if diff < 10:
-				good_results.append(fo)
+				good_results.append((fo,scale))
 				continue
 
 
@@ -78,30 +83,46 @@ class FHandler:
 			if diff<0:diff*=-1
 
 			if diff < 0.1:
-				good_results.append(fo)
+				good_results.append((fo,scale))
 
-		return FHandler.choice(good_results)		
+		return FHandler.choice(good_results, fobj)
 
 
 	@staticmethod
-	def choice(array):
+	def choice(array, compare_to=0):
+		
+		if len(array)==0:
+			print "No matches"
+			return -1
+		
 		print ""
 		choose = 1
 		for x in array:
-			res_lines = x.printout(pre="").split('\n')
-			choose_s = "%2d:" % choose
-			print choose_s, res_lines[0]
-
-			del res_lines[0]
-			while len(res_lines)>0:
-				print ' '*(len(choose_s)-2), res_lines[0]
-				del res_lines[0]
-
+			scale = 1
+			if len(x)>1:
+				scale = x[1]
+				x = x[0]
+			
+			choose_s= "%2d: " % choose
+			
+			sobj = x.scaled(scale)
+			print sobj.printout(pre=choose_s)
+			
+			if compare_to!=0:
+				if sobj.isEqual(compare_to):
+					print "Found definite match!"
+					return x
+			
+			print x.scaled(scale).printout(pre=choose_s)
 			choose +=1
+		
 		ind = int(raw_input('Please pick a number (0 to cancel): '))-1
 		if ind==-1:
 			return -1
-		return array[ind]
+		
+		res = array[ind]
+		if len(res)>1: res = array[ind][0]  # dont want scale
+		return res
 
 
 
@@ -111,7 +132,7 @@ class FHandler:
 			print "No matches"
 			return -1
 	
-		maxlen_foodname=30
+		maxlen_foodname=Yemek.buffer
 
 		print >> sys.stderr, '\n', 
 		hhh = Yemek.printheader(buffer=maxlen_foodname+4)
@@ -126,7 +147,10 @@ class FHandler:
 	def handleFoodInfo(food_data):
 		#Cal
 		b_1 = food_data.index("<b>")
-		b_2 = food_data.index("calories</b>", b_1+1)
+		try:
+			b_2 = food_data.index("calories</b>", b_1+1)
+		except ValueError:
+			b_2 = food_data.index("calorie</b>", b_1+1)
 		
 		calories = int(food_data[b_1+3:b_2])
 #		print "cal:", calories
@@ -134,18 +158,63 @@ class FHandler:
 		#Per
 		b_3 = food_data.index(".</div>", b_2+1)
 		tokes = food_data[b_2+12:b_3].split()
+		print tokes
 
-		num_index = 0
+		unit_info = ""
+#		num_index = 0
+		per = -1
+		
+		last_val=False
 		for t in xrange(len(tokes)):
+			
+			if last_val:
+				unit_info += tokes[t]
+				last_val = False
+				continue
+
 			try:
-				Common.amountsplit(tokes[t], floater=True)
-				num_index = t
-				break
+				perd, leftover = Common.amountsplit(tokes[t], floater=True)
+				
+				#First round
+				if per==-1:
+					 per = perd
+				else:
+					unit_info += str(perd)+"@CAS"
+				
+				if leftover!="":
+					unit_info += leftover
+				
+				last_val = True
 			except ValueError:
+				if last_val:
+					unit_info += tokes[t]
+				last_val = False
 				pass
 
-		per = Common.amountsplit(tokes[num_index], floater=True)[0]
-		unit = tokes[num_index+1].strip()
+#		per, leftover = Common.amountsplit(tokes[num_index], floater=True)
+#		unit = tokes[num_index+1].strip()
+		
+		#Find extra unit info
+#		extra= ""
+#		unit_keys = Common.conversion.keys()
+#		for t in tokes[num_index+2:]:
+#			if t in ['in','of','a']:continue
+#			if t in unit_keys:
+#				print "YES:", t
+#				extra += " "+t
+#				break
+#
+#		if extra!="":
+#			extra = '('+extra+')'
+		
+		
+#		if leftover in ['g','ml','grams']:
+#			if unit=="serving":
+#				unit = leftover + extra
+#			else:
+#				unit += ' ('+leftover+" "+extra+')'
+		unit = unit_info
+
 #		print "p/u:", per, unit
 		
 		#Fat
@@ -202,32 +271,41 @@ class FHandler:
 		start_index = portion_data.index("<table ", start_index+1)
 		end_index = portion_data.index("</table>", start_index + 5)
 		
-		portion_data = portion_data[start_index:end_index].split("<tr>")[1:]
+		portion_data = portion_data[start_index:end_index].split("<tr")[1:]
 		
 		res = []
 		
 		for p_data in portion_data:
-			start = p_data.index("<a href=\"")+9
+			try:
+				start = p_data.index("<a href=\"")+9
+			except ValueError:
+				continue
+				
 			start = p_data.index(">", start)+1
 			end = p_data.index("</a>", start)
 			
 			name = p_data[start:end].strip()
 			
-			#Extra name info
+			#Try for extra name info, skip otherwise
 			try:
-				ex_start = p_data.index("(",end+5)
-				ex_end = p_data.index(")",ex_start+1)
+				ex_start = p_data.index("<span class=\"small-text grey-text\">(",end+5)+35
+				ex_end = p_data.index(")",ex_start)
 				
-				name += p_data[ex_start:ex_end+1].strip()
+				name += " "+p_data[ex_start:ex_end+1].strip()
 			except ValueError:
 				pass
 			
+
 			# Calorie info
 			start = p_data.index("a class=\"small-text\" href=", end)
 			start = p_data.index(">", start+10)+1
 			end = p_data.index("</a>", start)
 			
-			calorie = int(p_data[start:end].strip())
+			try:
+				calorie = int(p_data[start:end].strip())
+			except ValueError:
+				# Couldn't convert, or kCal non-existent, skip
+				continue
 			
 			res.append( [name, calorie] )
 		return res
@@ -250,7 +328,13 @@ class FHandler:
 		
 		name = tempdata[n_index1+4:n_index2].strip().lower()
 
-		index1 = tempdata.index("<div>There are")
+#		print tempdata, "\n\n\n"
+		try:
+			index1 = tempdata.index("<div>There are")
+		except ValueError:
+			# Single calorie...
+			index1 = tempdata.index("<div>There is")
+
 		index2 = tempdata.index("</td></tr>", index1+1)
 
 		food_data = tempdata[index1:index2]

@@ -156,17 +156,23 @@ class FoodList:
 
 
 	def updateListInfo(self):
-		for name in self.foodmap:
+		for name in self.foodmap.keys():
 			food = self.foodmap[name]
-			print "Check:", food.printout()
+			
+			if not((food.carb.sugar ==0 and food.carb.fibre==0) and (food.carb.total == food.carb.bad)):
+				continue
+			
+#			if name != 'chicken drumstick (skin eaten)':continue
+			
+			print "Check:"
+			print food.printout(pre="---")
 			f = MiniFSChecker.FHandler(food.name, food).found
 			if f!=-1:
 				del self.foodmap[name]
 				self.foodmap[f.name.lower()] = f
-			print "\n\n"
+				self.write()
 		
-		if raw_input("Commit all changes?").strip().lower()=='y':
-			self.write()
+		self.write()
 
 
 	

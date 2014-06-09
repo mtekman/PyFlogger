@@ -145,23 +145,31 @@ class Yemek:
 		printname = self.name
 		words = printname.split()
 
+		first_pre = pre
+		pre = ' '*len(pre)
+
+		# Fit words on a line, rather than an uneven split
 		while len(words) > 0:
 			fword = words[0]
 			joiner = ""
 
-			while len(joiner+fword) < buffer:
+			while len(pre+joiner+fword) < buffer:
 				joiner += fword+' '
 				del words[0]
 				if len(words)==0:break
 				fword = words[0]
 
-			name_split.append( '  '+joiner )
-		name_split[0] = (pre+name_split[0][1:]).strip()
+			line = pre+(joiner.strip())
+			name_split.append(line)
 
+		#first line
+		name_split[0] = first_pre+(name_split[0].strip())
+
+		#Fill remainder of first line until data
 		fill = buffer-len(name_split[0])+1
 		outname = name_split[0]+(' '*fill)
 
-		form = "%s|"+Yemek.outformat
+		form = "%s|"+Yemek.outformat  #template formatting
 		text += form % (
 				outname, int(self.kC), self.carb.total, 
 				self.carb.fibre, self.carb.sugar, self.carb.bad,
@@ -170,11 +178,10 @@ class Yemek:
 		if portions_buff!=0:
 			text += self.portions.printout(portions_buff)
 
-
 		if len(name_split)>0:
 			del name_split[0]
 		while len(name_split)>0:
-			text += "\n%s" % name_split[0]
+			text += "\n%s%s|" % (name_split[0], (' '*(buffer-len(name_split[0])+1)))
 			del name_split[0]
 
 		return text
@@ -203,7 +210,7 @@ class Yemek:
 
 
 	def scaled(self, multip=1):
-		if multip==1:
+		if multip==1 and self.amount!=0:
 			multip = float(self.amount)/self.per
 
 		# Dupe, never edit self
@@ -216,3 +223,23 @@ class Yemek:
 		selfy.per *= multip
 
 		return selfy
+	
+	@staticmethod
+	def roughlyEqual(one,two, thresh=0.1):
+		three = one - two
+		if three < 0:three *=-1
+		return three < thresh
+	
+	def isEqual(self, other):
+		#Debug
+#		print Yemek.roughlyEqual(self.kC, other.kC)
+#		print Yemek.roughlyEqual(self.prot, other.prot)
+#		print Yemek.roughlyEqual(self.fat, other.fat)
+#		print Yemek.roughlyEqual(self.carb.fibre, other.carb.fibre)
+#		print Yemek.roughlyEqual(self.carb.sugar, other.carb.sugar)
+
+		return (Yemek.roughlyEqual(self.kC, other.kC)
+			and Yemek.roughlyEqual(self.prot, other.prot)
+			and Yemek.roughlyEqual(self.fat, other.fat)
+			and Yemek.roughlyEqual(self.carb.fibre, other.carb.fibre)
+			and Yemek.roughlyEqual(self.carb.sugar, other.carb.sugar) )
