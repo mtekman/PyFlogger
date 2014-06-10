@@ -80,8 +80,6 @@ class PieChart:
 	def __init__(self, c,p,f,kc, macrofile, lmargin = 6, radius=8, printme=True):
 
 		if printme:
-			colors=".%F"
-
 			self.circle = []
 			self.rad = radius/2
 			lmarginal = lmargin - 20
@@ -138,6 +136,11 @@ class PieChart:
 
 
 		if printme:
+			c_col = '.' if self.carb_current.bad < self.macro_carb.bad else 'C'
+			p_col = '%' if self.protein_current < self.macro_prot else 'P'
+			f_col = '!' if self.fat_current < self.macro_fat else 'F'
+
+			colors="%s%s%s" % (c_col, p_col, f_col)
 			self.make(colors,[c,p,f],radius)
 
 			mid_x, mid_y = (len(self.circle[0])/2)+1, len(self.circle)/2

@@ -159,16 +159,17 @@ class FoodList:
 		self.insert(name)
 	
 	def search(self,name):
-		searchname = name.split()[0].strip()
+		searchname = name.split()  #d[0].strip()
 		#print searchfoods, searchname
 			
 		found=[];
 		for avail_food, obj in self.foodmap.iteritems():
 			#words
-			for s in avail_food:
-				if searchname in s.strip():
-					found.append(obj)
-					break
+			for ss in searchname:
+				for s in avail_food.split():
+					if ss.strip() in s.strip():
+						found.append(obj)
+						break
 		return found
 
 
@@ -242,7 +243,7 @@ class FoodList:
 		# Multiple results
 		print >> sys.stderr, ": "
 		
-		res = MiniFSChecker.choice(found)
+		res = Common.choice(found)
 
 		if res==-1:
 			if Common.ynprompt('Search online? '):
@@ -252,6 +253,8 @@ class FoodList:
 			else:
 				#Manual insert
 				self.insert(name)
+		else:
+			name = res.name
 		return name
 				
 

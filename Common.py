@@ -89,8 +89,7 @@ def choice(yem_array, compare_to=0):
 				scale = x[1]
 				x = x[0]
 		except AttributeError:
-			# Not a tuple
-			pass
+			pass # Not a tuple
 		
 		choose_s= "%2d: " % choose
 		
@@ -117,7 +116,10 @@ def choice(yem_array, compare_to=0):
 	if ind==-1:return -1
 	
 	res = yem_array[ind]
-	if len(res)>1: res = yem_array[ind][0]  # dont want scale
+	try:
+		res = yem_array[ind][0]  # dont want scale
+	except AttributeError:
+		pass
 	return res
 
 
