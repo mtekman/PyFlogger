@@ -3,6 +3,34 @@
 # Each Yemek object has a single Carb and Portion class attached to it
 import sys
 
+class Tags:
+	delim='##'
+
+	global_tags={}
+
+	def __init__(self):
+		self.tags={}
+
+	def insert(self, tag):
+		if not tag in self.tags:
+			self.tags[tag] = 1
+		if not tag in Tags.global_tags:
+			Tags.global_tags[tag] = 1
+		else:
+			Tags.global_tags[tag] += 1
+
+	def printout(self):
+		return Tags.delim.join(self.tags.keys())
+
+
+	@staticmethod
+	def popcon():
+		def treas(keyd):
+			return Tags.global_tags[keyd]
+
+		return sorted(Tags.global_tags.keys(), key=treas, reverse=True)
+
+
 class Carb:
 	def __init__(self, carb, fibre, sugar):
 		self.fibre = float(fibre)
@@ -16,13 +44,6 @@ class Carb:
 		
 		self.bad = self.total - self.fibre
 		
-#		diff = total - carb
-#		if diff<0:diff *=-1
-#		diff = float(diff)/self.total
-#		
-#		if diff>0.1:
-#			print >> sys.stderr, "DOES NOT ADD UP", carb, fibre, sugar, diff
-#			exit(-1)
 
 	# override multiplier
 	def multiply(self, x):
@@ -110,7 +131,9 @@ class Yemek:
 		self.carb = carb_obj
 		self.prot = float(prot)
 		self.fat = float(fat)
+
 		self.portions = Portion()
+		self.tags = Tags()
 
 		try:
 			self.per = float(per)
@@ -131,7 +154,8 @@ class Yemek:
 		self.amount = float(amount)
 		self.url = url
 
-	def printout(self,header=False, buffer=0, pre="*", portions_buff=0):
+	def printout(self,header=False, buffer=0, pre="*", 
+			portions_buff=0, tags=False):
 		if buffer ==0:
 			buffer=Yemek.buffer
 
@@ -177,6 +201,9 @@ class Yemek:
 
 		if portions_buff!=0:
 			text += self.portions.printout(portions_buff)
+
+		if tags:
+			text += '|'+self.tags.printout()
 
 		if len(name_split)>0:
 			del name_split[0]

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import sys
-from Yemek import Yemek, Carb, Portion
+from Yemek import Yemek, Carb, Portion, Tags
 from os.path import abspath
 import Common
 import MiniFSChecker
@@ -32,7 +32,11 @@ class FoodList:
 			name = dd[0]
 			data = dd[1]
 			portions = ""
+			tags=""
 			if len(dd)==3:portions = dd[2]
+			if len(dd)==4:
+				portions = dd[2]
+				tags == dd[3]
 			
 			name = name.strip().lower()
 			
@@ -51,6 +55,12 @@ class FoodList:
 					p,v = pv.split(Portion.end_delim)
 					food.portions.insert(p.strip(), int(v))
 
+			# Handle Tags
+			if tags!="":
+				t_data = tags.split(Tags.delim)
+				for tv in t_data:
+					food.tags.insert(tv.strip())
+			
 			self.foodmap[food.name] = food
 		f.close()
 
@@ -66,12 +76,16 @@ class FoodList:
 		maxport_name = len(self.foodmap[maxport_name].unit)+5
 		
 		
-		print >> f, Yemek.printheader(buffer=maxlen_name, portions_buff=(maxport_name-len('unit')))
+		print >> f, Yemek.printheader(buffer=maxlen_name, 
+			portions_buff=(maxport_name-len('unit')),
+			tags=True)
 		print >> f, ""
 		
 		for food in sorted(self.foodmap.keys()):
 			fooditem = self.foodmap[food]
-			print >> f, fooditem.printout(buffer=maxlen_name, pre="", portions_buff=(maxport_name-len(fooditem.unit)))
+			print >> f, fooditem.printout(buffer=maxlen_name, pre="", 
+				portions_buff=(maxport_name-len(fooditem.unit)),
+				tags=True)
 		f.close()
 
 
