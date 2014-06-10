@@ -85,45 +85,7 @@ class FHandler:
 			if diff < 0.1:
 				good_results.append((fo,scale))
 
-		return FHandler.choice(good_results, fobj)
-
-
-	@staticmethod
-	def choice(array, compare_to=0):
-		
-		if len(array)==0:
-			print "No matches"
-			return -1
-		
-		print ""
-		choose = 1
-		for x in array:
-			scale = 1
-			if len(x)>1:
-				scale = x[1]
-				x = x[0]
-			
-			choose_s= "%2d: " % choose
-			
-			sobj = x.scaled(scale)
-			print sobj.printout(pre=choose_s)
-			
-			if compare_to!=0:
-				if sobj.isEqual(compare_to):
-					print "Found definite match!"
-					return x
-			
-			print x.scaled(scale).printout(pre=choose_s)
-			choose +=1
-		
-		ind = int(raw_input('Please pick a number (0 to cancel): '))-1
-		if ind==-1:
-			return -1
-		
-		res = array[ind]
-		if len(res)>1: res = array[ind][0]  # dont want scale
-		return res
-
+		return Common.choice(good_results, fobj)
 
 
 
@@ -132,15 +94,8 @@ class FHandler:
 			print "No matches"
 			return -1
 	
-		maxlen_foodname=Yemek.buffer
+		return Common.choice(self.results)
 
-		print >> sys.stderr, '\n', 
-		hhh = Yemek.printheader(buffer=maxlen_foodname+4)
-		print >> sys.stderr, hhh
-		hhh = hhh.replace('\t','    ')
-		print >> sys.stderr, '-'*(len(hhh)-1)
-			    
-		return FHandler.choice(self.results)
 
 
 	@staticmethod
@@ -158,64 +113,30 @@ class FHandler:
 		#Per
 		b_3 = food_data.index(".</div>", b_2+1)
 		tokes = food_data[b_2+12:b_3].split()
-		print tokes
+#		print tokes
 
-		unit_info = ""
-#		num_index = 0
-		per = -1
-		
-		last_val=False
+
+		# Store per,unit combos as tuples
+		per_unit = []
+
+		last_index = -1
+
+		# Single pass, find all units
 		for t in xrange(len(tokes)):
-			
-			if last_val:
-				unit_info += tokes[t]
-				last_val = False
-				continue
-
 			try:
-				perd, leftover = Common.amountsplit(tokes[t], floater=True)
-				
-				#First round
-				if per==-1:
-					 per = perd
-				else:
-					unit_info += str(perd)+"@CAS"
-				
-				if leftover!="":
-					unit_info += leftover
-				
-				last_val = True
+				per, unit = Common.amountsplit(tokes[t], floater=True)
+				try:
+					unit += ' '+tokes[t+1]
+				except IndexError:
+					pass
+				per_unit.append( [per,unit] )
 			except ValueError:
-				if last_val:
-					unit_info += tokes[t]
-				last_val = False
 				pass
 
-#		per, leftover = Common.amountsplit(tokes[num_index], floater=True)
-#		unit = tokes[num_index+1].strip()
-		
-		#Find extra unit info
-#		extra= ""
-#		unit_keys = Common.conversion.keys()
-#		for t in tokes[num_index+2:]:
-#			if t in ['in','of','a']:continue
-#			if t in unit_keys:
-#				print "YES:", t
-#				extra += " "+t
-#				break
-#
-#		if extra!="":
-#			extra = '('+extra+')'
-		
-		
-#		if leftover in ['g','ml','grams']:
-#			if unit=="serving":
-#				unit = leftover + extra
-#			else:
-#				unit += ' ('+leftover+" "+extra+')'
-		unit = unit_info
 
-#		print "p/u:", per, unit
+		per = per_unit[0][0]
+		unit = per_unit[0][1]+' '+','.join(set(map(lambda x: '('+str(x[0]).strip()+' '+x[1].strip()+')', per_unit[1:])))
+
 		
 		#Fat
 		b_2 = food_data.index("<b>Fat:</b>", b_3+1)

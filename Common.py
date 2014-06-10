@@ -3,6 +3,7 @@
 import sys
 from os.path import abspath, expanduser
 from time import localtime, time
+from Yemek import Yemek
 
 
 #Taken from r/slowcooking
@@ -20,7 +21,7 @@ conversion['gallon'] = 4*conversion['quart']
 
 #Global method
 def ynprompt(message):
-	ans = raw_input(message)
+	ans = raw_input(message+' ').strip()
 	return (ans[0].lower()=='y')
 
 
@@ -39,23 +40,86 @@ def amountsplit(text,floater=False):
 	lower = 47
 	if floater:lower=46 # '.' allowed
 	
-	index_let=0
-	for a in text:
-		if not(lower <= ord(a) <= 57):
-			break
-		index_let +=1
+	num_builder = amount_builder=""
+	num_encounter = float_encounter = False
 	
-	num = text[0:index_let].strip()
+	for a in xrange(len(text)):
+		chor = text[a]
+			
+		if lower <= ord(chor) <= 57:
+			if floater and chor == '.':
+				if float_encounter:continue				#Already seen a dot, skip
+				else:float_encounter=True
+				
+			num_builder += chor
+			num_encounter = True
+		else:
+			#NAN
+			if num_encounter:
+				amount_builder += chor
+		
 	try:
-		amount = text[index_let:].splitlines()[0].strip()
+		amount = amount_builder.splitlines()[0].strip()
 	except IndexError:
 		amount = ""
 	
-	if floater:
-		return fraction(num),amount
-	else:
-		return int(num),amount
+	if floater:return fraction(num_builder),amount
+	else:return int(num_builder),amount
 
 
 def stripAll(list):
 	return map(lambda x: x.strip(), list)
+
+
+'''Takes a list of yem objects and returns one'''
+def choice(yem_array, compare_to=0):
+	
+	if len(yem_array)==0:
+		print "No matches"
+		return -1
+	
+	print ""
+	choose = 1
+	print Yemek.printFullHeader()
+
+	for x in yem_array:
+		scale = 1
+		try:
+			if len(x)>1:
+				scale = x[1]
+				x = x[0]
+		except AttributeError:
+			# Not a tuple
+			pass
+		
+		choose_s= "%2d: " % choose
+		
+		sobj = x.scaled(scale)
+		print sobj.printout(pre=choose_s)
+		
+		if compare_to!=0:
+			if sobj.isEqual(compare_to):
+				print "Found definite match!"
+				return x
+		
+#		print x.scaled(scale).printout(pre=choose_s)
+		choose +=1
+	
+	ind = ""
+	isNum = False
+	while not isNum:
+		try:
+			ind = int(raw_input('Please pick a number (0 to cancel): '))-1
+			isNum = True
+		except ValueError:
+			print "Not a number, please try again"
+	
+	if ind==-1:return -1
+	
+	res = yem_array[ind]
+	if len(res)>1: res = yem_array[ind][0]  # dont want scale
+	return res
+
+
+def makewhitespace(lbuff):
+	return (' '*lbuff)

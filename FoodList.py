@@ -100,6 +100,7 @@ class FoodList:
 
 
 	def insertAll(self, yem):
+		print yem
 		name = yem.name.strip().lower()
 		self.foodmap[name] = yem
 		print >> sys.stderr, "Inserted", name
@@ -111,8 +112,11 @@ class FoodList:
 		per,unit = Common.amountsplit(raw_input("Per Unit (e.g. '100g'): ").strip())
 		kc, carb_total, carb_sugar, carb_fibre , prot, fat = raw_input("kCal Carb Sug Fibr Prot Fat: ").split()
 		
+		user_input_tags = Tags.tagprompt()
+		
 		carbs = Carb(carb_total, carb_fibre, carb_sugar)
 		y = Yemek(name, kc, carbs, prot, fat, per, unit)
+		y.tags.insertList(user_input_tags)
 
 		self.insertAll(y)
 
@@ -155,17 +159,16 @@ class FoodList:
 		self.insert(name)
 	
 	def search(self,name):
-		foods = self.foodmap.keys()
-		searchfoods = map(lambda x: x.split(), foods)
 		searchname = name.split()[0].strip()
 		#print searchfoods, searchname
 			
-		found=[]; index=0;
-		for sf in searchfoods:
-			for s in sf:
-				if searchname.strip() in s.strip():
-					found.append(foods[index])
-			index +=1
+		found=[];
+		for avail_food, obj in self.foodmap.iteritems():
+			#words
+			for s in avail_food:
+				if searchname in s.strip():
+					found.append(obj)
+					break
 		return found
 
 
@@ -195,62 +198,59 @@ class FoodList:
 			print >> sys.stderr,  self.foodmap[name].printout(header=True)
 			return name
 
-		#Search keys for closest match
+		#Search objects for closest match
 		found = self.search(name)
 		res = len(found)
 
 		if res == 0:
 			print >> sys.stderr, "\nCannot find:", "\"%s\"" % name,
-			ans = raw_input(', insert? ').strip()
-			if ans[0].lower() == 'y':
+			if Common.ynprompt(", manually insert?"):
 				self.insert(name)
 				return name.lower()
-			if raw_input('Search online? ').strip()[0].lower()=='y':
+			if Common.ynprompt('Search online? '):
 				f = MiniFSChecker.FHandler(name).found
-				
-				self.insertAll(f)
+				if f!=-1:
+					self.insertAll(f)
+					name = f.name
+				else:
+					exit(0)
 				return f.name
 			exit(0)
 			
-		# Found
-		print >> sys.stderr, "\nDid you mean ",
+		# Found something, print
+		print >> sys.stderr, "\nMatched",
 		
 		# One result
-		if res==1:
-			print >> sys.stderr, "\"%s\"" % found[0],
-			ans = raw_input(' ? ')
-			if ans[0].lower()=='y':
-				name = found[0]
-				print >> sys.stderr,  self.foodmap[name].printout(header=True)
-			elif raw_input('Search online? ').strip()[0].lower()=='y':
-				f = MiniFSChecker.FHandler(name).found
-				
-				if f==-1:
-					exit(-1)
-				
-				self.insertAll(f)
-				name = f.name
-			else:
-				self.insert(name)
-			return name
+#		if res==1:
+#			print >> sys.stderr, "\"%s\"" % found[0],
+#			ans = raw_input(' ? ')
+#			if ans[0].lower()=='y':
+#				name = found[0]
+#				print >> sys.stderr,  self.foodmap[name].printout(header=True)
+#			elif raw_input('Search online? ').strip()[0].lower()=='y':
+#				f = MiniFSChecker.FHandler(name).found
+#				
+#				if f==-1:
+#					exit(-1)
+#				
+#				self.insertAll(f)
+#				name = f.name
+#			else:
+#				self.insert(name)
+#			return name
 	
 		# Multiple results
 		print >> sys.stderr, ": "
 		
-		cnt=1
-		for f in found:
-			print >> sys.stderr, ' *%d:' % cnt, f
-			cnt += 1
+		res = MiniFSChecker.choice(found)
 
-		ans = int(raw_input('Enter Number (0 to cancel): '))
-		if ans != 0:
-			name = found[ans-1]
-			print >> sys.stderr,  self.foodmap[name].printout(header=True)
-		elif raw_input('Search online? ').strip()[0].lower()=='y':
-			f = MiniFSChecker.FHandler(name).found
-			self.insertAll(f)
-			name = f.name
-		else:
+		if res==-1:
+			if Common.ynprompt('Search online? '):
+				f = MiniFSChecker.FHandler(name).found
+				self.insertAll(f)
+				name = f.name
+			else:
+				#Manual insert
 				self.insert(name)
 		return name
 				

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Each Yemek object has a single Carb and Portion class attached to it
+# Each Yemek object has a single Carb, Portion, and Tag class attached to it
 import sys
 
 class Tags:
@@ -11,6 +11,10 @@ class Tags:
 	def __init__(self):
 		self.tags={}
 
+	def insertList(self, lists):
+		for tag in lists:self.insert(tag)
+
+
 	def insert(self, tag):
 		if not tag in self.tags:
 			self.tags[tag] = 1
@@ -19,8 +23,15 @@ class Tags:
 		else:
 			Tags.global_tags[tag] += 1
 
-	def printout(self):
+	def printout(self):		
 		return Tags.delim.join(self.tags.keys())
+
+
+	@staticmethod
+	def tagprompt():
+		get_avail_tags = Tags.popcon()
+		tags = raw_input("Attach a tag? (Avail: %s)" % ','.join(get_avail_tags))
+		return tags.split(',')
 
 
 	@staticmethod
@@ -79,23 +90,25 @@ class Portion:
 	def __init__(self):
 		self.avail = {}
 
-	@staticmethod
-	def makewhitespace(lbuff):
-		return (' '*lbuff)
+	def portionprompt(self):
+		get_avail = ','.join(self.avail.keys())
+		ports = raw_input("Attach a tag? (Avail: %s)" % ','.join(get_avail))
+		return ports.split(',')
+	
 
 	@staticmethod
 	def printheader(lbuff):
-		return Portion.makewhitespace(lbuff)+"| Other Portions"
+		return Common.makewhitespace(lbuff)+"| Other Portions"
+		
 
 	def printout(self, lbuff):
-		strr = Portion.makewhitespace(lbuff)+'|'
+		strr = Common.makewhitespace(lbuff)+'|'
 		for p,v in self.avail.iteritems():
 			strr += Portion.start_delim + p + Portion.end_delim +str(v)
-
 		return strr
+
 	
 	def insert(self, name, calorie):
-		
 		name = name.strip()
 
 		if name in self.avail:
