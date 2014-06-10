@@ -5,6 +5,7 @@ from FoodLogger import FoodLogger
 from Weight import WeightLog
 from Plotter import *
 from Suggest import Suggest
+from Common import daysSince
 
 class Args:
 
@@ -12,7 +13,7 @@ class Args:
 		print >> sys.stderr, '''
 Records progress during keto; weight and food consumption
 		
-		%s <command> <task> [OPT
+		%s <command> <task> [OPTS]
 
 commands:  	insert, remove, list, plot, suggest
 tasks:    	weight, food
@@ -91,7 +92,7 @@ OPTS:		foodname, lbs
 						startdate=date
 						continue
 				               
-					days_since = wl.daysSince(startdate,date)
+					days_since = daysSince(startdate,date)
 					total = days_since
 
 #					print date,total
@@ -121,8 +122,29 @@ OPTS:		foodname, lbs
 				return
 			
 			if self.list:
-				fl.showTotals(fl.date)
+				fl.showTotals(fl.date, showPie=True)
 				return
+
+			if self.plot:
+				all_avail_dates = fl.read(fl.date)		# order/keys
+				xy = XYGraph()
+
+				startdate=""
+				for date in all_avail_dates:
+				
+					if startdate=="":
+						startdate=date
+						continue
+				               
+					days_since = daysSince(startdate,date)
+					cumulative_days = days_since
+
+					kc_tot = fl.makeTotals(date)[0]
+					xy.addPoint(cumulative_days, kc_tot,"x")
+				                                          
+				Printer(xy)
+				return                                       
+
 
 			if self.suggest:
 				fl.makeTotals(fl.date)

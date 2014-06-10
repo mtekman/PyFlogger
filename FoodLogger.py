@@ -28,24 +28,34 @@ class FoodLogger:
 		
 		f.readline()   # Strip Header
 
+		datelist=[] # Not really used
+		
+		date = date[0:10]
+
 		for line in f:
 			if len(line) < 5:
 				continue
 			ddate, amount, name = line.split('\t')
+			ddate = ddate[0:10]
+			
+			datelist.append(ddate)
 
-			if date[0:10] == ddate[0:10]:
+			if date == ddate:
 				#Find food if date matches
 				food = copy(self.foodlist.foodmap[name.strip()])
 				food.amount = amount
 				self.foodlog.append(food)
 		f.close()
+		
+		return datelist
+	
+	
+
+	def showTotals(self,date, showPie=True):
+		self.makeTotals(date, showPie, printme=True)		
 
 
-	def showTotals(self,date):
-		self.makeTotals(date, printme=True)		
-
-
-	def makeTotals(self,date, printme=False):
+	def makeTotals(self,date, showPie=False, printme=False):
 		self.read(date)
 		
 		kC_total=0
@@ -73,9 +83,9 @@ class FoodLogger:
 				print >> sys.stderr, scyem.printout()
 
 		self.pie = PieChart(carb_total, protein_total, fat_total, kC_total, self.macrofile,
-			Yemek.buffer-8, 8, printme)
+			Yemek.buffer-8, 8, printme=showPie)
 		
-		self.foodlog = [] # clear until next
+		return kC_total, carb_total, protein_total, fat_total
 
 
 	def log(self, name=""):

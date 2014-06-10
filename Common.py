@@ -2,7 +2,8 @@
 
 import sys
 from os.path import abspath, expanduser
-from time import localtime, time
+from os import stat
+from time import localtime, time, mktime
 from Yemek import Yemek
 
 
@@ -19,7 +20,8 @@ conversion['quart'] = conversion['quarts'] = 4*conversion['cups']
 conversion['gallon'] = 4*conversion['quart']
 
 
-#Global method
+############################ Prompts ###################################
+
 def ynprompt(message):
 	ans = raw_input(message+' ').strip()
 	return (ans[0].lower()=='y')
@@ -27,58 +29,10 @@ def ynprompt(message):
 
 def userlistprompt(message, str_array):
 	opts = raw_input("%s : %s\n" % (message,','.join(str_array)))
-	opts = opts.splitlines()[0].strip()
+	opts = opts.strip()
 	if opts == "":return -1
 	return opts.split(',')
-
-
-def fraction(am_amount):
-	try:
-		am = float(am_amount)
-	except ValueError:
-		spl = am_amount.split('/')
-		am = float(spl[0])/float(spl[1])
-	return am
-
-
-def amountsplit(text,floater=False):
-	text= text.strip()
 	
-	lower = 47
-	if floater:lower=46 # '.' allowed
-	
-	num_builder = amount_builder=""
-	num_encounter = float_encounter = False
-	
-	for a in xrange(len(text)):
-		chor = text[a]
-			
-		if lower <= ord(chor) <= 57:
-			if floater and chor == '.':
-				if float_encounter:continue				#Already seen a dot, skip
-				else:float_encounter=True
-				
-			num_builder += chor
-			num_encounter = True
-		else:
-			#NAN
-			if num_encounter:
-				amount_builder += chor
-		
-	try:
-		amount = amount_builder.splitlines()[0].strip()
-	except IndexError:
-		amount = ""
-	
-	if floater:return fraction(num_builder),amount
-	else:return int(num_builder),amount
-
-
-def stripAll(list):
-	return map(lambda x: x.strip(), list)
-
-
-
 '''Takes any array and returns a chosen item'''
 def choice(array, compare_to=0):
 	
@@ -144,7 +98,113 @@ def choice(array, compare_to=0):
 	isYem = isinstance( array[0][0] if isTuple else array[0], Yemek)
 	
 	return def_choice(array, compare_to, isTuple, isYem)
+
+
+
+
+
+
+###################### Str to Num ######################################
+
+def fraction(am_amount):
+	try:
+		am = float(am_amount)
+	except ValueError:
+		spl = am_amount.split('/')
+		am = float(spl[0])/float(spl[1])
+	return am
+
+
+
+def amountsplit(text,floater=False):
+	text= text.strip()
+	
+	lower = 47
+	if floater:lower=46 # '.' allowed
+	
+	num_builder = amount_builder=""
+	num_encounter = float_encounter = False
+	
+	for a in xrange(len(text)):
+		chor = text[a]
+			
+		if lower <= ord(chor) <= 57:
+			if floater and chor == '.':
+				if float_encounter:continue				#Already seen a dot, skip
+				else:float_encounter=True
+				
+			num_builder += chor
+			num_encounter = True
+		else:
+			#NAN
+			if num_encounter:
+				amount_builder += chor
 		
+	try:
+		amount = amount_builder.splitlines()[0].strip()
+	except IndexError:
+		amount = ""
+	
+	if floater:return fraction(num_builder),amount
+	else:return int(num_builder),amount
+
+
+
+
+
+###################### File Handling ###################################
+
+def backup(path):
+	backup_path = path+".backup"
+
+	try:
+		curr_bytes = stat(path).st_size
+	except OSError:
+		print "No file to backup..."
+		return 0
+
+	try:
+		back_bytes = stat(backup_path).st_size
+	except OSError:
+		print "No backup file, creating one"
+		b=open(backup_path,'w');b.write("");b.close()
+		back_bytes = stat(backup_path).st_size
+
+	if curr_bytes > back_bytes:
+		back = open(backup_path,'w')
+		curr = open(path,'r')
+		# Copy current into backup if gt
+#		print "Backing", path, "into", backup_path
+		for line in curr:
+			print >> back, line
+		back.close()
+		curr.close()
+
+
+
+##################### Time functions ##########################
+def daysSince(date1,date2):
+	y1,m1,d1 = map(lambda x: int(x), date1.split('/'))
+	y2,m2,d2 = map(lambda x: int(x), date2.split('/'))
+	
+	seconds1 = mktime((y1,m1,d1,0,0,0,0,0,-1))
+	seconds2 = mktime((y2,m2,d2,0,0,0,0,0,-1))
+	
+	diff = seconds2 - seconds1
+	return float(diff)/(24*60*60)
+
+
+def nextDay(date):
+	return ("%04d/%02d/%02d" % localtime(time()+(24*60*60))[0:3])
+
+
+
+
+
+##################### String handling #################################
+
+def stripAll(list):
+	return map(lambda x: x.strip(), list)
 
 
 def makewhitespace(lbuff):

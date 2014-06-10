@@ -72,7 +72,7 @@ class PieChart:
 				print self.allows_line,
 			
 			print ""
-		print ""
+		print "\n\n"
 
 		
 
@@ -138,7 +138,7 @@ class PieChart:
 		if printme:
 			c_col = '.' if self.carb_current.bad < self.macro_carb.bad else 'C'
 			p_col = '%' if self.protein_current < self.macro_prot else 'P'
-			f_col = '!' if self.fat_current < self.macro_fat else 'F'
+			f_col = '*' if self.fat_current < self.macro_fat else 'F'
 
 			colors="%s%s%s" % (c_col, p_col, f_col)
 			self.make(colors,[c,p,f],radius)

@@ -67,9 +67,7 @@ class FoodList:
 
 	def write(self):
 		
-
-#		def backup
-
+		Common.backup(self.path)
 		f=open(self.path,'w')
 		
 		maxlen_name = reduce(lambda x,y: x if len(x) > len(y) else y, self.foodmap.keys())
@@ -101,12 +99,13 @@ class FoodList:
 
 
 
-	def insertAll(self, yem, input_search=""):
+	def insertAll(self, yem, input_search=[]):
 		#Tag prompt
 		user_input_tags = Tags.tagprompt()
-		yem.tags.insertList(user_input_tags)
+		if user_input_tags!=-1:
+			yem.tags.insertList(user_input_tags)
 		
-		if input_search!="":yem.tags.insert(input_search)
+		if input_search!=[]:yem.tags.insertAll(input_search)
 
 		name = yem.name.strip().lower()
 		self.foodmap[name] = yem
@@ -114,7 +113,7 @@ class FoodList:
 		self.write()
 
 
-	def insert(self,name, input_search=""):
+	def insert(self,name, input_search=[]):
 		print "Inserting new food:", name
 		per,unit = Common.amountsplit(raw_input("Per Unit (e.g. '100g'): ").strip())
 		kc, carb_total, carb_sugar, carb_fibre , prot, fat = raw_input("kCal Carb Sug Fibr Prot Fat: ").split()
@@ -195,6 +194,8 @@ class FoodList:
 			if not((food.carb.sugar ==0 and food.carb.fibre==0) and (food.carb.total == food.carb.bad)):
 				continue
 			
+			if "FS_online" not in food.tags.tags:continue
+			
 #			if name != 'chicken drumstick (skin eaten)':continue
 			
 			print "Check:"
@@ -223,12 +224,12 @@ class FoodList:
 		if res == 0:
 			print >> sys.stderr, "\nCannot find:", "\"%s\"" % name,
 			if Common.ynprompt(", manually insert?"):
-				self.insert(name)
+				self.insert(name, [arg_name])
 				return name.lower()
 			if Common.ynprompt('Search online? '):
 				f = MiniFSChecker.FHandler(name).found
 				if f==-1:exit(0)
-				self.insertAll(f, arg_name)
+				self.insertAll(f, [arg_name,"FS_online"])
 				return f.name
 			exit(0)
 			
@@ -241,11 +242,11 @@ class FoodList:
 			if Common.ynprompt('Search online? '):
 				f = MiniFSChecker.FHandler(name).found
 				if f==-1:exit(0)
-				self.insertAll(f, arg_name)		# Nothing found, include input name as a tag
+				self.insertAll(f, [arg_name], "FS_online")		# Nothing found, include input name as a tag
 				name = f.name
 			else:
 				#Manual insert
-				self.insert(name, arg_name)		# Nothing ...
+				self.insert(name, [arg_name])		# Nothing ...
 		else:
 			name = res.name
 		return name

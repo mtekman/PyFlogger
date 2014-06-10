@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from time import localtime, time, mktime
 from Plotter import *
 from Common import *
 
@@ -109,20 +108,6 @@ class WeightLog:
 		for dated in availdates[index:]:
 			w = self.weightlogmap[dated]
 			print >> sys.stderr, "%s\t%s %s" % (dated, w.printout(), ("   <--" if date==dated else " "))
-
-
-	def daysSince(self, date1,date2):
-		y1,m1,d1 = map(lambda x: int(x), date1.split('/'))
-		y2,m2,d2 = map(lambda x: int(x), date2.split('/'))
-		
-		seconds1 = mktime((y1,m1,d1,0,0,0,0,0,-1))
-		seconds2 = mktime((y2,m2,d2,0,0,0,0,0,-1))
-		
-		diff = seconds2 - seconds1
-		return float(diff)/(24*60*60)
-
-	def nextDay(self, date):
-		return ("%04d/%02d/%02d" % localtime(time()+(24*60*60))[0:3])
 
 
 	def log(self, date, lbls, ismorning):

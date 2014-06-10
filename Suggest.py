@@ -32,11 +32,10 @@ class Suggest:
 
 
 
-	def __init__(self, foodlist_obj, kc, carb, prot, fat):
+	def __init__(self, foodlist_obj, kc, carb_obj, prot, fat):
 		self.flist = foodlist_obj.foodmap
 		self.allowed_kc = kc
-		self.allowed_carb = carb
-		print carb
+		self.allowed_carb = carb_obj
 		self.allowed_prot = prot
 		self.allowed_fat = fat
 
@@ -54,7 +53,7 @@ class Suggest:
 		self.singles = dict((x,v) for x,v in self.flist.iteritems()\
  if len(v.unit)>2\
  and v.kC < self.allowed_kc\
- and v.carb < self.allowed_carb\
+ and v.carb.bad < self.allowed_carb.bad\
  and v.fat < self.allowed_fat\
  and v.prot < self.allowed_prot)
 		
@@ -79,6 +78,8 @@ class Suggest:
 				amount_to_scale = float(1)/temp_scale
 			
 			new_scale = yem.scaled(amount_to_scale)
+			
+			if new_scale.carb.bad > self.allowed_carb.bad:continue
 			
 			if new_scale.unit == 'g':
 				if new_scale.per < 20.0 or new_scale.per > 350:
