@@ -83,15 +83,28 @@ class FoodLogger:
 			name = raw_input("Food: ").strip().lower()
 		name = self.foodlist.info(name) # find match
 		
-		print "\nAmount consumed?"
-		ports = self.foodlist.foodmap[name].portions.avail
-		if len(ports)!=0:
-			print "Avail:"
-			for p,v in ports.iteritems():
-				print p
-		
-		am_amount = raw_input("\nAmount Consumed? ").strip()
-		am = fraction(am_amount)
+
+		am = -1
+		if ynprompt("\nView available portions?"):
+			yem_obj = self.foodlist.foodmap[name]
+			
+			ports = yem_obj.portions.avail.keys()
+			port_res = -1
+	
+			happy = False
+			while not happy:
+				port_res = choice(ports)
+				if port_res == -1:break
+				happy = ynprompt("\nHappy with this portion?")
+
+			if port_res!=-1:
+				kC = yem_obj.portions.avail[port_res]
+				am = float(kC)/yem_obj.kC
+
+		# Am is set by port_res, so no need to check port_res here
+		if am == -1:
+			am_amount = raw_input("\nAmount Consumed? ").strip()
+			am = fraction(am_amount)
 
 		dater = "%04d/%02d/%02d--%02d:%02d" % localtime()[0:5]
 

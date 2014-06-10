@@ -36,7 +36,7 @@ class FoodList:
 			if len(dd)==3:portions = dd[2]
 			if len(dd)==4:
 				portions = dd[2]
-				tags == dd[3]
+				tags = dd[3].strip()
 			
 			name = name.strip().lower()
 			
@@ -67,6 +67,9 @@ class FoodList:
 
 	def write(self):
 		
+
+#		def backup
+
 		f=open(self.path,'w')
 		
 		maxlen_name = reduce(lambda x,y: x if len(x) > len(y) else y, self.foodmap.keys())
@@ -89,7 +92,6 @@ class FoodList:
 		f.close()
 
 
-
 	def printlist(self):
 		keys = sorted(self.foodmap.keys())
 		print >> sys.stderr, Yemek.printheader()
@@ -99,26 +101,28 @@ class FoodList:
 
 
 
-	def insertAll(self, yem):
-		print yem
+	def insertAll(self, yem, input_search=""):
+		#Tag prompt
+		user_input_tags = Tags.tagprompt()
+		yem.tags.insertList(user_input_tags)
+		
+		if input_search!="":yem.tags.insert(input_search)
+
 		name = yem.name.strip().lower()
 		self.foodmap[name] = yem
 		print >> sys.stderr, "Inserted", name
 		self.write()
 
 
-	def insert(self,name):
+	def insert(self,name, input_search=""):
 		print "Inserting new food:", name
 		per,unit = Common.amountsplit(raw_input("Per Unit (e.g. '100g'): ").strip())
 		kc, carb_total, carb_sugar, carb_fibre , prot, fat = raw_input("kCal Carb Sug Fibr Prot Fat: ").split()
-		
-		user_input_tags = Tags.tagprompt()
-		
+			
 		carbs = Carb(carb_total, carb_fibre, carb_sugar)
 		y = Yemek(name, kc, carbs, prot, fat, per, unit)
-		y.tags.insertList(user_input_tags)
 
-		self.insertAll(y)
+		self.insertAll(y, input_search)
 
 
 	def removeprompt(self):
@@ -170,6 +174,17 @@ class FoodList:
 					if ss.strip() in s.strip():
 						found.append(obj)
 						break
+		
+		if len(found)==0:
+			print "Searching tags..."
+			for avail_food, obj in self.foodmap.iteritems():
+				for ss in searchname:
+					for tag in obj.tags.tags:
+						if ss.strip() in tag:
+							found.append(obj)
+							break
+			
+			
 		return found
 
 
@@ -200,6 +215,8 @@ class FoodList:
 			return name
 
 		#Search objects for closest match
+		arg_name = name	#store
+		
 		found = self.search(name)
 		res = len(found)
 
@@ -210,49 +227,25 @@ class FoodList:
 				return name.lower()
 			if Common.ynprompt('Search online? '):
 				f = MiniFSChecker.FHandler(name).found
-				if f!=-1:
-					self.insertAll(f)
-					name = f.name
-				else:
-					exit(0)
+				if f==-1:exit(0)
+				self.insertAll(f, arg_name)
 				return f.name
 			exit(0)
 			
 		# Found something, print
-		print >> sys.stderr, "\nMatched",
-		
-		# One result
-#		if res==1:
-#			print >> sys.stderr, "\"%s\"" % found[0],
-#			ans = raw_input(' ? ')
-#			if ans[0].lower()=='y':
-#				name = found[0]
-#				print >> sys.stderr,  self.foodmap[name].printout(header=True)
-#			elif raw_input('Search online? ').strip()[0].lower()=='y':
-#				f = MiniFSChecker.FHandler(name).found
-#				
-#				if f==-1:
-#					exit(-1)
-#				
-#				self.insertAll(f)
-#				name = f.name
-#			else:
-#				self.insert(name)
-#			return name
-	
-		# Multiple results
-		print >> sys.stderr, ": "
-		
+		print >> sys.stderr, "\nMatched:",		
 		res = Common.choice(found)
 
 		if res==-1:
+			print >> sys.stderr, "None"
 			if Common.ynprompt('Search online? '):
 				f = MiniFSChecker.FHandler(name).found
-				self.insertAll(f)
+				if f==-1:exit(0)
+				self.insertAll(f, arg_name)		# Nothing found, include input name as a tag
 				name = f.name
 			else:
 				#Manual insert
-				self.insert(name)
+				self.insert(name, arg_name)		# Nothing ...
 		else:
 			name = res.name
 		return name

@@ -2,6 +2,11 @@
 
 # Each Yemek object has a single Carb, Portion, and Tag class attached to it
 import sys
+import Common
+
+#
+# TODO:Maybe create a tag map, that for each insert points to a specific Yemek object? Filtering would be easier...
+#
 
 class Tags:
 	delim='##'
@@ -30,8 +35,7 @@ class Tags:
 	@staticmethod
 	def tagprompt():
 		get_avail_tags = Tags.popcon()
-		tags = raw_input("Attach a tag? (Avail: %s)" % ','.join(get_avail_tags))
-		return tags.split(',')
+		return Common.userlistprompt("Attach a tag? Avail:", get_avail_tags)
 
 
 	@staticmethod
@@ -90,10 +94,14 @@ class Portion:
 	def __init__(self):
 		self.avail = {}
 
-	def portionprompt(self):
-		get_avail = ','.join(self.avail.keys())
-		ports = raw_input("Attach a tag? (Avail: %s)" % ','.join(get_avail))
-		return ports.split(',')
+#	def portionprompt(self):
+#		Common.userlistprompt("Attach a ? Avail:")
+#		
+#		get_avail = ','.join(self.avail.keys())
+#		ports = raw_input("Attach a tag? (Avail: %s)" % ','.join(get_avail))
+#		ports = ports.splitlines().strip()
+#		if ports == "":return -1
+#		return ports.split(',')
 	
 
 	@staticmethod
@@ -237,7 +245,7 @@ class Yemek:
 
 
 	@staticmethod
-	def printheader(buffer=0, portions_buff=0):
+	def printheader(buffer=0, portions_buff=0, tags=False):
 		if buffer ==0:buffer=Yemek.buffer
 		
 		strr= ("%s |" + Yemek.headformat) % (
@@ -246,6 +254,9 @@ class Yemek:
 		
 		if portions_buff!=0:
 			strr += Portion.printheader(portions_buff)
+		
+		if tags:
+			strr += "| Tags"
 		return strr
 
 
@@ -270,16 +281,20 @@ class Yemek:
 		if three < 0:three *=-1
 		return three < thresh
 	
-	def isEqual(self, other):
-		#Debug
-#		print Yemek.roughlyEqual(self.kC, other.kC)
-#		print Yemek.roughlyEqual(self.prot, other.prot)
-#		print Yemek.roughlyEqual(self.fat, other.fat)
-#		print Yemek.roughlyEqual(self.carb.fibre, other.carb.fibre)
-#		print Yemek.roughlyEqual(self.carb.sugar, other.carb.sugar)
+	# Overload method
+	def __eq__(self, other):
+		if isinstance(other, Yemek):
+           #Debug
+	#		print Yemek.roughlyEqual(self.kC, other.kC)
+	#		print Yemek.roughlyEqual(self.prot, other.prot)
+	#		print Yemek.roughlyEqual(self.fat, other.fat)
+	#		print Yemek.roughlyEqual(self.carb.fibre, other.carb.fibre)
+	#		print Yemek.roughlyEqual(self.carb.sugar, other.carb.sugar)
 
-		return (Yemek.roughlyEqual(self.kC, other.kC)
-			and Yemek.roughlyEqual(self.prot, other.prot)
-			and Yemek.roughlyEqual(self.fat, other.fat)
-			and Yemek.roughlyEqual(self.carb.fibre, other.carb.fibre)
-			and Yemek.roughlyEqual(self.carb.sugar, other.carb.sugar) )
+			return (Yemek.roughlyEqual(self.kC, other.kC)
+				and Yemek.roughlyEqual(self.prot, other.prot)
+				and Yemek.roughlyEqual(self.fat, other.fat)
+				and Yemek.roughlyEqual(self.carb.fibre, other.carb.fibre)
+				and Yemek.roughlyEqual(self.carb.sugar, other.carb.sugar) )
+
+		return False

@@ -25,6 +25,13 @@ def ynprompt(message):
 	return (ans[0].lower()=='y')
 
 
+def userlistprompt(message, str_array):
+	opts = raw_input("%s : %s\n" % (message,','.join(str_array)))
+	opts = opts.splitlines()[0].strip()
+	if opts == "":return -1
+	return opts.split(',')
+
+
 def fraction(am_amount):
 	try:
 		am = float(am_amount)
@@ -71,56 +78,73 @@ def stripAll(list):
 	return map(lambda x: x.strip(), list)
 
 
-'''Takes a list of yem objects and returns one'''
-def choice(yem_array, compare_to=0):
+
+'''Takes any array and returns a chosen item'''
+def choice(array, compare_to=0):
 	
-	if len(yem_array)==0:
+	def getIndexInput():
+		ind = ""
+		isNum = False
+		while not isNum:
+			try:
+				ind = int(raw_input('Please pick a number (0 to cancel): '))-1
+				isNum = True
+			except ValueError:
+				print "Not a number, please try again"
+		return ind
+	
+
+	# Encaps.
+	'''Takes a list of objects and returns one'''
+	def def_choice(array, compare_to, isTuple=False, isYem=True, ):
+		
+		choose = 1
+		if isYem:print Yemek.printFullHeader()
+
+		for x in array:
+			scale = 1
+			
+			if isTuple:
+					scale = x[1]
+					x = x[0]
+			
+			choose_s= "%2d: " % choose
+			sobj = x
+			
+			if isYem:
+				sobj = x.scaled(scale)
+				print sobj.printout(pre=choose_s)
+			else:
+				print "%s%s" % (choose_s, (sobj if not isTuple else sobj+' '+str(scale)))
+			
+			if compare_to!=0:
+				# Whatever is compared MUST have equality method overloaded, else standard type
+				if sobj == compare_to:
+					print "Found definite match!"
+					return x
+			choose +=1
+		
+		ind = getIndexInput()
+		if ind==-1:return -1
+		
+		res = array[ind]
+		if isTuple:
+			res = array[ind][0]  # dont want scale
+		print "Chose:", res if not isYem else res.printout(pre="   ")
+		return res
+	
+	# Main
+	print ""
+
+	if len(array)==0:
 		print "No matches"
 		return -1
 	
-	print ""
-	choose = 1
-	print Yemek.printFullHeader()
-
-	for x in yem_array:
-		scale = 1
-		try:
-			if len(x)>1:
-				scale = x[1]
-				x = x[0]
-		except AttributeError:
-			pass # Not a tuple
-		
-		choose_s= "%2d: " % choose
-		
-		sobj = x.scaled(scale)
-		print sobj.printout(pre=choose_s)
-		
-		if compare_to!=0:
-			if sobj.isEqual(compare_to):
-				print "Found definite match!"
-				return x
-		
-#		print x.scaled(scale).printout(pre=choose_s)
-		choose +=1
+	isTuple = isinstance(array[0], tuple)
+	isYem = isinstance( array[0][0] if isTuple else array[0], Yemek)
 	
-	ind = ""
-	isNum = False
-	while not isNum:
-		try:
-			ind = int(raw_input('Please pick a number (0 to cancel): '))-1
-			isNum = True
-		except ValueError:
-			print "Not a number, please try again"
-	
-	if ind==-1:return -1
-	
-	res = yem_array[ind]
-	try:
-		res = yem_array[ind][0]  # dont want scale
-	except AttributeError:
-		pass
-	return res
+	return def_choice(array, compare_to, isTuple, isYem)
+		
 
 
 def makewhitespace(lbuff):
