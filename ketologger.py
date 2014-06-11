@@ -15,7 +15,7 @@ Records progress during keto; weight and food consumption
 		
 		%s <command> <task> [OPTS]
 
-commands:  	insert, remove, list, plot, suggest
+commands:  	insert, remove, list, plot, suggest, lookup
 tasks:    	weight, food
 
 OPTS:		foodname, lbs

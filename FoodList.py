@@ -105,7 +105,7 @@ class FoodList:
 		if user_input_tags!=-1:
 			yem.tags.insertList(user_input_tags)
 		
-		if input_search!=[]:yem.tags.insertAll(input_search)
+		if input_search!=[]:yem.tags.insertList(input_search)
 
 		name = yem.name.strip().lower()
 		self.foodmap[name] = yem
@@ -242,7 +242,7 @@ class FoodList:
 			if Common.ynprompt('Search online? '):
 				f = MiniFSChecker.FHandler(name).found
 				if f==-1:exit(0)
-				self.insertAll(f, [arg_name], "FS_online")		# Nothing found, include input name as a tag
+				self.insertAll(f, [arg_name, "FS_online"]) # Nothing found, include input name as a tag
 				name = f.name
 			else:
 				#Manual insert
