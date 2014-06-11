@@ -171,7 +171,7 @@ class FoodList:
 			for ss in searchname:
 				for s in avail_food.split():
 					if ss.strip() in s.strip():
-						found.append(obj)
+						if obj not in found: found.append(obj)
 						break
 		
 		if len(found)==0:
@@ -180,7 +180,7 @@ class FoodList:
 				for ss in searchname:
 					for tag in obj.tags.tags:
 						if ss.strip() in tag:
-							found.append(obj)
+							if obj not in found: found.append(obj)
 							break
 			
 			

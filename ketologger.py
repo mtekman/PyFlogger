@@ -153,7 +153,7 @@ OPTS:		foodname, lbs
 					p.allow_kc, 
 					p.allow_carb,
 					p.allow_prot, 
-					p.allow_fat)				
+					p.allow_fat)
 				return
 
 

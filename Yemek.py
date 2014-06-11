@@ -48,16 +48,16 @@ class Tags:
 
 class Carb:
 	def __init__(self, carb, fibre, sugar):
-		self.fibre = float(fibre)
-		self.sugar = float(sugar)
+		self.fibre = float(fibre) + Yemek.nonz
+		self.sugar = float(sugar) + Yemek.nonz
 
-		self.total = float(carb)
+		self.total = float(carb) + Yemek.nonz
 		real_total = self.fibre + self.sugar
 		
 		if self.total < real_total:
 			self.total = real_total
 		
-		self.bad = self.total - self.fibre
+		self.bad = (self.total - self.fibre) + Yemek.nonz
 		
 
 	# override multiplier
@@ -127,6 +127,7 @@ class Portion:
 
 
 class Yemek:
+	nonz = 0.00001
 	buffer = 30
 	outformat = "%5d  %5.1f [%5.1f,%5.1f] = %4.1f  %4.1f  %4.1f  %5.1f %s"
 	
@@ -150,8 +151,8 @@ class Yemek:
 		self.name = name
 		self.kC = int(kC)
 		self.carb = carb_obj
-		self.prot = float(prot)
-		self.fat = float(fat)
+		self.prot = float(prot) + Yemek.nonz
+		self.fat = float(fat) + Yemek.nonz
 
 		self.portions = Portion()
 		self.tags = Tags()

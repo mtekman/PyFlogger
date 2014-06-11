@@ -4,21 +4,17 @@ from FoodLogger import *
 
 class Suggest:
 
-	def sortOpts(self):
+	def sortOpts(self, num=15):
+		
 		def perSort(x):
 			yem = x[1]
 			f = float(yem.fat)
-			c = float(yem.carb.bad)
+			p = float(yem.prot)
 			
+			input_ratio = self.allowed_fat / self.allowed_prot
 			
-			# Fibre is taken care of intrinsically by checking only bad
-			if c == 0:c = 0.0001
-			if f == 0:f = 0.0001
-
-			prot_2_fat = float(yem.prot)/f
-			
-			# Overall, should have a good score on both
-			return (prot_2_fat/c) + yem.carb.fibre
+			ratio = ((f/p)/input_ratio) if self.allowed_fat >= self.allowed_prot else ((p/f)*input_ratio)
+			return ratio + 0.1*yem.carb.fibre
 
 
 		for x,v in self.singles.iteritems():
@@ -27,8 +23,11 @@ class Suggest:
 		sorted_ports = sorted(self.portions.iteritems(), key=perSort, reverse=True)
 
 		Yemek.printFullHeader()
+		count = 0
 		for x,v in sorted_ports:
-			print v.printout()
+			if count==num:break
+			count += 1
+			print v.printout(pre="%2d: " % count)
 
 
 
@@ -39,6 +38,15 @@ class Suggest:
 		self.allowed_prot = prot
 		self.allowed_fat = fat
 
+		outnow = (' '*(Yemek.buffer-8)) + "Allow :   %s" % Yemek.outformat
+		outnow = '\n'+'%'.join(outnow.split('%')[:-2])+'\n'
+			
+		print outnow % (
+				int(self.allowed_kc), 
+				self.allowed_carb.total, self.allowed_carb.fibre, self.allowed_carb.sugar, self.allowed_carb.bad,
+				self.allowed_prot,
+				self.allowed_fat)
+		
 		self.suggestSomething()
 
 
@@ -55,7 +63,8 @@ class Suggest:
  and v.kC < self.allowed_kc\
  and v.carb.bad < self.allowed_carb.bad\
  and v.fat < self.allowed_fat\
- and v.prot < self.allowed_prot)
+ and v.prot < self.allowed_prot\
+ and ((v.fat/v.carb.bad > 1) or (v.prot/v.carb.bad > 1)))
 		
 
 	def suggestPortions(self):
@@ -74,12 +83,13 @@ class Suggest:
 			#nearest round fraction
 			if amount_to_scale < 1:
 				temp_scale = int(float(1)/amount_to_scale)
-				print >> sys.stderr, amount_to_scale
 				amount_to_scale = float(1)/temp_scale
 			
 			new_scale = yem.scaled(amount_to_scale)
 			
 			if new_scale.carb.bad > self.allowed_carb.bad:continue
+			
+			if new_scale.prot <= 0.1:continue
 			
 			if new_scale.unit == 'g':
 				if new_scale.per < 20.0 or new_scale.per > 350:
