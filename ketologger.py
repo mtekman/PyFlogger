@@ -150,10 +150,10 @@ OPTS:		foodname, lbs
 				fl.makeTotals(fl.date)
 				p = fl.pie
 				Suggest(fl.foodlist, 
-					p.macro_kc, 
-					p.macro_carb,
-					p.macro_prot, 
-					p.macro_fat)				
+					p.allow_kc, 
+					p.allow_carb,
+					p.allow_prot, 
+					p.allow_fat)				
 				return
 
 

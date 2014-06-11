@@ -85,6 +85,8 @@ class FoodLogger:
 		self.pie = PieChart(carb_total, protein_total, fat_total, kC_total, self.macrofile,
 			Yemek.buffer-8, 8, printme=showPie)
 		
+
+		
 		return kC_total, carb_total, protein_total, fat_total
 
 
