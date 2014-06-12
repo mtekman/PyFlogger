@@ -36,14 +36,22 @@ def userlistprompt(message, str_array):
 '''Takes any array and returns a chosen item'''
 def choice(array, compare_to=0):
 	
-	def getIndexInput():
+	def getIndexInput(max):
 		ind = ""
 		isNum = False
-		while not isNum:
+		inRange = False
+		while not (isNum and inRange):
 			try:
 				ind = int(raw_input('Please pick a number (0 to cancel): '))-1
 				isNum = True
+
+				if ind < max:inRange = True
+				else:
+					inRange = False
+					print "Out of range, please try again"
+
 			except ValueError:
+				isNum = False
 				print "Not a number, please try again"
 		return ind
 	
@@ -78,13 +86,14 @@ def choice(array, compare_to=0):
 					return x
 			choose +=1
 		
-		ind = getIndexInput()
+		ind = getIndexInput(len(array))
 		if ind==-1:return -1
 		
 		res = array[ind]
 		if isTuple:
 			res = array[ind][0]  # dont want scale
-		print "Chose:", res if not isYem else res.printout(pre="   ")
+		print ""
+		print ("Chose: %s" % res) if not isYem else res.printout(pre="Chose: ")
 		return res
 	
 	# Main

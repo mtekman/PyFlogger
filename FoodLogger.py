@@ -97,21 +97,23 @@ class FoodLogger:
 		
 
 		am = -1
-		if ynprompt("\nView available portions?"):
-			yem_obj = self.foodlist.foodmap[name]
-			
-			ports = yem_obj.portions.avail.keys()
-			port_res = -1
-	
-			happy = False
-			while not happy:
-				port_res = choice(ports)
-				if port_res == -1:break
-				happy = ynprompt("\nHappy with this portion?")
+		yem_obj = self.foodlist.foodmap[name]
 
-			if port_res!=-1:
-				kC = yem_obj.portions.avail[port_res]
-				am = float(kC)/yem_obj.kC
+		if len(yem_obj.portions.avail)!=0:
+			if ynprompt("\nNote: Portions Available -- View? "):
+			
+				ports = yem_obj.portions.avail.keys()
+				port_res = -1
+	
+				happy = False
+				while not happy:
+					port_res = choice(ports)
+					if port_res == -1:break
+					happy = ynprompt("\nHappy with this portion?")
+
+				if port_res!=-1:
+					kC = yem_obj.portions.avail[port_res]
+					am = float(kC)/yem_obj.kC
 
 		# Am is set by port_res, so no need to check port_res here
 		if am == -1:

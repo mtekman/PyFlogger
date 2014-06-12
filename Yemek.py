@@ -94,15 +94,6 @@ class Portion:
 	def __init__(self):
 		self.avail = {}
 
-#	def portionprompt(self):
-#		Common.userlistprompt("Attach a ? Avail:")
-#		
-#		get_avail = ','.join(self.avail.keys())
-#		ports = raw_input("Attach a tag? (Avail: %s)" % ','.join(get_avail))
-#		ports = ports.splitlines().strip()
-#		if ports == "":return -1
-#		return ports.split(',')
-	
 
 	@staticmethod
 	def printheader(lbuff):
