@@ -192,21 +192,35 @@ def backup(path):
 
 
 ##################### Time functions ##########################
+def ymd2secs((y,m,d)):
+	if d.find('-')!=-1:
+		d = d.split('-')[0]
+#	print y,m,d
+	return mktime((int(y),int(m),int(d),0,0,0,0,0,-1))
+
+
 def daysSince(date1,date2):
 	y1,m1,d1 = map(lambda x: int(x), date1.split('/'))
 	y2,m2,d2 = map(lambda x: int(x), date2.split('/'))
 	
-	seconds1 = mktime((y1,m1,d1,0,0,0,0,0,-1))
-	seconds2 = mktime((y2,m2,d2,0,0,0,0,0,-1))
+	seconds1 = ymd2secs((y1,m1,d1))
+	seconds2 = ymd2secs((y2,m2,d2))
 	
 	diff = seconds2 - seconds1
 	return float(diff)/(24*60*60)
 
 
-def nextDay(date):
-	return ("%04d/%02d/%02d" % localtime(time()+(24*60*60))[0:3])
+def tomorrow():
+	return nextDay(time())
 
-
+def yesterday():
+	return previousDay(time())
+     
+def previousDay(date_sec):
+	return "%04d/%02d/%02d" % localtime(date_sec-(24*60*60))[0:3]
+	
+def nextDay(date_sec):
+	return "%04d/%02d/%02d" % localtime(date_sec+(24*60*60))[0:3]
 
 
 

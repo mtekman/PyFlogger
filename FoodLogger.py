@@ -64,8 +64,10 @@ class FoodLogger:
 		fat_total=0
 
 		if len(self.foodlog)==0:
-			print >> sys.stderr, "nothing logged for that day!"
-#			exit(-1)
+			print >> sys.stderr, "nothing logged for date: %s" % date
+			prevD = previousDay(ymd2secs(date.split('/')))
+			if ynprompt("Print day before that (%s)? " % prevD):
+				return self.makeTotals(prevD, showPie, printme)
 
 		if printme:
 			print >> sys.stderr, '\n'*10
