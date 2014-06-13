@@ -23,7 +23,13 @@ conversion['gallon'] = 4*conversion['quart']
 ############################ Prompts ###################################
 
 def ynprompt(message):
-	ans = raw_input(message+' ').strip()
+	ans = 'g'
+	while ans not in ['y','n']:
+		ans = raw_input(message+' (y/n):').strip()[0].lower()
+	return ans == 'y'
+	
+
+
 	return (ans[0].lower()=='y')
 
 
@@ -33,32 +39,44 @@ def userlistprompt(message, str_array):
 	if opts == "":return -1
 	return opts.split(',')
 	
-'''Takes any array and returns a chosen item'''
-def choice(array, compare_to=0):
-	
-	def getIndexInput(max):
-		ind = ""
-		isNum = False
-		inRange = False
-		while not (isNum and inRange):
-			try:
-				ind = int(raw_input('Please pick a number (0 to cancel): '))-1
-				isNum = True
 
+
+def getIndexInput(max, multiple=False):
+	ind_array = ""
+	isNum = False
+	inRange = False
+	while not (isNum and inRange):
+		try:
+			if multiple:
+				ind_array = map(lambda x: int(x)-1, raw_input('Please pick numbers (with spaces)(0 to cancel): ').split())
+			else:
+				ind_array = [int(raw_input('Please pick a number (0 to cancel): '))-1]
+			isNum = True
+		
+			for ind in ind_array:
 				if ind < max:inRange = True
 				else:
 					inRange = False
 					print "Out of range, please try again"
+					break
 
-			except ValueError:
-				isNum = False
-				print "Not a number, please try again"
-		return ind
+		except ValueError:
+			isNum = False
+			print "Not a number, please try again"
+
+	if len(ind_array)==1:return ind_array[0]
+	return ind_array
 	
 
+
+
+
+'''Takes any array and return chosen item(s)'''
+def choice(array, compare_to=0, multiple=False):
+	
 	# Encaps.
 	'''Takes a list of objects and returns one'''
-	def def_choice(array, compare_to, isTuple=False, isYem=True, ):
+	def def_choice(array, compare_to, isTuple=False, isYem=True):
 		
 		choose = 1
 		if isYem:print Yemek.printFullHeader()
@@ -86,7 +104,7 @@ def choice(array, compare_to=0):
 					return x
 			choose +=1
 		
-		ind = getIndexInput(len(array))
+		ind = getIndexInput(len(array), multiple)
 		if ind==-1:return -1
 		
 		res = array[ind]

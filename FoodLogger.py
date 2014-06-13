@@ -92,6 +92,7 @@ class FoodLogger:
 		return kC_total, carb_total, protein_total, fat_total
 
 
+
 	def log(self, name=""):
 		if name=="":
 			name = raw_input("Food: ").strip().lower()
@@ -102,7 +103,7 @@ class FoodLogger:
 		yem_obj = self.foodlist.foodmap[name]
 
 		if len(yem_obj.portions.avail)!=0:
-			if ynprompt("\nNote: Portions Available -- View? "):
+			if ynprompt("\nNote: Portions Available -- View?"):
 			
 				ports = yem_obj.portions.avail.keys()
 				port_res = -1
@@ -111,7 +112,7 @@ class FoodLogger:
 				while not happy:
 					port_res = choice(ports)
 					if port_res == -1:break
-					happy = ynprompt("\nHappy with this portion?")
+					happy = ynprompt("Accept with this portion?")
 
 				if port_res!=-1:
 					kC = yem_obj.portions.avail[port_res]
