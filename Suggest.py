@@ -87,9 +87,10 @@ class Suggest:
 			
 			new_scale = yem.scaled(amount_to_scale)
 			
+			
 			if new_scale.carb.bad > self.allowed_carb.bad:continue
 			
-			if new_scale.prot <= 0.1:continue
+			if new_scale.prot <= 0.1 and self.allowed.prot >=0:continue
 			
 			if new_scale.unit == 'g':
 				if new_scale.per < 20.0 or new_scale.per > 350:
