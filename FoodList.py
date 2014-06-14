@@ -147,12 +147,10 @@ class FoodList:
 
 	#This is the main insertion method
 	def updateprompt(self):
-	
-	   # Print details if exists, else insert, else return close match
+	    # Print details if exists, else insert, else return close match
 		name = self.info(raw_input('Food: ').strip())
 		
 		# Name exists by now, or prog exited
-      
 		if name in self.foodmap:
 			edit = raw_input('\nEdit? ')
 			if edit[0].lower() != 'y':
@@ -160,6 +158,10 @@ class FoodList:
 		else:
 			print >> sys.stderr, "\n[New Food: \"%s\"]" % name
 		self.insert(name)
+	
+	def closestMatch(self,name):
+		return self.search(name)[0];
+	
 	
 	def search(self,name):
 		searchname = name.split()  #d[0].strip()
@@ -183,7 +185,7 @@ class FoodList:
 							if obj not in found: found.append(obj)
 							break
 			
-			
+		
 		return found
 
 

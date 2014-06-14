@@ -42,7 +42,7 @@ class FoodLogger:
 
 			if date == ddate:
 				#Find food if date matches
-				food = copy(self.foodlist.foodmap[name.strip()])
+				food = copy(self.foodlist.foodmap[name.strip()])			
 				food.amount = amount
 				self.foodlog.append(food)
 		f.close()
@@ -86,9 +86,7 @@ class FoodLogger:
 
 		self.pie = PieChart(carb_total, protein_total, fat_total, kC_total, self.macrofile,
 			Yemek.buffer-8, 8, printme=showPie)
-		
-
-		
+				
 		return kC_total, carb_total, protein_total, fat_total
 
 
@@ -131,6 +129,7 @@ class FoodLogger:
 		
 		print >> sys.stderr, "\n\n"
 		self.showTotals(self.date)
+
 
 #w=FoodLogger()
 #w.log()
