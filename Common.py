@@ -211,7 +211,7 @@ def backup(path):
 
 ##################### Time functions ##########################
 def ymd2secs((y,m,d)):
-	if d.find('-')!=-1:
+	if str(d).find('-')!=-1:
 		d = d.split('-')[0]
 #	print y,m,d
 	return mktime((int(y),int(m),int(d),0,0,0,0,0,-1))
