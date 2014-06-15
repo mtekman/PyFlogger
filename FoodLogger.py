@@ -98,8 +98,8 @@ class FoodLogger:
 			name = raw_input("Food: ").strip().lower()
 		name = self.foodlist.info(name) # find match
 		
-
 		am = -1
+		unit_set = -1
 		yem_obj = self.foodlist.foodmap[name]
 
 		if len(yem_obj.portions.avail)!=0:
@@ -116,12 +116,16 @@ class FoodLogger:
 
 				if port_res!=-1:
 					kC = yem_obj.portions.avail[port_res]
-					am = float(kC)/yem_obj.kC
+					unit_set = float(kC)/yem_obj.kC
+
 
 		# Am is set by port_res, so no need to check port_res here
-		if am == -1:
-			am_amount = raw_input("\nAmount Consumed? ").strip()
-			am = fraction(am_amount)
+		if unit_set!=-1 or am==-1:
+			am_amount = fraction(raw_input("\nAmount Consumed? ").strip())
+			if am==-1:
+				am = am_amount
+			else:
+				am = unit_set * am_amount
 
 		dater = "%04d/%02d/%02d--%02d:%02d" % localtime()[0:5]
 
@@ -131,7 +135,3 @@ class FoodLogger:
 		
 		print >> sys.stderr, "\n\n"
 		self.showTotals(self.date)
-
-#w=FoodLogger()
-#w.log()
-#w.showTotals(w.date)
