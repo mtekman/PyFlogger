@@ -11,7 +11,7 @@ class Printer:
 		self.margY = 6
 		self.rows, self.columns= map(lambda x: int(x), popen('stty size').read().split());
 
-		self.rows -= self.margY
+		self.rows -= self.margY+1
 		self.columns -= self.margX
 						
 		graphObj.scaleGrid(self.rows, self.columns)
@@ -28,6 +28,7 @@ class Printer:
 
 		for row in reversed(self.exgrid):
 			print "".join(row)
+		print ' '*((self.columns/2)-5),"Days Elapsed",' '*((self.columns/2)-9)
 
 		
 class Point:

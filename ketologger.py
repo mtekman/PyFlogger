@@ -75,7 +75,7 @@ OPTS:		foodname, lbs
 				return
 			
 			if self.remove:
-				print "Do nothing"
+				print "Not implemented"
 				return
 
 			if self.list:
@@ -118,7 +118,7 @@ OPTS:		foodname, lbs
 				return
 			
 			if self.remove:
-				print "TODO"
+				print "Not implemented"
 				return
 			
 			if self.list:
@@ -126,23 +126,7 @@ OPTS:		foodname, lbs
 				return
 
 			if self.plot:
-				all_avail_dates = fl.read(fl.date)		# order/keys
-				xy = XYGraph()
-
-				startdate=""
-				for date in all_avail_dates:
-				
-					if startdate=="":
-						startdate=date
-						continue
-				               
-					days_since = daysSince(startdate,date)
-					cumulative_days = days_since
-
-					kc_tot = fl.makeTotals(date)[0]
-					xy.addPoint(cumulative_days, kc_tot,"x")
-				                                          
-				Printer(xy)
+				print "Not implemented"
 				return                                       
 
 
