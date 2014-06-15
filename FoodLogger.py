@@ -133,11 +133,3 @@ class FoodLogger:
 		
 		print >> sys.stderr, "\n\n"
 		self.showTotals(self.date)
-<<<<<<< HEAD
-=======
-
-
-#w=FoodLogger()
-#w.log()
-#w.showTotals(w.date)
->>>>>>> 3b25a257c6db953b9ba32e2755af096e3b756a94
