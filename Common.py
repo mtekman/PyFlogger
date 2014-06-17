@@ -232,6 +232,13 @@ def tomorrow():
 
 def yesterday():
 	return previousDay(time())
+
+def today():
+	return "%04d/%02d/%02d" % localtime(time())[0:3]
+
+def now():
+	return "%04d/%02d/%02d--%02d:%02d" % localtime(time())[0:5]
+
      
 def previousDay(date_sec):
 	return "%04d/%02d/%02d" % localtime(date_sec-(24*60*60))[0:3]
