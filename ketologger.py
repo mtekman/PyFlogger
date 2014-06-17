@@ -133,6 +133,8 @@ OPTS:		foodname, lbs
 			if self.suggest:
 				fl.makeTotals(fl.date)
 				p = fl.pie
+				if self.opts!="":
+					p.allow_kc = int(self.opts)	
 				Suggest(fl.foodlist, 
 					p.allow_kc, 
 					p.allow_carb,
