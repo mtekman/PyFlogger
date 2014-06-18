@@ -5,8 +5,7 @@ class Journal:
 	
 	def __init__(self, path='../logs/journal.txt'):
 		self.file = path
-		self.datemap= {}
-		self.dates =  []
+		self.read()
 		
 
 	def read(self):
@@ -20,6 +19,8 @@ class Journal:
 
 
 		f.readline()
+		self.datemap= {}
+		self.dates =  []
 
 		for line in f:
 			timestamp, score, activity = line.split('\t')
@@ -68,19 +69,27 @@ class Journal:
 		self.logReady(now(), score, activity.strip())
 
 
-#	def maketotal(self):
-#		self.totals=[]
-#		for d in sef.dates:
+	def maketotal(self):
+		self.totals={}
+		for d in self.dates:
+			tote = 0
+			for score,act in self.datemap[d]:
+				tote += score
+			self.totals[d] = tote
 
 
-	def showToday(self):
-		print self.datemap
-		tod= self.datemap[today()]
+	def showDate(self,date):
+		self.maketotal()
+		tod= self.datemap[date]
 		for d,s,a in tod:
 			print Journal.out(d,s,a)
+		print self.totals[date]
+
+	def showYesterday(self):
+		self.showDate(yesterday())
 
 
 j = Journal()
 #j.log("Ate 5 chocolate biscuits", -5)
-j.showToday()
+j.showDate('2014/06/15')
 

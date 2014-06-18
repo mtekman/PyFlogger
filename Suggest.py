@@ -38,6 +38,34 @@ class Suggest:
 		self.allowed_prot = prot
 		self.allowed_fat = fat
 
+#		self.suggestSomething()
+
+
+	#This is more for my own curiousity
+	def lowCalHighPF(self, num=15):
+		
+		def makeit(x):
+			yem = x[1]
+			f = float(yem.fat)
+			p = float(yem.prot)
+			kc = float(yem.kC)
+
+			return 1/((kc/p) + (kc/f))
+
+
+		sorted_ports = sorted(self.flist.iteritems(), key=makeit, reverse=True)
+
+		Yemek.printFullHeader()
+		count = 0
+		for x,v in sorted_ports:
+			if count==num:break
+			count += 1
+			print v.printout(pre="%2d: " % count)
+	
+
+
+
+	def suggestSomething(self):
 		outnow = (' '*(Yemek.buffer-8)) + "Allow :   %s" % Yemek.outformat
 		outnow = '\n'+'%'.join(outnow.split('%')[:-2])+'\n'
 			
@@ -47,10 +75,6 @@ class Suggest:
 				self.allowed_prot,
 				self.allowed_fat)
 		
-		self.suggestSomething()
-
-
-	def suggestSomething(self):
 		self.suggestSingles()
 		self.suggestPortions()
 		self.sortOpts()
