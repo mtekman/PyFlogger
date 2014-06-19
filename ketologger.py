@@ -5,7 +5,7 @@ from FoodLogger import FoodLogger
 from Weight import WeightLog
 from Plotter import *
 from Suggest import Suggest
-from Common import daysSince
+from Common import daysSince, previousDay
 
 class Args:
 
@@ -122,7 +122,14 @@ OPTS:		foodname, lbs, lowcal
 				return
 			
 			if self.list:
-				fl.showTotals(fl.date, showPie=True)
+				date = fl.date
+				if self.opts!="":
+					count = int(self.opts)
+					while count >=0:
+						date = previousDay(date)
+						count -= 1
+
+				fl.showTotals(date, showPie=True)
 				return
 
 			if self.plot:

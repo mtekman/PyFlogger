@@ -11,10 +11,16 @@ class Suggest:
 			f = float(yem.fat)
 			p = float(yem.prot)
 			
-			input_ratio = self.allowed_fat / self.allowed_prot
+
+			pff = (f - self.allowed_fat)/f
+			ppp = (p - self.allowed_prot)/p
+
+			return pff + ppp
+
+#			input_ratio = self.allowed_fat / self.allowed_prot
 			
-			ratio = ((f/p)/input_ratio) if self.allowed_fat >= self.allowed_prot else ((p/f)*input_ratio)
-			return ratio + 0.1*yem.carb.fibre
+#			ratio = ((f/p)/input_ratio) if self.allowed_fat >= self.allowed_prot else ((p/f)*input_ratio)
+#			return ratio + 0.1*yem.carb.fibre
 
 
 		for x,v in self.singles.iteritems():

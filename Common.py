@@ -239,11 +239,21 @@ def today():
 def now():
 	return "%04d/%02d/%02d--%02d:%02d" % localtime(time())[0:5]
 
-     
-def previousDay(date_sec):
+
+def previousDay(date):
+	try:
+		date_sec = ymd2secs( date.split('/') )
+	except AttributeError:
+		date_sec = date
+		pass
 	return "%04d/%02d/%02d" % localtime(date_sec-(24*60*60))[0:3]
 	
-def nextDay(date_sec):
+def nextDay(date):
+	try:
+		date_sec = ymd2secs( date.split('/') )
+	except AttributeError:
+		date_sec = date
+		pass
 	return "%04d/%02d/%02d" % localtime(date_sec+(24*60*60))[0:3]
 
 

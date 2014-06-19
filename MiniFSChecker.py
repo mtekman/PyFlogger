@@ -284,7 +284,7 @@ class FHandler:
 
 
 
-	def ParseResults(self):
+	def ParseResults(self, num=30):
 		res = []
 		tokes = self.pagedata.split("prominent")
 		
@@ -298,6 +298,10 @@ class FHandler:
 			result = FHandler.getFoodInfo(url)
 			print >> sys.stderr, "\r\t\t\t", len(res)+1,
 			res.append(result)
+
+			# count
+			num -= 1
+			if num==0: break
 		
 		return res
 

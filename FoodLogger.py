@@ -99,6 +99,7 @@ class FoodLogger:
 		am = -1
 		unit_set = -1
 		yem_obj = self.foodlist.foodmap[name]
+		init_per = equiv_per = float(yem_obj.per)
 
 		if len(yem_obj.portions.avail)!=0:
 			if ynprompt("\nNote: Portions Available -- View?"):
@@ -110,20 +111,24 @@ class FoodLogger:
 				while not happy:
 					port_res = choice(ports)
 					if port_res == -1:break
-					happy = ynprompt("Accept with this portion?")
+					happy = ynprompt("Accept this portion?")
 
 				if port_res!=-1:
 					kC = yem_obj.portions.avail[port_res]
 					unit_set = float(kC)/yem_obj.kC
+					equiv_per *= unit_set
+					print "kc for this:", kC, "yem kc:",yem_obj.kC, "fract:", unit_set, "equiv per=", equiv_per
 
 
 		# Am is set by port_res, so no need to check port_res here
 		if unit_set!=-1 or am==-1:
-			am_amount = fraction(raw_input("\nAmount Consumed? ").strip())
-			if am==-1:
-				am = am_amount
-			else:
-				am = unit_set * am_amount
+			am_amount = fraction(raw_input("\nAmount consumed (fraction or amount in g)? ").strip())
+			scale = am_amount/equiv_per if am_amount > 20 else am_amount
+
+			am = scale * equiv_per
+
+
+			print "unit_set=", unit_set, " am_amount=", am_amount
 
 		dater = "%04d/%02d/%02d--%02d:%02d" % localtime()[0:5]
 
