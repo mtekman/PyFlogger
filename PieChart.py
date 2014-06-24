@@ -156,7 +156,8 @@ class PieChart:
 			p = self.protein_current/current_total_fract
 			f = self.fat_current/current_total_fract
 
-			colors=".%^"
+#			colors=".%^"
+			colors=".%+"
 			self.make(colors,[c,p,f])
 
 			mid_x, mid_y = (len(self.circle[0])/2)+1, self.rad/2

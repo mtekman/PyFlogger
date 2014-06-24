@@ -118,7 +118,7 @@ class Suggest:
 			new_scale = yem.scaled(amount_to_scale)
 			
 			
-			if new_scale.carb.bad > self.allowed_carb.bad:continue
+#			if new_scale.carb.bad > self.allowed_carb.bad:continue
 			
 			if new_scale.prot <= 0.1 and self.allowed.prot >=0:continue
 			
