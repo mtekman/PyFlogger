@@ -170,23 +170,29 @@ class FoodList:
 		found=[];
 		for avail_food, obj in self.foodmap.iteritems():
 			#words
+			word_match = 0
 			for ss in searchname:
 				for s in avail_food.split():
 					if ss.strip() in s.strip():
-						if obj not in found: found.append(obj)
-						break
+						word_match += 1
+			if word_match != 0:
+				found.append( [obj, word_match] )
+
 		
 		if len(found)==0:
 			print "Searching tags..."
 			for avail_food, obj in self.foodmap.iteritems():
+				word_match = 0
 				for ss in searchname:
 					for tag in obj.tags.tags:
 						if ss.strip() in tag:
-							if obj not in found: found.append(obj)
-							break
-			
+							word_match += 1
+				if word_match != 0:
+					found.append( [obj, word_match] )
 		
-		return found
+		def sorter(x):return x[1]
+
+		return [x for x,y in sorted(found, key=sorter, reverse=True)]
 
 
 	def updateListInfo(self):
