@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from Common import *
 
 class Journal:
@@ -90,6 +92,5 @@ class Journal:
 
 
 j = Journal()
-#j.log("Ate 5 chocolate biscuits", -5)
-j.showDate('2014/06/15')
+j.log()
 

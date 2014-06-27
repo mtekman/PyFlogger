@@ -14,8 +14,6 @@ class PieChart:
 		return PieChart.s(k[1:],v[1:],a-v[0])
 
 
-
-
 	def setMacros(self, macrofile):
 		periodmap = {'day':1, 'week':5}
 
@@ -33,6 +31,7 @@ class PieChart:
 				self.macro_carb = Carb(bad,0,bad)
 			elif line.startswith('protein_total'):self.macro_prot = parseText(line)
 			elif line.startswith('fat_total'):self.macro_fat = parseText(line)
+			elif line.startswith('water_total'):self.macro_water = parseText(line)
 		f.close()
 		
 
@@ -123,6 +122,7 @@ class PieChart:
  		
  		self.allow_prot = self.macro_prot - self.protein_current
 		self.allow_fat = self.macro_fat - self.fat_current
+#		self.require_water = self.macro_water - self.water_current
 
 		if printme:
 			self.allows_line = ' ' * lmarginal
@@ -130,7 +130,9 @@ class PieChart:
 				int(self.allow_kc), 
 				self.allow_carb.total, self.allow_carb.fibre, self.allow_carb.sugar, self.allow_carb.bad,
 				self.allow_prot,
-				self.allow_fat)    
+				self.allow_fat)
+
+
 #
 # Bit of a mess  - I was trying to overlay macro and current pie charts and though it works it looks ugly.
 #			macro_total_fract = self.macro_carb.bad + self.macro_prot + self.macro_fat

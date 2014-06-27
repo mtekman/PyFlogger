@@ -13,7 +13,7 @@ class FoodLogger:
 		self.foodlog=[]
 		self.path= file
 		self.macrofile=file2
-		self.foodlist = FoodList() # i.e. ref FoodList cobj
+		self.foodlist = FoodList() 		# i.e. ref FoodList cobj
 		self.date = "%04d/%02d/%02d--%02d:%02d" % localtime()[0:5]
 
 	# any date
@@ -86,7 +86,7 @@ class FoodLogger:
 
 		self.pie = PieChart(carb_total, protein_total, fat_total, kC_total, self.macrofile,
 			Yemek.buffer-8, 8, printme=showPie)
-				
+
 		return kC_total, carb_total, protein_total, fat_total
 
 
