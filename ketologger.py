@@ -125,7 +125,7 @@ OPTS:		foodname, lbs, lowcal
 				date = fl.date
 				if self.opts!="":
 					count = int(self.opts)
-					while count >=0:
+					while count >0:
 						date = previousDay(date)
 						count -= 1
 

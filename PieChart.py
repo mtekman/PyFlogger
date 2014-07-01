@@ -170,7 +170,7 @@ class PieChart:
 			mid_x -= offset_x		
 
 			self.cpf_line = ' ' * lmarginal
-			self.cpf_line += "  CPF  :                                %3.1f%%  %3.1f%% %3.1f%%" % (
+			self.cpf_line += "  CPF  :                                    %3.1f%%   %3.1f%%  %3.1f%%" % (
 				100*c, 100*p, 100*f)
 
 			self.circle[mid_y] = self.circle[mid_y][:mid_x+2] + kc_text + self.circle[mid_y][mid_x+offset_x+2:]
