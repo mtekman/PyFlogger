@@ -18,7 +18,7 @@ Records progress during keto; weight and food consumption
 commands:  	insert, remove, list, plot, suggest, lookup
 tasks:    	weight, food
 
-OPTS:		foodname, lbs, lowcal
+OPTS:		foodname, lbs, lowcal, tag
 
 ''' % sys.argv[0].split('/')[-1]
 		exit(-1)
@@ -141,18 +141,23 @@ OPTS:		foodname, lbs, lowcal
 				fl.makeTotals(fl.date)
 				p = fl.pie
 				lowcal=False
+				tag=""
 				try:
 					p.allow_kc = int(self.opts)
 				except ValueError:
-					if self.opts.lower()=="lowcal":
+					self.opts = self.opts.lower()
+					if self.opts=="lowcal":
 						lowcal=True
+					else:
+						tag=self.opts
 					pass
 
-				s = Suggest(fl.foodlist, 
+				s = Suggest(fl.foodlist,
 					p.allow_kc, 
 					p.allow_carb,
 					p.allow_prot, 
-					p.allow_fat)
+					p.allow_fat, 
+					tag)
 
 				if lowcal:s.lowCalHighPF()
 				else:s.suggestSomething()

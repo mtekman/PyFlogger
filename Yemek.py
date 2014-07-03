@@ -43,7 +43,7 @@ class Tags:
 		def treas(keyd):
 			return Tags.global_tags[keyd]
 
-		return sorted(Tags.global_tags.keys(), key=treas, reverse=True)
+		return filter(lambda x: Tags.global_tags[x]>1, sorted(Tags.global_tags.keys(), key=treas, reverse=True))
 
 
 class Carb:

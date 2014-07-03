@@ -37,14 +37,14 @@ class Suggest:
 
 
 
-	def __init__(self, foodlist_obj, kc, carb_obj, prot, fat):
+	def __init__(self, foodlist_obj, kc, carb_obj, prot, fat, tag=""):
 		self.flist = foodlist_obj.foodmap
 		self.allowed_kc = kc
 		self.allowed_carb = carb_obj
 		self.allowed_prot = prot
 		self.allowed_fat = fat
+		self.wanted_tag = tag
 
-#		self.suggestSomething()
 
 
 	#This is more for my own curiousity
@@ -90,11 +90,14 @@ class Suggest:
 		# Filter singles again for kc limit
 		self.singles = dict((x,v) for x,v in self.flist.iteritems()\
  if len(v.unit)>2\
+ and ((
+       ( (self.wanted_tag in v.tags.tags) and (  (v.fat/v.carb.bad > 1) or (v.prot/v.carb.bad > 1)  )   )
+      )\
+ if (self.wanted_tag!="") else True)\
  and v.kC < self.allowed_kc\
  and v.carb.bad < self.allowed_carb.bad\
  and v.fat < self.allowed_fat\
- and v.prot < self.allowed_prot\
- and ((v.fat/v.carb.bad > 1) or (v.prot/v.carb.bad > 1)))
+ and v.prot < self.allowed_prot)
 		
 
 	def suggestPortions(self):
@@ -105,6 +108,10 @@ class Suggest:
 		#scale portions to a minimum, and then chuck out the unrealistic ones
 		for name in portions:
 			yem = portions[name]
+
+			if self.wanted_tag!="":
+				if self.wanted_tag not in yem.tags.tags:continue
+
 			amount_to_scale = float(self.allowed_kc)/yem.kC
 			
 #			if amount_to_scale == 0:
