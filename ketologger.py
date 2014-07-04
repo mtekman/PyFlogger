@@ -145,11 +145,15 @@ OPTS:		foodname, lbs, lowcal, tag
 				try:
 					p.allow_kc = int(self.opts)
 				except ValueError:
-					self.opts = self.opts.lower()
-					if self.opts=="lowcal":
-						lowcal=True
+					opts = self.opts.lower().split()
+					if len(opts)!=1:
+						tag= ' '.join(opts[:-1])
+						p.allow_kc = int(opts[-1])
 					else:
 						tag=self.opts
+
+					if tag=="lowcal":
+						lowcal=True
 					pass
 
 				s = Suggest(fl.foodlist,

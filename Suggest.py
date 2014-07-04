@@ -17,11 +17,6 @@ class Suggest:
 
 			return pff + ppp
 
-#			input_ratio = self.allowed_fat / self.allowed_prot
-			
-#			ratio = ((f/p)/input_ratio) if self.allowed_fat >= self.allowed_prot else ((p/f)*input_ratio)
-#			return ratio + 0.1*yem.carb.fibre
-
 
 		for x,v in self.singles.iteritems():
 			self.portions[x] = v
@@ -86,19 +81,48 @@ class Suggest:
 		self.sortOpts()
 
 
+	def minimumScale(self, yem):
+		kc_scale = float(self.allowed_kc)/yem.kC
+		yem = yem.scaled(kc_scale)
+
+		if yem.carb.bad > self.allowed_carb.bad:
+			carb_scale = float(self.allowed_carb.bad)/yem.carb.bad
+			scale = float(1)/( int( float(1)/carb_scale ) )
+			yem = yem.scaled(scale)
+		if yem.fat > self.allowed_fat:
+			fat_scale = float(self.allowed_fat)/yem.fat
+			scale = float(1)/( int( float(1)/fat_scale ) )
+			yem = yem.scaled(scale)
+		if yem.prot > self.allowed_prot:
+			protein_scale = float(self.allowed_prot)/yem.prot
+			scale = float(1)/( int( float(1)/protein_scale ) )
+			yem = yem.scaled(scale)
+
+		return yem
+
+
 	def suggestSingles(self):
 		# Filter singles again for kc limit
-		self.singles = dict((x,v) for x,v in self.flist.iteritems()\
- if len(v.unit)>2\
- and ((
-       ( (self.wanted_tag in v.tags.tags) and (  (v.fat/v.carb.bad > 1) or (v.prot/v.carb.bad > 1)  )   )
-      )\
- if (self.wanted_tag!="") else True)\
- and v.kC < self.allowed_kc\
- and v.carb.bad < self.allowed_carb.bad\
- and v.fat < self.allowed_fat\
- and v.prot < self.allowed_prot)
-		
+		singles1 = dict((x,v) for x,v in self.flist.iteritems()\
+ if len(v.unit)>2 and (
+  (  (v.fat/v.carb.bad > 1) or (v.prot/v.carb.bad > 1) )  
+  if (self.wanted_tag=="")\
+  else (self.wanted_tag in v.tags.tags)
+  ))
+
+		self.singles={}
+		for x,y in singles1.iteritems():
+			v = self.minimumScale(y)
+
+#			if (v.kC < self.allowed_kc 
+#				 and v.carb.bad < self.allowed_carb.bad
+#				 and v.fat < self.allowed_fat
+#				 and v.prot < self.allowed_prot):
+			self.singles[x]=v
+
+	
+	
+	
 
 	def suggestPortions(self):
 		
@@ -110,23 +134,10 @@ class Suggest:
 			yem = portions[name]
 
 			if self.wanted_tag!="":
-				if self.wanted_tag not in yem.tags.tags:continue
+				if not self.wanted_tag in yem.tags.tags:continue
 
-			amount_to_scale = float(self.allowed_kc)/yem.kC
-			
-#			if amount_to_scale == 0:
-#				continue
-
-			#nearest round fraction
-			if amount_to_scale < 1:
-				temp_scale = int(float(1)/amount_to_scale)
-				amount_to_scale = float(1)/temp_scale
-			
-			new_scale = yem.scaled(amount_to_scale)
-			
-			
-#			if new_scale.carb.bad > self.allowed_carb.bad:continue
-			
+			new_scale = self.minimumScale(yem)
+						
 			if new_scale.prot <= 0.1 and self.allowed.prot >=0:continue
 			
 			if new_scale.unit == 'g':
