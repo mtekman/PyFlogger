@@ -36,14 +36,19 @@ class FoodLogger:
 			if len(line) < 5:
 				continue
 			ddate, amount, name = line.split('\t')
+
+			# rough hour
+			hour,min = map(int, ddate[-5:].split(':'))
+			hour += 1 if min >= 30 else 0
+
 			ddate = ddate[0:10]
-			
 			datelist.append(ddate)
 
 			if date == ddate:
 				#Find food if date matches
 				food = copy(self.foodlist.foodmap[name.strip()])			
 				food.amount = amount
+				food.hour = hour
 				self.foodlog.append(food)
 		f.close()
 		
@@ -73,6 +78,10 @@ class FoodLogger:
 			print >> sys.stderr, '\n'*10
 			Yemek.printFullHeader()
 		
+
+		after_L_head=False
+		after_6_head=False
+
 		for y in self.foodlog:
 			scyem = y.scaled()
 			
@@ -82,7 +91,15 @@ class FoodLogger:
 			fat_total += scyem.fat
 
 			if printme:
+				if not(after_L_head) and (y.hour >= 12):
+					print >> sys.stderr, '        ===== Lunch ===='
+					after_L_head = True
+				if not(after_6_head) and (y.hour >= 18):
+					print >> sys.stderr, '        ===== Dinner ===='
+					after_6_head = True
 				print >> sys.stderr, scyem.printout()
+
+
 
 		self.pie = PieChart(carb_total, protein_total, fat_total, kC_total, self.macrofile,
 			Yemek.buffer-8, 8, printme=showPie)

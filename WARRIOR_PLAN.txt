@@ -1,0 +1,26 @@
+Lunch is a light salad with assorted fruit and veg, whatever I fancy
+Dinner is lean meat like tuna steak or chicken or lamb or whatever!!
+
+
+Harringay Routine:
+
+08:00-08:30	Wake up	shower          	0	0
+08:30-08:40	Drink 300ml water       	0	"
+08:40-09:10	Cycle to work           	-100	-100
+10:00-12:00	Drink rest of 1L water  	0	"
+12:00-13:00	1 fruit + 3 x veg + Mint tea	150	50
+13:00-15:00	Drink 1L water			0	"
+15:00-16:00	3 x veg + Mint tea         	150	200
+17:30-18:00	Cycle to gym              	-100	100
+
+	Mon,Wed,Fri
+18:20-19:00	Workout 3 reps            	-300	-200
+19:00-19:10	Cold shower at gym
+19:30-21:30	Cook Meat + veg + Eat		600	400
+22:00-08:00	Dishes + Sleep
+
+	Tue,Thur
+18:20-20:00	Workout 6 reps            	-600	-500
+20:00-20:10	Cold shower at gym
+20:30-21:30	Cook Meat + veg + Eat		600	100
+22:00-08:00	Dishes + Sleep

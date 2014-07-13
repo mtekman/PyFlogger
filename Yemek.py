@@ -166,6 +166,8 @@ class Yemek:
 
 		self.amount = float(amount)
 		self.url = url
+		self.hour = -1
+
 
 	def printout(self,header=False, buffer=0, pre="*", 
 			portions_buff=0, tags=False):
