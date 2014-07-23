@@ -87,7 +87,10 @@ class Suggest:
 
 		if yem.carb.bad > self.allowed_carb.bad:
 			carb_scale = float(self.allowed_carb.bad)/yem.carb.bad
-			scale = float(1)/( int( float(1)/carb_scale ) )
+			try:
+				scale = float(1)/( int( float(1)/carb_scale ) )
+			except ZeroDivisionError:
+				scale = 0.1
 			yem = yem.scaled(scale)
 		if yem.fat > self.allowed_fat:
 			fat_scale = float(self.allowed_fat)/yem.fat
@@ -138,7 +141,7 @@ class Suggest:
 
 			new_scale = self.minimumScale(yem)
 						
-			if new_scale.prot <= 0.1 and self.allowed.prot >=0:continue
+			if new_scale.prot <= 0.1 and self.allowed_prot >=0:continue
 			
 			if new_scale.unit == 'g':
 				if new_scale.per < 20.0 or new_scale.per > 350:

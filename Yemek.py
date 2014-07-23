@@ -47,12 +47,12 @@ class Tags:
 
 
 class Carb:
-	def __init__(self, carb, fibre, sugar):
+	def __init__(self, carb, fibre, sugstar):
 		self.fibre = float(fibre) + Yemek.nonz
-		self.sugar = float(sugar) + Yemek.nonz
+		self.sugstar = float(sugstar) + Yemek.nonz
 
 		self.total = float(carb) + Yemek.nonz
-		real_total = self.fibre + self.sugar
+		real_total = self.fibre + self.sugstar
 		
 		if self.total < real_total:
 			self.total = real_total
@@ -63,7 +63,7 @@ class Carb:
 	# override multiplier
 	def multiply(self, x):
 		self.fibre *= x
-		self.sugar *= x
+		self.sugstar *= x
 		self.total *= x
 		self.bad *= x
 	
@@ -71,7 +71,7 @@ class Carb:
 
 	def add(self, other):
 		self.fibre += other.fibre
-		self.sugar += other.sugar
+		self.sugstar += other.sugstar
 		self.total += other.total
 		self.bad += other.bad
 	
@@ -79,7 +79,7 @@ class Carb:
 	
 	def sub(self, other):
 		self.fibre -= other.fibre
-		self.sugar -= other.sugar
+		self.sugstar -= other.sugstar
 		self.total -= other.total
 		self.bad -= other.bad
 	
@@ -211,7 +211,7 @@ class Yemek:
 		form = "%s|"+Yemek.outformat  #template formatting
 		text += form % (
 				outname, int(self.kC), self.carb.total, 
-				self.carb.fibre, self.carb.sugar, self.carb.bad,
+				self.carb.fibre, self.carb.sugstar, self.carb.bad,
 				self.prot, self.fat, self.per, self.unit)
 
 		if portions_buff!=0:
@@ -243,7 +243,7 @@ class Yemek:
 		if buffer ==0:buffer=Yemek.buffer
 		
 		strr= ("%s |" + Yemek.headformat) % (
-			(' '*buffer), "kC", "Carb", "Fibre", "Sugar", "Bad", "Prot", "Fat", "per", "unit"
+			(' '*buffer), "kC", "Carb", "Fibre", "Sug/Star", "Bad", "Prot", "Fat", "per", "unit"
 			)
 		
 		if portions_buff!=0:
@@ -259,7 +259,7 @@ class Yemek:
 			multip = float(self.amount)/self.per
 
 		# Dupe, never edit self
-		selfy = Yemek(self.name, self.kC, Carb(self.carb.total,self.carb.fibre,self.carb.sugar), self.prot, self.fat, self.per, self.unit)
+		selfy = Yemek(self.name, self.kC, Carb(self.carb.total,self.carb.fibre,self.carb.sugstar), self.prot, self.fat, self.per, self.unit)
 		
 		selfy.kC = int( selfy.kC * multip)
 		selfy.carb.multiply(multip)
@@ -283,12 +283,12 @@ class Yemek:
 	#		print Yemek.roughlyEqual(self.prot, other.prot)
 	#		print Yemek.roughlyEqual(self.fat, other.fat)
 	#		print Yemek.roughlyEqual(self.carb.fibre, other.carb.fibre)
-	#		print Yemek.roughlyEqual(self.carb.sugar, other.carb.sugar)
+	#		print Yemek.roughlyEqual(self.carb.sugstar, other.carb.sugstar)
 
 			return (Yemek.roughlyEqual(self.kC, other.kC)
 				and Yemek.roughlyEqual(self.prot, other.prot)
 				and Yemek.roughlyEqual(self.fat, other.fat)
 				and Yemek.roughlyEqual(self.carb.fibre, other.carb.fibre)
-				and Yemek.roughlyEqual(self.carb.sugar, other.carb.sugar) )
+				and Yemek.roughlyEqual(self.carb.sugstar, other.carb.sugstar) )
 
 		return False

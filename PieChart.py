@@ -107,7 +107,7 @@ class PieChart:
 			
 			self.totals_line += outnow % (
 				int(self.kc_current),
-				self.carb_current.total, self.carb_current.fibre, self.carb_current.sugar, self.carb_current.bad,
+				self.carb_current.total, self.carb_current.fibre, self.carb_current.sugstar, self.carb_current.bad,
 				self.protein_current,
 				self.fat_current,)
 
@@ -128,7 +128,7 @@ class PieChart:
 			self.allows_line = ' ' * lmarginal
 			self.allows_line += " Allow :   %5d  %5.1f [%5.1f,%5.1f] = %4.1f  %4.1f  %4.1f" % (
 				int(self.allow_kc), 
-				self.allow_carb.total, self.allow_carb.fibre, self.allow_carb.sugar, self.allow_carb.bad,
+				self.allow_carb.total, self.allow_carb.fibre, self.allow_carb.sugstar, self.allow_carb.bad,
 				self.allow_prot,
 				self.allow_fat)
 
