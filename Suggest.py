@@ -72,7 +72,7 @@ class Suggest:
 			
 		print outnow % (
 				int(self.allowed_kc), 
-				self.allowed_carb.total, self.allowed_carb.fibre, self.allowed_carb.sugar, self.allowed_carb.bad,
+				self.allowed_carb.total, self.allowed_carb.fibre, self.allowed_carb.sugstar, self.allowed_carb.bad,
 				self.allowed_prot,
 				self.allowed_fat)
 		

@@ -126,7 +126,7 @@ class PieChart:
 
 		if printme:
 			self.allows_line = ' ' * lmarginal
-			self.allows_line += " Allow :   %5d  %5.1f [%5.1f,%5.1f] = %4.1f  %4.1f  %4.1f" % (
+			self.allows_line += " Allow :   %5d  %6.1f [%6.1f,%6.1f] =%6.1f  %5.1f  %5.1f" % (
 				int(self.allow_kc), 
 				self.allow_carb.total, self.allow_carb.fibre, self.allow_carb.sugstar, self.allow_carb.bad,
 				self.allow_prot,
