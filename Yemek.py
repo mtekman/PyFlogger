@@ -243,7 +243,7 @@ class Yemek:
 		if buffer ==0:buffer=Yemek.buffer
 		
 		strr= ("%s |" + Yemek.headformat) % (
-			(' '*buffer), "kC", "Carb", "Fibre", "Sug/Star", "Bad", "Prot", "Fat", "per", "unit"
+			(' '*buffer), "kC", "Carb", "Fibre", "Sg/St", "Bad", "Prot", "Fat", "per", "unit"
 			)
 		
 		if portions_buff!=0:
