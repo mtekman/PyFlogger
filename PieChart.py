@@ -126,11 +126,15 @@ class PieChart:
 
 		if printme:
 			self.allows_line = ' ' * lmarginal
-			self.allows_line += " Allow :   %5d  %6.1f [%6.1f,%6.1f] =%6.1f  %5.1f  %5.1f" % (
-				int(self.allow_kc), 
-				self.allow_carb.total, self.allow_carb.fibre, self.allow_carb.sugstar, self.allow_carb.bad,
-				self.allow_prot,
-				self.allow_fat)
+			self.allows_line += " Allow :   %5d               Protein Required:  %5.1f" % (
+				int(self.allow_kc), self.allow_prot)
+
+
+#			self.allows_line += " Allow :   %5d  %6.1f [%6.1f,%6.1f] =%6.1f  %5.1f  %5.1f" % (
+#				int(self.allow_kc), 
+#				self.allow_carb.total, self.allow_carb.fibre, self.allow_carb.sugstar, self.allow_carb.bad,
+#				self.allow_prot,
+#				self.allow_fat)
 
 
 #
@@ -170,7 +174,7 @@ class PieChart:
 			mid_x -= offset_x		
 
 			self.cpf_line = ' ' * lmarginal
-			self.cpf_line += "  CPF  :                                    %3.1f%%  %3.1f%%  %3.1f%%" % (
+			self.cpf_line += "  CPF  :                                    %3d%%   %3d%%   %3d%%" % (
 				100*c, 100*p, 100*f)
 
 			self.circle[mid_y] = self.circle[mid_y][:mid_x+2] + kc_text + self.circle[mid_y][mid_x+offset_x+2:]
