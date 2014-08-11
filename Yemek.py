@@ -21,6 +21,7 @@ class Tags:
 
 
 	def insert(self, tag):
+		if len(tag)==0:return
 		if not tag in self.tags:
 			self.tags[tag] = 1
 		if not tag in Tags.global_tags:

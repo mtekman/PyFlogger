@@ -105,7 +105,7 @@ class FoodList:
 		if user_input_tags!=-1:
 			yem.tags.insertList(user_input_tags)
 		
-		if input_search!=[]:yem.tags.insertList(input_search)
+#		if input_search!=[]:yem.tags.insertList(input_search)
 
 		name = yem.name.strip().lower()
 		self.foodmap[name] = yem
