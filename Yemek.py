@@ -120,7 +120,7 @@ class Portion:
 
 class Yemek:
 	nonz = 0.00001
-	buffer = 30
+	buffer = 20
 	outformat = "%5d  %6.1f [%6.1f,%6.1f] = %5.1f  %5.1f  %5.1f  %5.1f %s"
 	
 	headformat = ""
