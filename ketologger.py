@@ -15,7 +15,7 @@ Records progress during keto; weight and food consumption
 		
 		%s <command> <task> [OPTS]
 
-commands:  	insert, remove, list, plot, suggest, lookup
+commands:  	insert, remove, list, plot, suggest, lookup, test, cleartest
 tasks:    	weight, food
 
 OPTS:		foodname, lbs, lowcal, tag
@@ -39,6 +39,7 @@ OPTS:		foodname, lbs, lowcal, tag
 		self.list = False
 		self.plot = False
 		self.suggest = False
+		self.test = 0
 		self.food = self.weight = False
 		self.task = ""
 		
@@ -54,6 +55,11 @@ OPTS:		foodname, lbs, lowcal, tag
 			self.plot=True
 		elif arg.startswith('suggest'):
 			self.suggest=True
+		elif arg.startswith('test'):
+			self.test=1
+			self.insert=True
+		elif arg.startswith('cleartest'):
+			self.test=2
 	
 		arg=self.argv[2].lower()	
 		if arg.startswith('food'):
@@ -111,7 +117,7 @@ OPTS:		foodname, lbs, lowcal, tag
 
 
 		if self.food:
-			fl = FoodLogger()
+			fl = FoodLogger(testmode=self.test)
 			
 			if self.insert:
 				fl.log(self.opts)

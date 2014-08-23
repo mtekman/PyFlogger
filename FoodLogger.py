@@ -9,12 +9,28 @@ from PieChart import PieChart
 
 class FoodLogger:
 	def __init__(self, 	file=abspath("../")+"/logs/keto_foodlog.txt",
-				file2=abspath("../")+"/logs/targets.txt"):
-		self.foodlog=[]
+				file2=abspath("../")+"/logs/targets.txt",
+			testmode=0):
+			# Test modes:
+			# 0 - inactive
+			# 1 - log and record @ 1972/01/02-13:00
+			# 2 - clear all tests from record
+
 		self.path= file
-		self.macrofile=file2
-		self.foodlist = FoodList() 		# i.e. ref FoodList cobj
-		self.date = "%04d/%02d/%02d--%02d:%02d" % localtime()[0:5]
+
+		if testmode==2:
+			self.clearTest()
+			
+		else:
+			self.date = "%04d/%02d/%02d--%02d:%02d" % localtime()[0:5]
+			if testmode==1:
+				self.date = "1972/01/02-13:00"
+
+			self.foodlog=[]
+			self.macrofile=file2
+			self.foodlist = FoodList() 		# i.e. ref FoodList cobj
+
+
 
 	# any date
 	def read(self,date):
@@ -107,6 +123,19 @@ class FoodLogger:
 		return kC_total, carb_total, protein_total, fat_total
 
 
+	def clearTest(self):
+		f=open(self.path,'r')
+		all=filter(lambda x: not(x.startswith('1972')),  f.readlines())
+		f.close()
+
+		f=open(self.path,'w')
+		for line in all:
+#			if not line.startswith('1972'):
+				print >> f, line.splitlines()[0]
+		f.close()
+		
+
+
 
 	def log(self, name=""):
 		if name=="":
@@ -150,7 +179,8 @@ class FoodLogger:
 
 			print "unit_set=", unit_set, " am_amount=", am_amount
 
-		dater = "%04d/%02d/%02d--%02d:%02d" % localtime()[0:5]
+#		dater = "%04d/%02d/%02d--%02d:%02d" % localtime()[0:5]
+		dater = self.date
 
 		f=open(self.path,'a')
 		print >> f, "%s\t%.1f\t%s" % (dater,am,name)
