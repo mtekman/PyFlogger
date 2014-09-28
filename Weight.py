@@ -5,6 +5,17 @@ from Common import *
 
 
 class Weight:
+
+	@staticmethod
+	def lbs2stone(lbs):
+		if lbs<=0:return ""
+
+		stone = lbs/14
+		major = int(stone)
+		minor = int((stone-major)*14)
+		return str(major)+"'"+str(minor)
+
+
 	def __init__(self,morning=-1,night=-1):
 		self.morn = morning
 		self.night = night
@@ -23,7 +34,9 @@ class Weight:
 			
 		if filler:
 			resil += "             \t"
-		return resil+("%.1f\t%.1f" % (self.morn, self.night))
+
+		p2s=("%s %s" % (Weight.lbs2stone(self.morn), Weight.lbs2stone(self.night))).strip()
+		return resil+("%.1f\t%.1f\t[ %s\t]" % (self.morn, self.night, p2s))
 	
 				
 	def set(self, lbls, setmorn, finalprint=False):
@@ -48,6 +61,7 @@ class Weight:
 			print self.printout(True)
 	
 	
+
 class WeightLog:
 	def __init__(self,file=abspath("../")+"/logs/keto_weightlog.txt"):
 		self.weightlogmap={}
