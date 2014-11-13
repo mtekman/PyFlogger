@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+from Weight import Weight
 from os import popen
 
 '''Translates XYGraph into terminal window space'''
@@ -94,6 +95,7 @@ class XYGraph:
 			
 			if r%3==1:
 				coordY = "%.1f" % (self.minY + (float(r) / self.scaleY)) 
+				coordY = Weight.lbs2stone(float(coordY))
 				self.text2Array(' '+str(coordY)+'_', self.grid[r] )
 
 
