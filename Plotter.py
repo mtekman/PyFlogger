@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import sys
-from Weight import Weight
+#from Weight import Weight
 from os import popen
 
 '''Translates XYGraph into terminal window space'''
