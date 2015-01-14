@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from Plotter import *
 from Common import *
 
 

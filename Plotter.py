@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import sys
-from Weight import *
 from os import popen
 
 '''Translates XYGraph into terminal window space'''
@@ -29,6 +28,7 @@ class Printer:
 
 		for row in reversed(self.exgrid):
 			print "".join(row)
+
 		print ' '*((self.columns/2)-5),"Days Elapsed",' '*((self.columns/2)-9)
 
 		
@@ -101,24 +101,24 @@ class XYGraph:
 
 		#X-axis
 		grid_row	= ['-'] * (len(self.grid[0])-3)
-		hyphen_row = [' '] * (len(self.grid[0]))
+		tick_row = [' '] * (len(self.grid[0]))
 		number_row = [' '] * (len(self.grid[0]))
-
+		
 		for r in xrange(len(self.grid[0])):
 		
 			coordX = int(self.minX + (float(r) / self.scaleX)) 
 			
 			if r%(len(str(coordX))+2)==0:
-				hyphen_row[r] = '\\'
+				tick_row[r] = '\\'
 				self.text2Array( str(coordX), number_row, r )
 		
 		# Add margins
 		grid_row	= ([' ']*5) + grid_row
-		hyphen_row	= ([' ']*5) + hyphen_row
+		tick_row	= ([' ']*5) + tick_row
 		number_row	= ([' ']*5) + number_row
 		
 		self.grid = [grid_row] + self.grid
-		self.grid = [hyphen_row] + self.grid
+		self.grid = [tick_row] + self.grid
 		self.grid = [number_row] + self.grid
 				
 
@@ -158,7 +158,7 @@ class XYGraph:
 				
 
 
-
+from Weight import *
 #xy = XYGraph()
 #xy.addPoint(10.9,10,"a")
 #xy.addPoint(20,20.2,"b")
