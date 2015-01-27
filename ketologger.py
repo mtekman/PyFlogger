@@ -89,7 +89,7 @@ OPTS:		foodname, lbs, lowcal, tag
 				return
 			
 			if self.plot:
-				xy = XYGraph()
+				xy = XYGraph(False)
 
 				startdate=""
 				for date in sorted(wl.weightlogmap.keys()):

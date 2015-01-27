@@ -43,10 +43,11 @@ class Point:
 '''Holds Points'''
 class XYGraph:
 
-	def __init__(self):
+	def __init__(self, lbs=True):
 		self.points=[]
 		self.minX = self.minY = sys.maxint
 		self.maxX = self.maxY = 0
+		self.lbs = lbs
 	
 	
 	def updateRange(self, v, axes):
@@ -95,7 +96,8 @@ class XYGraph:
 			
 			if r%3==1:
 				coordY = "%.1f" % (self.minY + (float(r) / self.scaleY)) 
-				coordY = Weight.lbs2stone(float(coordY))
+				if self.lbs:
+					coordY = Weight.lbs2stone(float(coordY))			
 				self.text2Array(' '+str(coordY)+'_', self.grid[r] )
 
 
