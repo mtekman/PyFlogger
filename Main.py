@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import sys
 from FoodLogger import FoodLogger
@@ -6,28 +6,33 @@ from Weight import WeightLog
 from Plotter import *
 from Suggest import Suggest
 from Common import daysSince, previousDay
+from os import path,mkdir
+from xdg.BaseDirectory import xdg_config_home
+
+INFO="[INFO]"
+WARNING="[WARNING]"
 
 class Args:
-
 	def usage(self):
-		print >> sys.stderr, '''
-Records progress during keto; weight and food consumption
-		
+		print('''
+Records progress during weight and food consumption
+
 		%s <command> <task> [OPTS]
 
-commands:  	insert, remove, list, plot, suggest, lookup, test, cleartest
-tasks:    	weight, food
+commands:	insert, remove, list, plot, suggest, lookup, test, cleartest
+tasks:		weight, food
 
 OPTS:		foodname, lbs, lowcal, tag
 
-''' % sys.argv[0].split('/')[-1]
+''' % sys.argv[0].split('/')[-1], file=sys.stderr);
 		exit(-1)
+
 
 	def __init__(self, argv):
 
 		if len(argv)<3:
 			self.usage()
-		
+
 		self.argv = argv
 		self.parse()
 		self.callProgs()
@@ -40,10 +45,10 @@ OPTS:		foodname, lbs, lowcal, tag
 		self.plot = False
 		self.suggest = False
 		self.test = 0
-		self.food = self.weight = False
+		self.food = False; self.weight = False
 		self.task = ""
-		
-		
+
+
 		arg=self.argv[1].lower()
 		if arg.startswith('insert') or arg.startswith('log'):
 			self.insert=True
@@ -60,73 +65,93 @@ OPTS:		foodname, lbs, lowcal, tag
 			self.insert=True
 		elif arg.startswith('cleartest'):
 			self.test=2
-	
-		arg=self.argv[2].lower()	
+
+		arg=self.argv[2].lower()
 		if arg.startswith('food'):
 			self.food=True
 		elif arg.startswith('weight'):
 			self.weight=True
 
 		self.opts = " ".join(self.argv[3:])
-	
-	
-	
+
+
+	def resolveFoodLogPath(self):
+		direc=path.join( xdg_config_home, 'foodlogger')
+		filename=path.join( direc, 'foodlist.txt' )
+
+		if not path.exists(filename):
+
+			print(INFO, filename, "does not exist -- creating new", file=sys.stderr)
+			mkdir(direc)
+
+			# Open file and write blank
+			with open(filename,'w') as f:
+				f.write("\n")
+				f.close()
+
+		return filename
+
+
 	def callProgs(self):
+		#import pdb
+		#pdb.set_trace()
 
 		if self.weight:
 			wl = WeightLog()
-		
+
 			if self.insert:
 				wl.checkGaps()
 				return
-			
+
 			if self.remove:
-				print "Not implemented"
+				print("Not implemented")
 				return
 
 			if self.list:
-				wl.display( wl.weightlogmap.keys()[0] )
+				wl.display( list(wl.weightlogmap.keys())[0] )
 				return
-			
+
 			if self.plot:
 				xy = XYGraph(False)
 
 				startdate=""
 				for date in sorted(wl.weightlogmap.keys()):
-				
+
 					if startdate=="":
 						startdate=date
 						continue
-				               
+
 					days_since = daysSince(startdate,date)
 					total = days_since
 
 #					print date,total
-				                     
+
 					w = wl.weightlogmap[date]
 					if w.morn>0:
 						xy.addPoint(total,w.morn,"x")
 					if w.night>0:
 						xy.addPoint(total+.5,w.night,"x")
-				                                          
-				Printer(xy)
-				return                                       
 
-			print "Nothing to do"
+				Printer(xy)
+				return
+
+			print("Nothing to do")
 			return
 
 
 		if self.food:
-			fl = FoodLogger(testmode=self.test)
-			
+			foodlog_path = self.resolveFoodLogPath()
+
+			fl = FoodLogger(foodlog_path,testmode=self.test)
+
 			if self.insert:
 				fl.log(self.opts)
 				return
-			
+
 			if self.remove:
-				print "Not implemented"
+				print("Not implemented")
 				return
-			
+
 			if self.list:
 				date = fl.date
 				if self.opts!="":
@@ -139,8 +164,8 @@ OPTS:		foodname, lbs, lowcal, tag
 				return
 
 			if self.plot:
-				print "Not implemented"
-				return                                       
+				print("Not implemented")
+				return
 
 
 			if self.suggest:
@@ -163,10 +188,10 @@ OPTS:		foodname, lbs, lowcal, tag
 					pass
 
 				s = Suggest(fl.foodlist,
-					p.allow_kc, 
+					p.allow_kc,
 					p.allow_carb,
-					p.allow_prot, 
-					p.allow_fat, 
+					p.allow_prot,
+					p.allow_fat,
 					tag)
 
 				if lowcal:s.lowCalHighPF()
@@ -177,5 +202,5 @@ OPTS:		foodname, lbs, lowcal, tag
 try:
 	Args(sys.argv)
 except KeyboardInterrupt:
-	print "\nQuit"
+	print("\nQuit")
 	exit(-1)

@@ -9,7 +9,7 @@ class Printer:
 	def __init__(self, graphObj):	
 		self.margX = 10
 		self.margY = 6
-		self.rows, self.columns= map(lambda x: int(x), popen('stty size').read().split());
+		self.rows, self.columns= [int(x) for x in popen('stty size').read().split()];
 
 		self.rows -= self.margY+1
 		self.columns -= self.margX
@@ -23,13 +23,13 @@ class Printer:
 		
 		
 		#title
-		print ' '*((self.columns/2)-5),"W/T chart",' '*((self.columns/2)-9)
-		print "    ", '='*(self.columns), ' '*4
+		print(' '*((self.columns/2)-5),"W/T chart",' '*((self.columns/2)-9))
+		print("    ", '='*(self.columns), ' '*4)
 
 		for row in reversed(self.exgrid):
-			print "".join(row)
+			print("".join(row))
 
-		print ' '*((self.columns/2)-5),"Days Elapsed",' '*((self.columns/2)-9)
+		print(' '*((self.columns/2)-5),"Days Elapsed",' '*((self.columns/2)-9))
 
 		
 class Point:
@@ -45,7 +45,7 @@ class XYGraph:
 
 	def __init__(self, lbs=True):
 		self.points=[]
-		self.minX = self.minY = sys.maxint
+		self.minX = self.minY = sys.maxsize
 		self.maxX = self.maxY = 0
 		self.lbs = lbs
 	
@@ -73,14 +73,14 @@ class XYGraph:
 		if p not in self.points:
 			self.points.append(p)
 		else:
-			print "Dupe point", x,y
+			print("Dupe point", x,y)
 
 
 	def text2Array(self, text, array, start=0):
 		if len(array) < len(text):
 			array += [' ']* (len(text)-len(array))
 	
-		for x in xrange(len(text)):
+		for x in range(len(text)):
 			try:
 				array[start+x] = text[x]
 			except IndexError:
@@ -91,7 +91,7 @@ class XYGraph:
 	def setAxes(self):
 
 		#Y-axis
-		for r in xrange(len(self.grid)):
+		for r in range(len(self.grid)):
 			self.grid[r] = [' ',' ',' ',' ','|'] + self.grid[r]
 			
 			if r%3==1:
@@ -106,7 +106,7 @@ class XYGraph:
 		tick_row = [' '] * (len(self.grid[0]))
 		number_row = [' '] * (len(self.grid[0]))
 		
-		for r in xrange(len(self.grid[0])):
+		for r in range(len(self.grid[0])):
 		
 			coordX = int(self.minX + (float(r) / self.scaleX)) 
 			
@@ -127,9 +127,9 @@ class XYGraph:
 	def scaleGrid(self, rows,cols):
 
 		self.grid=[]
-		for r in xrange(rows):
+		for r in range(rows):
 			row = []
-			for c in xrange(cols):
+			for c in range(cols):
 				row.append(' ')
 			self.grid.append(row)
 		

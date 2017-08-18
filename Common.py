@@ -25,20 +25,20 @@ conversion['gallon'] = 4*conversion['quart']
 def ynprompt(message):
 	ans = 'g'
 	while ans not in ['y','n']:
-		ans = raw_input(message+' (y/n):').strip()[0].lower()
+		ans = input(message+' (y/n):').strip()[0].lower()
 	return ans == 'y'
-	
+
 
 
 	return (ans[0].lower()=='y')
 
 
 def userlistprompt(message, str_array):
-	opts = raw_input("%s : %s\n" % (message,','.join(str_array)))
+	opts = input("%s : %s\n" % (message,','.join(str_array)))
 	opts = opts.strip()
 	if opts == "":return -1
 	return opts.split(',')
-	
+
 
 
 def getIndexInput(max, multiple=False):
@@ -48,82 +48,82 @@ def getIndexInput(max, multiple=False):
 	while not (isNum and inRange):
 		try:
 			if multiple:
-				ind_array = map(lambda x: int(x)-1, raw_input('Please pick numbers (with spaces)(0 to cancel): ').split())
+				ind_array = [int(x)-1 for x in input('Please pick numbers (with spaces)(0 to cancel): ').split()]
 			else:
-				ind_array = [int(raw_input('Please pick a number (0 to cancel): '))-1]
+				ind_array = [int(input('Please pick a number (0 to cancel): '))-1]
 			isNum = True
-		
+
 			for ind in ind_array:
 				if ind < max:inRange = True
 				else:
 					inRange = False
-					print "Out of range, please try again"
+					print("Out of range, please try again")
 					break
 
 		except ValueError:
 			isNum = False
-			print "Not a number, please try again"
+			print("Not a number, please try again")
 
 	if len(ind_array)==1:return ind_array[0]
 	return ind_array
-	
+
 
 
 
 
 '''Takes any array and return chosen item(s)'''
 def choice(array, compare_to=0, multiple=False):
-	
+
 	# Encaps.
 	'''Takes a list of objects and returns one'''
 	def def_choice(array, compare_to, isTuple=False, isYem=True):
-		
+
 		choose = 1
-		if isYem:print Yemek.printFullHeader()
+		if isYem:print(Yemek.printFullHeader())
 
 		for x in array:
 			scale = 1
-			
+
 			if isTuple:
 					scale = x[1]
 					x = x[0]
-			
+
 			choose_s= "%2d: " % choose
 			sobj = x
-			
+
 			if isYem:
 				sobj = x.scaled(scale)
-				print sobj.printout(pre=choose_s)
+				print(sobj.printout(pre=choose_s))
 			else:
-				print "%s%s" % (choose_s, (sobj if not isTuple else sobj+' '+str(scale)))
-			
+				print("%s%s" % (choose_s, (sobj if not isTuple else sobj+' '+str(scale))))
+
 			if compare_to!=0:
 				# Whatever is compared MUST have equality method overloaded, else standard type
 				if sobj == compare_to:
-					print "Found definite match!"
+					print("Found definite match!")
 					return x
 			choose +=1
-		
+
 		ind = getIndexInput(len(array), multiple)
 		if ind==-1:return -1
-		
+
 		res = array[ind]
 		if isTuple:
 			res = array[ind][0]  # dont want scale
-		print ""
-		print ("Chose: %s" % res) if not isYem else res.printout(pre="Chose: ")
+		print("")
+		print(("Chose: %s" % res) if not isYem else res.printout(pre="Chose: "))
 		return res
-	
+
 	# Main
-	print ""
+	print("")
 
 	if len(array)==0:
-		print "No matches"
+		print("No matches")
 		return -1
-	
+
 	isTuple = isinstance(array[0], tuple)
 	isYem = isinstance( array[0][0] if isTuple else array[0], Yemek)
-	
+
 	return def_choice(array, compare_to, isTuple, isYem)
 
 
@@ -142,36 +142,36 @@ def fraction(am_amount):
 	return am
 
 
-
+# write unit cases
 def amountsplit(text,floater=False):
 	text= text.strip()
-	
+
 	lower = 47
 	if floater:lower=46 # '.' allowed
-	
+
 	num_builder = amount_builder=""
 	num_encounter = float_encounter = False
-	
-	for a in xrange(len(text)):
+
+	for a in range(len(text)):
 		chor = text[a]
-			
+
 		if lower <= ord(chor) <= 57:
 			if floater and chor == '.':
 				if float_encounter:continue				#Already seen a dot, skip
 				else:float_encounter=True
-				
+
 			num_builder += chor
 			num_encounter = True
 		else:
 			#NAN
 			if num_encounter:
 				amount_builder += chor
-		
+
 	try:
 		amount = amount_builder.splitlines()[0].strip()
 	except IndexError:
 		amount = ""
-	
+
 	if floater:return fraction(num_builder),amount
 	else:return int(num_builder),amount
 
@@ -187,13 +187,13 @@ def backup(path):
 	try:
 		curr_bytes = stat(path).st_size
 	except OSError:
-		print "No file to backup..."
+		print("No file to backup...")
 		return 0
 
 	try:
 		back_bytes = stat(backup_path).st_size
 	except OSError:
-		print "No backup file, creating one"
+		print("No backup file, creating one")
 		b=open(backup_path,'w');b.write("");b.close()
 		back_bytes = stat(backup_path).st_size
 
@@ -203,26 +203,27 @@ def backup(path):
 		# Copy current into backup if gt
 #		print "Backing", path, "into", backup_path
 		for line in curr:
-			print >> back, line
+			print(line, file=back)
 		back.close()
 		curr.close()
 
 
 
 ##################### Time functions ##########################
-def ymd2secs((y,m,d)):
+def ymd2secs(xxx_todo_changeme):
+	(y,m,d) = xxx_todo_changeme
 	if str(d).find('-')!=-1:
 		d = d.split('-')[0]
 	return mktime((int(y),int(m),int(d),0,0,0,0,0,-1))
 
 
 def daysSince(date1,date2):
-	y1,m1,d1 = map(lambda x: int(x), date1.split('/'))
-	y2,m2,d2 = map(lambda x: int(x), date2.split('/'))
-	
+	y1,m1,d1 = [int(x) for x in date1.split('/')]
+	y2,m2,d2 = [int(x) for x in date2.split('/')]
+
 	seconds1 = ymd2secs((y1,m1,d1))
 	seconds2 = ymd2secs((y2,m2,d2))
-	
+
 	diff = seconds2 - seconds1
 	return float(diff)/(24*60*60)
 
@@ -247,7 +248,7 @@ def previousDay(date):
 		date_sec = date
 		pass
 	return "%04d/%02d/%02d" % localtime(date_sec-(24*60*60))[0:3]
-	
+
 def nextDay(date):
 	try:
 		date_sec = ymd2secs( date.split('/') )
@@ -261,7 +262,7 @@ def nextDay(date):
 ##################### String handling #################################
 
 def stripAll(list):
-	return map(lambda x: x.strip(), list)
+	return [x.strip() for x in list]
 
 
 def makewhitespace(lbuff):

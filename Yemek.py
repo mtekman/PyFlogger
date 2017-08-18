@@ -30,7 +30,7 @@ class Tags:
 			Tags.global_tags[tag] += 1
 
 	def printout(self):		
-		return Tags.delim.join(self.tags.keys())
+		return Tags.delim.join(list(self.tags.keys()))
 
 
 	@staticmethod
@@ -44,7 +44,7 @@ class Tags:
 		def treas(keyd):
 			return Tags.global_tags[keyd]
 
-		return filter(lambda x: Tags.global_tags[x]>1, sorted(Tags.global_tags.keys(), key=treas, reverse=True))
+		return [x for x in sorted(list(Tags.global_tags.keys()), key=treas, reverse=True) if Tags.global_tags[x]>1]
 
 
 class Carb:
@@ -103,7 +103,7 @@ class Portion:
 
 	def printout(self, lbuff):
 		strr = Common.makewhitespace(lbuff)+'|'
-		for p,v in self.avail.iteritems():
+		for p,v in self.avail.items():
 			strr += Portion.start_delim + p + Portion.end_delim +str(v)
 		return strr
 
@@ -113,7 +113,7 @@ class Portion:
 
 		if name in self.avail:
 			if self.avail[name] != calorie:
-				print >> sys.stderr, "Portion contradiction:", name, self.avail[name], calorie
+				print("Portion contradiction:", name, self.avail[name], calorie, file=sys.stderr)
 		else:
 			self.avail[name] = calorie
 
@@ -152,7 +152,7 @@ class Yemek:
 		try:
 			self.per = float(per)
 		except ValueError:
-			up,down = map(lambda x: float(x), per.split('/'))
+			up,down = [float(x) for x in per.split('/')]
 			self.per = up/down
 
 		self.unit = unit.strip()
@@ -160,7 +160,7 @@ class Yemek:
 			subword = word[1:-2]
 			if len(subword)>4:
 				tokes = self.unit.split()
-				for u in xrange(len(tokes)):
+				for u in range(len(tokes)):
 					if subword in tokes[u]:
 						tokes[u] = ""
 				self.unit = " ".join(tokes).strip()
@@ -234,9 +234,9 @@ class Yemek:
 	def printFullHeader(buffer=0):
 		if buffer ==0:buffer=Yemek.buffer
 		hhh = Yemek.printheader(buffer)
-		print hhh
-		print '-' * buffer, '|', '-' * (len(hhh)-buffer)
-		print ' ' * buffer, '|'
+		print(hhh)
+		print('-' * buffer, '|', '-' * (len(hhh)-buffer))
+		print(' ' * buffer, '|')
 
 
 	@staticmethod

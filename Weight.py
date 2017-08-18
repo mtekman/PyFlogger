@@ -41,23 +41,23 @@ class Weight:
 	def set(self, lbls, setmorn, finalprint=False):
 		if setmorn:
 			if self.morn!=-1:
-				print "Morning already set:"
-				print self.printout(header=True, filler=True)
+				print("Morning already set:")
+				print(self.printout(header=True, filler=True))
 				if (ynprompt('Overwrite? ')):
 					self.morn = lbls
 			else:
 				self.morn = lbls
 		else:
 			if self.night!=-1:
-				print "Night already set:"
-				print self.printout()
+				print("Night already set:")
+				print(self.printout())
 				if (ynprompt('Overwrite? ')):
 					self.night = lbls
 			else:
 				self.night = lbls
 
 		if finalprint:
-			print self.printout(True)
+			print(self.printout(True))
 	
 	
 
@@ -94,11 +94,11 @@ class WeightLog:
 
 	def write(self):
 		f=open(self.path,'w')
-		print >> f, "Date     \tMorn\tNight\n"	#header
+		print("Date     \tMorn\tNight\n", file=f)	#header
 
 		for date in sorted(self.weightlogmap.keys()):
 			w = self.weightlogmap[date]
-			print >> f, "%s\t%s\t%s" % (date, w.morn, w.night)
+			print("%s\t%s\t%s" % (date, w.morn, w.night), file=f)
 		f.close()
 
 
@@ -115,13 +115,13 @@ class WeightLog:
 			if index < 0:
 				index = 0
 		
-		print >> sys.stderr, Weight.printheader()	#print header
+		print(Weight.printheader(), file=sys.stderr)	#print header
 
 		# Print all dates from that day forward
 		# For today it is a single date
 		for dated in availdates[index:]:
 			w = self.weightlogmap[dated]
-			print >> sys.stderr, "%s\t%s %s" % (dated, w.printout(), ("   <--" if date==dated else " "))
+			print("%s\t%s %s" % (dated, w.printout(), ("   <--" if date==dated else " ")), file=sys.stderr)
 
 
 	def log(self, date, lbls, ismorning):
@@ -146,7 +146,7 @@ class WeightLog:
 		tod= "morning" if isDay else "night"
 
 		#Input
-		lbls= float(raw_input('Please enter input for %s%s: ' % (day,tod)).strip())		
+		lbls= float(input('Please enter input for %s%s: ' % (day,tod)).strip())		
 		self.log(date, lbls, isDay)
 		self.display(date, lastSeven=True)
 
@@ -166,7 +166,7 @@ class WeightLog:
 		if self.today in self.weightlogmap:
 			w = self.weightlogmap[self.today]
 			if self.nighttime and w.morn==-1:
-				print "Night now, morning not set"
+				print("Night now, morning not set")
 				if (ynprompt('Set morning? ')):
 					self.logprompt(self.today, isDay=True)
 					return True
@@ -179,7 +179,7 @@ class WeightLog:
 
 		#Else log a new morning at night
 		if self.nighttime:
-				print "Night now, morning not set"
+				print("Night now, morning not set")
 				if (ynprompt('Set morning? ')):
 					self.logprompt(self.today, isDay=True)
 					return True
@@ -189,18 +189,18 @@ class WeightLog:
 		if self.yesterday in self.weightlogmap:
 			w = self.weightlogmap[self.yesterday]
 			if w.night==-1:
-				print "Last night not set"
+				print("Last night not set")
 				if (ynprompt('Set last night? ')):
 					self.logprompt(self.yesterday, isDay=False)
 					return True
 					
-				print "[Ignoring last night]"
+				print("[Ignoring last night]")
 				if ynprompt('Ignore permanently? '):
 					self.log(self.yesterday, 0, False)
-					print "[Ignoring last night permanently]"
+					print("[Ignoring last night permanently]")
 					return True
 
-				print "[Temporarily ignored last night, moving on..]\n"
+				print("[Temporarily ignored last night, moving on..]\n")
 				
 		return False #nothing changed
 

@@ -5,11 +5,12 @@ from Yemek import Yemek, Carb, Portion, Tags
 from os.path import abspath
 import Common
 import MiniFSChecker
+from functools import reduce
 
 class FoodList:
-	def __init__(self,file=abspath("../")+"/logs/keto_foodlist.txt"):
+	def __init__(self,foodlist_file):
 		self.foodmap={}
-		self.path= file
+		self.path= foodlist_file
 		self.read()
 
 	def read(self):
@@ -23,7 +24,7 @@ class FoodList:
 
 		# Strip Headers
 		f.readline(); f.readline()
-		
+
 		for foodentry in f:
 			if len(foodentry)< 5:
 				continue
@@ -37,9 +38,9 @@ class FoodList:
 			if len(dd)==4:
 				portions = dd[2]
 				tags = dd[3].strip()
-			
+
 			name = name.strip().lower()
-			
+
 			tokes = data.split()
 			#629      11.6   [     7.4,   4.2]   =                4.2  21.1  55.8 100.0 g
 			kC, carb_total, junk, fibre, sugar, junk, carb_bad_unused, prot, fat, per = tokes[0:10]
@@ -47,7 +48,7 @@ class FoodList:
 
 			carbs = Carb(carb_total, fibre[:-1], sugar[:-1])
 			food = Yemek(name, kC, carbs, prot, fat, per, unit)
-			
+
 			# Handle avail portions
 			if portions!="":
 				p_data = portions.split(Portion.start_delim)[1:]
@@ -60,42 +61,42 @@ class FoodList:
 				t_data = tags.split(Tags.delim)
 				for tv in t_data:
 					food.tags.insert(tv.strip())
-			
+
 			self.foodmap[food.name] = food
 		f.close()
 
 
 	def write(self):
-		
+
 		Common.backup(self.path)
 		f=open(self.path,'w')
-		
-		maxlen_name = reduce(lambda x,y: x if len(x) > len(y) else y, self.foodmap.keys())
+
+		maxlen_name = reduce(lambda x,y: x if len(x) > len(y) else y, list(self.foodmap.keys()))
 		maxlen_name = len(maxlen_name)+5
-		
-		maxport_name = reduce(lambda x,y: x if len(self.foodmap[x].unit) > len(self.foodmap[y].unit) else y, self.foodmap.keys())
+
+		maxport_name = reduce(lambda x,y: x if len(self.foodmap[x].unit) > len(self.foodmap[y].unit) else y, list(self.foodmap.keys()))
 		maxport_name = len(self.foodmap[maxport_name].unit)+5
-		
-		
-		print >> f, Yemek.printheader(buffer=maxlen_name, 
+
+
+		print(Yemek.printheader(buffer=maxlen_name,
 			portions_buff=(maxport_name-len('unit')),
-			tags=True)
-		print >> f, ""
-		
+			tags=True), file=f)
+		print("", file=f)
+
 		for food in sorted(self.foodmap.keys()):
 			fooditem = self.foodmap[food]
-			print >> f, fooditem.printout(buffer=maxlen_name, pre="", 
+			print(fooditem.printout(buffer=maxlen_name, pre="",
 				portions_buff=(maxport_name-len(fooditem.unit)),
-				tags=True)
+				tags=True), file=f)
 		f.close()
 
 
 	def printlist(self):
 		keys = sorted(self.foodmap.keys())
-		print >> sys.stderr, Yemek.printheader()
+		print(Yemek.printheader(), file=sys.stderr)
 		for food in keys:
 			fooditem = self.foodmap[food]
-			print >> sys.stderr, fooditem.printout() #.strip()
+			print(fooditem.printout(), file=sys.stderr) #.strip()
 
 
 
@@ -104,20 +105,20 @@ class FoodList:
 		user_input_tags = Tags.tagprompt()
 		if user_input_tags!=-1:
 			yem.tags.insertList(user_input_tags)
-		
+
 #		if input_search!=[]:yem.tags.insertList(input_search)
 
 		name = yem.name.strip().lower()
 		self.foodmap[name] = yem
-		print >> sys.stderr, "Inserted", name
+		print("Inserted", name, file=sys.stderr)
 		self.write()
 
 
 	def insert(self,name, input_search=[]):
-		print "Inserting new food:", name
-		per,unit = Common.amountsplit(raw_input("Per Unit (e.g. '100g'): ").strip())
-		kc, carb_total, carb_sugar, carb_fibre , prot, fat = raw_input("kCal Carb Sug Fibr Prot Fat: ").split()
-			
+		print("Inserting new food:", name)
+		per,unit = Common.amountsplit(input("Per Unit (e.g. '100g'): ").strip())
+		kc, carb_total, carb_sugar, carb_fibre , prot, fat = input("kCal Carb Sug Fibr Prot Fat: ").split()
+
 		carbs = Carb(carb_total, carb_fibre, carb_sugar)
 		y = Yemek(name, kc, carbs, prot, fat, per, unit)
 
@@ -125,22 +126,22 @@ class FoodList:
 
 
 	def removeprompt(self):
-		name = raw_input('Food Name: ').strip()
+		name = input('Food Name: ').strip()
 
 		if name in self.foodmap:
 			del self.foodmap[name]
-			print >> sys.stderr, "[Removed]"
+			print("[Removed]", file=sys.stderr)
 		else:
-			print >> sys.stderr, "[Does not exist!]"
+			print("[Does not exist!]", file=sys.stderr)
 		self.write()
 
 
 	def insertprompt(self):
-		name = raw_input('Food Name: ').strip()
+		name = input('Food Name: ').strip()
 
 		if name in self.foodmap:
-			print >> sys.stderr, "[Food already exists!]"
-			print >> sys.stderr,  self.foodmap[name].printout(header=True)
+			print("[Food already exists!]", file=sys.stderr)
+			print(self.foodmap[name].printout(header=True), file=sys.stderr)
 			exit(-1)
 		self.insert(name)
 
@@ -148,27 +149,27 @@ class FoodList:
 	#This is the main insertion method
 	def updateprompt(self):
 	    # Print details if exists, else insert, else return close match
-		name = self.info(raw_input('Food: ').strip())
-		
+		name = self.info(input('Food: ').strip())
+
 		# Name exists by now, or prog exited
 		if name in self.foodmap:
-			edit = raw_input('\nEdit? ')
+			edit = input('\nEdit? ')
 			if edit[0].lower() != 'y':
 				exit(-1)
 		else:
-			print >> sys.stderr, "\n[New Food: \"%s\"]" % name
+			print("\n[New Food: \"%s\"]" % name, file=sys.stderr)
 		self.insert(name)
-	
+
 	def closestMatch(self,name):
 		return self.search(name)[0];
-	
-	
+
+
 	def search(self,name):
 		searchname = name.split()  #d[0].strip()
 		#print searchfoods, searchname
-			
+
 		found=[];
-		for avail_food, obj in self.foodmap.iteritems():
+		for avail_food, obj in self.foodmap.items():
 			#words
 			word_match = 0
 			for ss in searchname:
@@ -178,10 +179,10 @@ class FoodList:
 			if word_match != 0:
 				found.append( [obj, word_match] )
 
-		
+
 		if len(found)==0:
-			print "Searching tags..."
-			for avail_food, obj in self.foodmap.iteritems():
+			print("Searching tags...")
+			for avail_food, obj in self.foodmap.items():
 				word_match = 0
 				for ss in searchname:
 					for tag in obj.tags.tags:
@@ -189,48 +190,48 @@ class FoodList:
 							word_match += 1
 				if word_match != 0:
 					found.append( [obj, word_match] )
-		
+
 		def sorter(x):return x[1]
 
 		return [x for x,y in sorted(found, key=sorter, reverse=True)]
 
 
 	def updateListInfo(self):
-		for name in self.foodmap.keys():
+		for name in list(self.foodmap.keys()):
 			food = self.foodmap[name]
-			
+
 			if not((food.carb.sugar ==0 and food.carb.fibre==0) and (food.carb.total == food.carb.bad)):
 				continue
-			
+
 			if "FS_online" not in food.tags.tags:continue
-			
+
 #			if name != 'chicken drumstick (skin eaten)':continue
-			
-			print "Check:"
-			print food.printout(pre="---")
+
+			print("Check:")
+			print(food.printout(pre="---"))
 			f = MiniFSChecker.FHandler(food.name, food).found
 			if f!=-1:
 				del self.foodmap[name]
 				self.foodmap[f.name.lower()] = f
 				self.write()
-		
+
 		self.write()
 
 
-	
+
 	def info(self,name):
 		if name in self.foodmap:
-			print >> sys.stderr,  self.foodmap[name].printout(header=True)
+			print(self.foodmap[name].printout(header=True), file=sys.stderr)
 			return name
 
 		#Search objects for closest match
 		arg_name = name	#store
-		
+
 		found = self.search(name)
 		res = len(found)
 
 		if res == 0:
-			print >> sys.stderr, "\nCannot find:", "\"%s\"" % name,
+			print("\nCannot find:", "\"%s\"" % name, end=' ', file=sys.stderr)
 			if Common.ynprompt(", manually insert?"):
 				self.insert(name, [arg_name])
 				return name.lower()
@@ -240,13 +241,13 @@ class FoodList:
 				self.insertAll(f, [arg_name,"FS_online"])
 				return f.name
 			exit(0)
-			
+
 		# Found something, print
-		print >> sys.stderr, "\nMatched:",		
+		print("\nMatched:", end=' ', file=sys.stderr)
 		res = Common.choice(found)
 
 		if res==-1:
-			print >> sys.stderr, "None"
+			print("None", file=sys.stderr)
 			if Common.ynprompt('Search online? '):
 				f = MiniFSChecker.FHandler(name).found
 				if f==-1:exit(0)
@@ -258,7 +259,7 @@ class FoodList:
 		else:
 			name = res.name
 		return name
-				
+
 
 #w = FoodList()
 #w.updateListInfo()

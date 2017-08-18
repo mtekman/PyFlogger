@@ -18,17 +18,17 @@ class Suggest:
 			return pff + ppp
 
 
-		for x,v in self.singles.iteritems():
+		for x,v in self.singles.items():
 			self.portions[x] = v
 
-		sorted_ports = sorted(self.portions.iteritems(), key=perSort, reverse=True)
+		sorted_ports = sorted(iter(self.portions.items()), key=perSort, reverse=True)
 
 		Yemek.printFullHeader()
 		count = 0
 		for x,v in sorted_ports:
 			if count==num:break
 			count += 1
-			print v.printout(pre="%2d: " % count)
+			print(v.printout(pre="%2d: " % count))
 
 
 
@@ -54,14 +54,14 @@ class Suggest:
 			return 1/((kc/p) + (kc/f))
 
 
-		sorted_ports = sorted(self.flist.iteritems(), key=makeit, reverse=True)
+		sorted_ports = sorted(iter(self.flist.items()), key=makeit, reverse=True)
 
 		Yemek.printFullHeader()
 		count = 0
 		for x,v in sorted_ports:
 			if count==num:break
 			count += 1
-			print v.printout(pre="%2d: " % count)
+			print(v.printout(pre="%2d: " % count))
 	
 
 
@@ -70,11 +70,11 @@ class Suggest:
 		outnow = (' '*(Yemek.buffer-8)) + "Allow :   %s" % Yemek.outformat
 		outnow = '\n'+'%'.join(outnow.split('%')[:-2])+'\n'
 			
-		print outnow % (
+		print(outnow % (
 				int(self.allowed_kc), 
 				self.allowed_carb.total, self.allowed_carb.fibre, self.allowed_carb.sugstar, self.allowed_carb.bad,
 				self.allowed_prot,
-				self.allowed_fat)
+				self.allowed_fat))
 		
 		self.suggestSingles()
 		self.suggestPortions()
@@ -106,7 +106,7 @@ class Suggest:
 
 	def suggestSingles(self):
 		# Filter singles again for kc limit
-		singles1 = dict((x,v) for x,v in self.flist.iteritems()\
+		singles1 = dict((x,v) for x,v in self.flist.items()\
  if len(v.unit)>2 and (
   (  (v.fat/v.carb.bad > 1) or (v.prot/v.carb.bad > 1) )  
   if (self.wanted_tag=="")\
@@ -114,7 +114,7 @@ class Suggest:
   ))
 
 		self.singles={}
-		for x,y in singles1.iteritems():
+		for x,y in singles1.items():
 			v = self.minimumScale(y)
 
 #			if (v.kC < self.allowed_kc 
@@ -129,7 +129,7 @@ class Suggest:
 
 	def suggestPortions(self):
 		
-		portions = dict((x,v) for x,v in self.flist.iteritems() if len(v.unit)<=2)	# g, ml, etc
+		portions = dict((x,v) for x,v in self.flist.items() if len(v.unit)<=2)	# g, ml, etc
 		self.portions = {}
 		
 		#scale portions to a minimum, and then chuck out the unrealistic ones
