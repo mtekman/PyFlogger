@@ -19,6 +19,21 @@ conversion['pint'] = conversion['pints'] = 2*conversion['cups']
 conversion['quart'] = conversion['quarts'] = 4*conversion['cups']
 conversion['gallon'] = 4*conversion['quart']
 
+unit_converter_premap = [
+	(('grams', 'gram'), (1,'g')),
+	(('kilogram','kilograms','kgs','kg'), (1000, 'g')),
+	(('miligram', 'milligram', 'mg'), (0.001,'g')),
+	(('litres', 'litre', 'liter', 'liters', 'l'), (1000,'ml')),
+	(('millilitres','millilitre','milliliters','millilitre'),(1,'ml'))
+]
+
+# Premake
+unit_converter = {}
+for unit_types in unit_converter_premap:
+	for unit in unit_types[0]:
+		unit_converter[unit] = unit_types[1]
+
+
 
 ############################ Prompts ###################################
 
@@ -143,11 +158,10 @@ def fraction(am_amount):
 
 
 # write unit cases
-def amountsplit(text,floater=False):
+def amountsplit(text):
 	text= text.strip()
 
-	lower = 47
-	if floater:lower=46 # '.' allowed
+	lower = 46 # 46 = '.'
 
 	num_builder = amount_builder=""
 	num_encounter = float_encounter = False
@@ -156,7 +170,7 @@ def amountsplit(text,floater=False):
 		chor = text[a]
 
 		if lower <= ord(chor) <= 57:
-			if floater and chor == '.':
+			if chor == '.':
 				if float_encounter:continue				#Already seen a dot, skip
 				else:float_encounter=True
 
@@ -172,8 +186,14 @@ def amountsplit(text,floater=False):
 	except IndexError:
 		amount = ""
 
-	if floater:return fraction(num_builder),amount
-	else:return int(num_builder),amount
+	try:
+		multi, unit = unit_converter[amount]
+	except KeyError:
+		print("Not encountered", amount, "before", file=sys.stderr)
+		exit(-1)
+
+	return fraction(num_builder) * multi , unit
+
 
 
 
