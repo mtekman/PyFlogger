@@ -104,7 +104,14 @@ class FHandler:
 	def handleFoodInfo(food_data):
 		#Header indexes and make a column map
 		headers = [tr.find('td', {'class':'label borderTop'}) for tr in food_data.table.find_all('tr')]
-		fact_map = {}
+		fact_map = {
+			'carbohydrate' : (0,'g'),
+			'fibre'   : (0,'g'),
+			'sugar'   : (0,'g'),
+			'calories': (0,'kC'),
+			'protein' : (0,'g'),
+			'fat'     : (0,'g')
+		}
 
 		for t in range(len(headers)):
 			tag = headers[t]
@@ -121,7 +128,8 @@ class FHandler:
 
 		# Serving size
 		fact_map['serving'] = Common.amountsplit(
-			food_data.table.find('td',attrs={'class':'title'}).findNext('tr').td.text.split('Size:')[-1]
+			food_data.table.find('td',attrs={'class':'title'}).findNext('tr').td.text.split('Size:')[-1],
+			resolve_unit=False
 		)
 
 		car = Carb(
@@ -154,9 +162,9 @@ class FHandler:
 	def getFoodInfo(url):
 		try:
 			newurl = FHandler.mobile_url + url
-			#tempdata = uopen(newurl).read()
+			tempdata = uopen(newurl).read()
 			##with open('test_foodinfo','w') as file:file.write(str(tempdata));file.close();exit(0);
-			tempdata = open('test_foodinfo.html','r').read()
+			#tempdata = open('test_foodinfo.html','r').read()
 
 		except URLError:
 			print(" stopped, no connection?")
@@ -175,12 +183,17 @@ class FHandler:
 			food_info[0], food_info[1], food_info[2],
 			food_info[3], food_info[4], food_info[5])
 
-		portion_data = [x for x in bsobj.body.find_all('div', {'class':'section-title'}) if x.text == "Common serving sizes"][0]
-		portion_info = FHandler.handlePortionData(portion_data.findNext('table'))
+		#import pdb; pdb.set_trace()
+		section_titles = bsobj.body.find_all('div', {'class':'section-title'})
+		portion_data = [x for x in section_titles if x.text == "Common serving sizes"]
 
-		if portion_info!=-1:
-			for key,val in portion_info:
-				yem.portions.insert(key,val)
+		if len(portion_data)>0:
+			portion_data = portion_data[0]
+			portion_info = FHandler.handlePortionData(portion_data.findNext('table'))
+
+			if portion_info!=-1:
+				for key,val in portion_info:
+					yem.portions.insert(key,val)
 
 		return yem
 
@@ -199,6 +212,8 @@ class FHandler:
 		bsobj = bs(self.pagedata, "html.parser")
 		bsurls = bsobj.body.find_all('a', attrs={'class':'prominent'});
 
+		res = []
+
 		for meta in bsurls:
 			url = meta.attrs['href']
 			text = meta.findNext('div', attrs={'class':'greyLink'}).text
@@ -216,7 +231,6 @@ class FHandler:
 			# count
 			num -= 1
 			if num==0: break
-
 
 		return res
 
