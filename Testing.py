@@ -24,6 +24,7 @@ class PyFlogTest(unittest.TestCase):
         ase(cas("3.4kg"), (3400, 'g'))
         ase(cas("0.1grams"), (0.1, 'g'))
         ase(cas("0 g"), (0, 'g'))
+        ase(cas("100ml (100 ml)", (100, 'ml'))
 
 
 

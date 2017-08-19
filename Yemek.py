@@ -29,7 +29,7 @@ class Tags:
 		else:
 			Tags.global_tags[tag] += 1
 
-	def printout(self):		
+	def printout(self):
 		return Tags.delim.join(list(self.tags.keys()))
 
 
@@ -54,12 +54,12 @@ class Carb:
 
 		self.total = float(carb) + Yemek.nonz
 		real_total = self.fibre + self.sugstar
-		
+
 		if self.total < real_total:
 			self.total = real_total
-		
+
 		self.bad = (self.total - self.fibre) + Yemek.nonz
-		
+
 
 	# override multiplier
 	def multiply(self, x):
@@ -67,7 +67,7 @@ class Carb:
 		self.sugstar *= x
 		self.total *= x
 		self.bad *= x
-	
+
 #	__rmul__ = __lmul__
 
 	def add(self, other):
@@ -75,15 +75,15 @@ class Carb:
 		self.sugstar += other.sugstar
 		self.total += other.total
 		self.bad += other.bad
-	
+
 #	__radd__ = __ladd__
-	
+
 	def sub(self, other):
 		self.fibre -= other.fibre
 		self.sugstar -= other.sugstar
 		self.total -= other.total
 		self.bad -= other.bad
-	
+
 #	__rsub__ = __lsub__
 
 
@@ -91,7 +91,7 @@ class Carb:
 class Portion:
 	start_delim="$$"
 	end_delim="::"
-	
+
 	def __init__(self):
 		self.avail = {}
 
@@ -99,7 +99,7 @@ class Portion:
 	@staticmethod
 	def printheader(lbuff):
 		return Common.makewhitespace(lbuff)+"| Other Portions"
-		
+
 
 	def printout(self, lbuff):
 		strr = Common.makewhitespace(lbuff)+'|'
@@ -107,7 +107,7 @@ class Portion:
 			strr += Portion.start_delim + p + Portion.end_delim +str(v)
 		return strr
 
-	
+
 	def insert(self, name, calorie):
 		name = name.strip()
 
@@ -122,7 +122,7 @@ class Yemek:
 	nonz = 0.00001
 	buffer = 30
 	outformat = "%5d  %6.1f [%6.1f,%6.1f] = %5.1f  %5.1f  %5.1f  %5.1f %s"
-	
+
 	headformat = ""
 	c = 0
 	while c < len(outformat):
@@ -130,16 +130,17 @@ class Yemek:
 		if out=='.':
 			c += 2
 			continue
-			
+
 		elif out in ['d','f']:
 			out = "s"
 
 		headformat += out
 		c += 1
-	
+
 #	print headformat
-	
+
 	def __init__(self, name, kC, carb_obj, prot, fat, per, unit, amount=0, url=""):
+
 		self.name = name
 		self.kC = int(kC)
 		self.carb = carb_obj
@@ -170,7 +171,7 @@ class Yemek:
 		self.hour = -1
 
 
-	def printout(self,header=False, buffer=0, pre="*", 
+	def printout(self,header=False, buffer=0, pre="*",
 			portions_buff=0, tags=False):
 		if buffer ==0:
 			buffer=Yemek.buffer
@@ -211,7 +212,7 @@ class Yemek:
 
 		form = "%s|"+Yemek.outformat  #template formatting
 		text += form % (
-				outname, int(self.kC), self.carb.total, 
+				outname, int(self.kC), self.carb.total,
 				self.carb.fibre, self.carb.sugstar, self.carb.bad,
 				self.prot, self.fat, self.per, self.unit)
 
@@ -242,14 +243,14 @@ class Yemek:
 	@staticmethod
 	def printheader(buffer=0, portions_buff=0, tags=False):
 		if buffer ==0:buffer=Yemek.buffer
-		
+
 		strr= ("%s |" + Yemek.headformat) % (
 			(' '*buffer), "kC", "Carb", "Fibre", "Sg/St", "Bad", "Prot", "Fat", "per", "unit"
 			)
-		
+
 		if portions_buff!=0:
 			strr += Portion.printheader(portions_buff)
-		
+
 		if tags:
 			strr += "| Tags"
 		return strr
@@ -261,7 +262,7 @@ class Yemek:
 
 		# Dupe, never edit self
 		selfy = Yemek(self.name, self.kC, Carb(self.carb.total,self.carb.fibre,self.carb.sugstar), self.prot, self.fat, self.per, self.unit)
-		
+
 		selfy.kC = int( selfy.kC * multip)
 		selfy.carb.multiply(multip)
 		selfy.prot *= multip
@@ -269,13 +270,13 @@ class Yemek:
 		selfy.per *= multip
 
 		return selfy
-	
+
 	@staticmethod
 	def roughlyEqual(one,two, thresh=0.1):
 		three = one - two
 		if three < 0:three *=-1
 		return three < thresh
-	
+
 	# Overload method
 	def __eq__(self, other):
 		if isinstance(other, Yemek):
