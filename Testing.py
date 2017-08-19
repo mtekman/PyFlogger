@@ -23,6 +23,7 @@ class PyFlogTest(unittest.TestCase):
         ase(cas("3.4 kg"), (3400, 'g'))
         ase(cas("3.4kg"), (3400, 'g'))
         ase(cas("0.1grams"), (0.1, 'g'))
+        ase(cas("0 g"), (0, 'g'))
 
 
 

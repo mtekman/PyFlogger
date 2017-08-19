@@ -103,7 +103,7 @@ class FHandler:
 	@staticmethod
 	def handleFoodInfo(food_data):
 		#Header indexes and make a column map
-		headers = [tr.td.b for tr in food_data.table.find_all('tr')]
+		headers = [tr.find('td', {'class':'label borderTop'}) for tr in food_data.table.find_all('tr')]
 		fact_map = {}
 
 		for t in range(len(headers)):
@@ -111,99 +111,24 @@ class FHandler:
 			if tag == None:
 				continue
 
-			#import pdb; pdb.set_trace()
-
-			value = tag.parent.findNext('td')
+			value = tag.findNext('td')
 			try:
-				value = value.b.text
+				value = value.b.text.strip()
 			except AttributeError:
-				value = value.text
+				value = value.text.strip()
 
-			fact_map[tag.text.lower()] = value
+			fact_map[tag.text.lower().strip()] = value
 
 		# Serving size
 		fact_map['serving'] = food_data.table.find('td',attrs={'class':'title'}).findNext('tr').td.text.split('Size:')[-1]
 
-		#Cal
-		import pdb; pdb.set_trace()
-		b_1 = food_data.index("<b>")
-		try:
-			b_2 = food_data.index("calories</b>", b_1+1)
-		except ValueError:
-			b_2 = food_data.index("calorie</b>", b_1+1)
+		car = Carb(
+			fact_map['carbohydrate'][0],
+			fact_map['fibre'][0],
+			fact_map['sugar'][0]
+		)
 
-		calories = int(food_data[b_1+3:b_2])
-#		print "cal:", calories
-
-		#Per
-		b_3 = food_data.index(".</div>", b_2+1)
-		tokes = food_data[b_2+12:b_3].split()
-#		print tokes
-
-
-		# Store per,unit combos as tuples
-		per_unit = []
-
-		last_index = -1
-
-		# Single pass, find all units
-		for t in range(len(tokes)):
-			try:
-				per, unit = Common.amountsplit(tokes[t], floater=True)
-				try:
-					unit += ' '+tokes[t+1]
-				except IndexError:
-					pass
-				per_unit.append( [per,unit] )
-			except ValueError:
-				pass
-
-
-		per = per_unit[0][0]
-		unit = per_unit[0][1]+' '+','.join(set(['('+str(x[0]).strip()+' '+x[1].strip()+')' for x in per_unit[1:]]))
-
-
-		#Fat
-		b_2 = food_data.index("<b>Fat:</b>", b_3+1)
-		b_3 = food_data.index("</div>",b_2+1)
-
-		fat = Common.amountsplit(food_data[b_2+11:b_3].strip().split()[0], floater=True)[0]
-#		print "fat:", fat
-
-		#Carbs
-		b_2 = food_data.index("<b>Carbs:</b>", b_3+1)
-		b_3 = food_data.index("</div>",b_2+1)
-
-		carb_data = food_data[b_2+13:b_3].strip().split()
-		carbs = Common.amountsplit(carb_data[0], floater=True)[0]
-
-		f_index = s_index = -1
-		for c_d in range(len(carb_data)):
-			if "Fibre:" in carb_data[c_d]:
-				f_index = c_d+1
-			elif "Sugar:" in carb_data[c_d]:
-				s_index = c_d+1
-
-		fibre = Common.amountsplit(carb_data[f_index], floater=True)[0]
-		sugar = Common.amountsplit(carb_data[s_index], floater=True)[0]
-
-		if f_index==-1:
-			fibre = 0
-		if s_index==-1:
-			sugar = carbs
-
-
-		#Protein
-		b_2 = food_data.index("<b>Protein:</b>", b_3+1)
-		b_3 = food_data.index("</div>",b_2+1)
-
-		protein = Common.amountsplit(food_data[b_2+15:b_3].strip().split()[0],floater=True)[0]
-#		print "protein", protein
-		if unit=="grams":unit='g'
-
-		car = Carb(carbs, fibre, sugar)
-
-		return calories, car, protein, fat, per, unit
+		return fact_map['calories'], car, fact_map['protein'], fact_map['fat'], fact_map['serving']
 
 
 
@@ -266,7 +191,7 @@ class FHandler:
 			newurl = FHandler.mobile_url + url
 			#tempdata = uopen(newurl).read()
 			##with open('test_foodinfo','w') as file:file.write(str(tempdata));file.close();exit(0);
-			tempdata = open('test_foodinfo','r').read()
+			tempdata = open('test_foodinfo.html','r').read()
 
 		except URLError:
 			print(" stopped, no connection?")

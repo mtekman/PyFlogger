@@ -20,11 +20,11 @@ conversion['quart'] = conversion['quarts'] = 4*conversion['cups']
 conversion['gallon'] = 4*conversion['quart']
 
 unit_converter_premap = [
-	(('grams', 'gram'), (1,'g')),
+	(('grams', 'gram','g'), (1,'g')),
 	(('kilogram','kilograms','kgs','kg'), (1000, 'g')),
 	(('miligram', 'milligram', 'mg'), (0.001,'g')),
 	(('litres', 'litre', 'liter', 'liters', 'l'), (1000,'ml')),
-	(('millilitres','millilitre','milliliters','millilitre'),(1,'ml'))
+	(('millilitres','millilitre','milliliters','millilitre', 'ml'),(1,'ml'))
 ]
 
 # Premake
