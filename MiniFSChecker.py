@@ -117,10 +117,12 @@ class FHandler:
 			except AttributeError:
 				value = value.text.strip()
 
-			fact_map[tag.text.lower().strip()] = value
+			fact_map[tag.text.lower().strip()] = Common.amountsplit( value )
 
 		# Serving size
-		fact_map['serving'] = food_data.table.find('td',attrs={'class':'title'}).findNext('tr').td.text.split('Size:')[-1]
+		fact_map['serving'] = Common.amountsplit(
+			food_data.table.find('td',attrs={'class':'title'}).findNext('tr').td.text.split('Size:')[-1]
+		)
 
 		car = Carb(
 			fact_map['carbohydrate'][0],
@@ -128,57 +130,20 @@ class FHandler:
 			fact_map['sugar'][0]
 		)
 
-		return fact_map['calories'], car, fact_map['protein'], fact_map['fat'], fact_map['serving']
+		return (fact_map['calories'][0], car, fact_map['protein'][0], fact_map['fat'][0],
+			fact_map['serving'][0], fact_map['serving'][1])
 
 
 
 	@staticmethod
 	def handlePortionData(portion_data):
-		try:
-			start_index = portion_data.index("<h2>Common serving sizes</h2>")
-		except ValueError:
-			return -1
 
-		start_index = portion_data.index("<table ", start_index+1)
-		end_index = portion_data.index("</table>", start_index + 5)
+		res = [
+			(tr.td.div.a.text, int(tr.td.findNext('td').div.a.text)	)\
+			for tr in portion_data.find_all('tr')\
+				if tr.find('div',{'class':'other-link'})\
+		]
 
-		portion_data = portion_data[start_index:end_index].split("<tr")[1:]
-
-		res = []
-
-		for p_data in portion_data:
-			try:
-				start = p_data.index("<a href=\"")+9
-			except ValueError:
-				continue
-
-			start = p_data.index(">", start)+1
-			end = p_data.index("</a>", start)
-
-			name = p_data[start:end].strip()
-
-			#Try for extra name info, skip otherwise
-			try:
-				ex_start = p_data.index("<span class=\"small-text grey-text\">(",end+5)+35
-				ex_end = p_data.index(")",ex_start)
-
-				name += " "+p_data[ex_start:ex_end+1].strip()
-			except ValueError:
-				pass
-
-
-			# Calorie info
-			start = p_data.index("a class=\"small-text\" href=", end)
-			start = p_data.index(">", start+10)+1
-			end = p_data.index("</a>", start)
-
-			try:
-				calorie = int(p_data[start:end].strip())
-			except ValueError:
-				# Couldn't convert, or kCal non-existent, skip
-				continue
-
-			res.append( [name, calorie] )
 		return res
 
 
@@ -210,8 +175,8 @@ class FHandler:
 			food_info[0], food_info[1], food_info[2],
 			food_info[3], food_info[4], food_info[5])
 
-		portion_data = tempdata[index2:]
-		portion_info = FHandler.handlePortionData(portion_data)
+		portion_data = [x for x in bsobj.body.find_all('div', {'class':'section-title'}) if x.text == "Common serving sizes"][0]
+		portion_info = FHandler.handlePortionData(portion_data.findNext('table'))
 
 		if portion_info!=-1:
 			for key,val in portion_info:
