@@ -7,32 +7,35 @@ from time import localtime, time, mktime
 from Yemek import Yemek
 
 
-#Taken from r/slowcooking
-conversion = {}
-conversion['teaspoon'] = conversion['tsp'] = conversion['teaspoons'] = conversion['tsps'] = float(5) #ml
-conversion['tablespoon'] = conversion['tbsp'] = conversion['tablespoons'] = conversion['tbsps'] = float(15) #ml
-conversion['fluid ounce'] = conversion['fluid ounces'] = conversion['fluid oz'] = float(30) #ml
-conversion['oz'] = conversion['ounce'] = conversion['ounces'] = float(28) #grams
-conversion['pound'] = conversion['pounds'] = conversion['lb'] = conversion['lbs'] = float(454) #grams
-conversion['cup'] = conversion['cups'] = float(237) #ml
-conversion['pint'] = conversion['pints'] = 2*conversion['cups']
-conversion['quart'] = conversion['quarts'] = 4*conversion['cups']
-conversion['gallon'] = 4*conversion['quart']
-
-unit_converter_premap = [
+__unit_converter_premap = [
+	# grams
 	(('grams', 'gram','g'), (1,'g')),
 	(('kilogram','kilograms','kgs','kg'), (1000, 'g')),
 	(('miligram', 'milligram', 'mg'), (0.001,'g')),
+	(('oz', 'ounce', 'ounces'), (28,'g')),
+	(('pound','pounds','lb','lbs'), (454,'g')),
+	# litres
+	(('cup', 'cups'), (237,'ml')),
+	(('pint', 'pints'), (472,'ml')),
+	(('quart', 'quarts'), (948, 'ml')),
+	(('gallon', 'gallons'), (3792, 'ml')),
 	(('litres', 'litre', 'liter', 'liters', 'l'), (1000,'ml')),
 	(('millilitres','millilitre','milliliters','millilitre', 'ml'),(1,'ml')),
+	(('teaspoon','tsp','teaspoons','tsps'), (5, 'ml')),
+	(('tablespoon', 'tbsp', 'tablespoons', 'tbsps'), (15,'ml')),
+	(('fluid ounce', 'fluid ounces', 'fluid oz'), (30,'ml')),
+	# joules
 	(('kilojoules', 'kj'), (1, 'kj')),
 	(('joules'), (0.001, 'kj')),
+	# cals
 	(('kilocals', 'kCal', 'kcal', 'kc', 'kC'), (1, 'kC')),
+	# serving
+	(('serving','servings'), (1,'serving'))
 ]
 
 # Premake
 unit_converter = {}
-for unit_types in unit_converter_premap:
+for unit_types in __unit_converter_premap:
 	for unit in unit_types[0]:
 		unit_converter[unit] = unit_types[1]
 
@@ -161,7 +164,10 @@ def fraction(am_amount):
 
 
 # write unit cases
-def amountsplit(text):
+def amountsplit(text, resolve_unit=False):
+
+	text = text.split('(')[0]  # handle cases like 100ml (100ml)
+
 	text= text.strip()
 
 	lower = 46 # 46 = '.'
@@ -185,17 +191,23 @@ def amountsplit(text):
 				amount_builder += chor
 
 	try:
-		amount = amount_builder.splitlines()[0].strip()
+		unit = amount_builder.splitlines()[0].strip()
 	except IndexError:
-		amount = ""
+		unit = ""
 
-	try:
-		multi, unit = unit_converter[amount]
-	except KeyError:
-		print("Not encountered", amount, "before", file=sys.stderr)
-		exit(-1)
 
-	return fraction(num_builder) * multi , unit
+	amount = fraction(num_builder)
+
+	if resolve_unit:
+		try:
+			multi, unit = unit_converter[unit]
+			amount *= multi
+		except KeyError:
+			print("Not encountered", unit, "before", file=sys.stderr)
+			import pdb; pdb.set_trace()
+			exit(-1)
+
+	return amount , unit
 
 
 
