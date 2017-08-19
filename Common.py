@@ -24,7 +24,10 @@ unit_converter_premap = [
 	(('kilogram','kilograms','kgs','kg'), (1000, 'g')),
 	(('miligram', 'milligram', 'mg'), (0.001,'g')),
 	(('litres', 'litre', 'liter', 'liters', 'l'), (1000,'ml')),
-	(('millilitres','millilitre','milliliters','millilitre', 'ml'),(1,'ml'))
+	(('millilitres','millilitre','milliliters','millilitre', 'ml'),(1,'ml')),
+	(('kilojoules', 'kj'), (1, 'kj')),
+	(('joules'), (0.001, 'kj')),
+	(('kilocals', 'kCal', 'kcal', 'kc', 'kC'), (1, 'kC')),
 ]
 
 # Premake
