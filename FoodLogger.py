@@ -7,8 +7,10 @@ from Yemek import Yemek, Carb
 from copy import copy
 from PieChart import PieChart
 
+'''Logs food entered into system with timestamp into foodlog.txt'''
 class FoodLogger:
-    def __init__(self, foodlog, targets=None, testmode=0):
+    def __init__(self, foodlog, foodlist,
+    targets=None, testmode=0):
         # Test modes:
         # 0 - inactive
         # 1 - log and record @ 1972/01/02-13:00
@@ -26,7 +28,7 @@ class FoodLogger:
 
             self.foodlog=[]
             self.macrofile= targets
-            self.foodlist = FoodList( foodlog )         # i.e. ref FoodList cobj
+            self.foodlist = FoodList( foodlist )        # i.e. ref FoodList cobj
 
 
 
@@ -115,7 +117,8 @@ class FoodLogger:
 
 
 
-        self.pie = PieChart(carb_total, protein_total, fat_total, kC_total, self.macrofile,
+        self.pie = PieChart(carb_total, protein_total, fat_total, kC_total,
+            self.macrofile,
             Yemek.buffer-8, 8, printme=showPie)
 
         return kC_total, carb_total, protein_total, fat_total
@@ -142,6 +145,7 @@ class FoodLogger:
 
         am = -1
         unit_set = -1
+        #import pdb; pdb.set_trace()
         yem_obj = self.foodlist.foodmap[name]
         init_per = equiv_per = float(yem_obj.per)
 
@@ -150,12 +154,6 @@ class FoodLogger:
 
                 ports = list(yem_obj.portions.avail.keys())
                 port_res = -1
-
-                happy = False
-                while not happy:
-                    port_res = choice(ports)
-                    if port_res == -1:break
-                    happy = ynprompt("Accept this portion?")
 
                 if port_res!=-1:
                     kC = yem_obj.portions.avail[port_res]
