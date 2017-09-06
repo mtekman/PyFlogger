@@ -75,21 +75,34 @@ OPTS:		foodname, lbs, lowcal, tag
 		self.opts = " ".join(self.argv[3:])
 
 
-	def resolveFoodLogPath(self):
-		direc=path.join( xdg_config_home, 'foodlogger')
-		filename=path.join( direc, 'foodlist.txt' )
-
+	@staticmethod
+	def __touch(filename):
 		if not path.exists(filename):
 
 			print(INFO, filename, "does not exist -- creating new", file=sys.stderr)
-			mkdir(direc)
+
+			direc = path.sep.join(filename.split(path.sep)[:-1])
+			if not path.exists(direc):
+				mkdir( direc )
 
 			# Open file and write blank
 			with open(filename,'w') as f:
 				f.write("\n")
 				f.close()
 
-		return filename
+
+
+	def resolveFoodLogPaths(self):
+		direc=path.join( xdg_config_home, 'foodlogger')
+
+		foodlist=path.join( direc, 'list.txt' )
+		foodlog=path.join( direc, 'log.txt' )
+
+		Args.__touch(foodlist)
+		Args.__touch(foodlog)
+
+		return (foodlist, foodlog)
+
 
 
 	def callProgs(self):
@@ -140,9 +153,9 @@ OPTS:		foodname, lbs, lowcal, tag
 
 
 		if self.food:
-			foodlog_path = self.resolveFoodLogPath()
+			foodlist_path, foodlog_path = self.resolveFoodLogPaths()
 
-			fl = FoodLogger(foodlog_path,testmode=self.test)
+			fl = FoodLogger(foodlog_path, foodlist_path, testmode=self.test)
 
 			if self.insert:
 				fl.log(self.opts)
