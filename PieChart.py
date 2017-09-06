@@ -23,16 +23,29 @@ class PieChart:
             return float(value)/periodmap[period.strip()]
 
 
-        f = open( macrofile ,'r')
-        for line in f:
-            if line.startswith('kc_total'):self.macro_kc = parseText(line)
-            elif line.startswith('carb_total'):
-                bad = parseText(line)
-                self.macro_carb = Carb(bad,0,bad)
-            elif line.startswith('protein_total'):self.macro_prot = parseText(line)
-            elif line.startswith('fat_total'):self.macro_fat = parseText(line)
-            elif line.startswith('water_total'):self.macro_water = parseText(line)
-        f.close()
+
+        self.macro_kc = 2000
+        self.macro_carb = Carb(60,50,10)
+        self.macro_prot = 60
+        self.macro_fat = 60
+        self.macro_water = 2
+
+
+        if macrofile != None:
+
+
+            f = open( macrofile ,'r')
+            for line in f:
+                if line.startswith('kc_total'):self.macro_kc = parseText(line)
+                elif line.startswith('carb_total'):
+                    bad = parseText(line)
+                    self.macro_carb = Carb(bad,0,bad)
+                elif line.startswith('protein_total'):self.macro_prot = parseText(line)
+                elif line.startswith('fat_total'):self.macro_fat = parseText(line)
+                elif line.startswith('water_total'):self.macro_water = parseText(line)
+            f.close()
+
+
 
 
 
@@ -63,7 +76,7 @@ class PieChart:
     def printout(self, lmargin):
         l_count=0
         print("")
-        r = len(self.circle)/2
+        r = int( len(self.circle)/2 )
         d=list(range(-r,r))
         for l in d:
             if l%2==0:continue
@@ -112,6 +125,8 @@ class PieChart:
                 self.fat_current,)
 
 
+
+        # Macros are set
         self.setMacros(macrofile)
 
         #Allowed
@@ -176,6 +191,11 @@ class PieChart:
             self.cpf_line = ' ' * lmarginal
             self.cpf_line += "  CPF  :                                    %3d%%   %3d%%   %3d%%" % (
                 100*c, 100*p, 100*f)
+
+
+            mid_y = int(mid_y)
+            mid_x = int(mid_x)
+            offset_x = int(offset_x)
 
             self.circle[mid_y] = self.circle[mid_y][:mid_x+2] + kc_text + self.circle[mid_y][mid_x+offset_x+2:]
             self.printout(lmargin+20)
