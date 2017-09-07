@@ -6,7 +6,6 @@ from Weight import WeightLog
 from Plotter import *
 from Suggest import Suggest
 from Common import daysSince, previousDay
-from os import path,mkdir
 from Config import Config
 
 
