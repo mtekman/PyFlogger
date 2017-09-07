@@ -13,7 +13,6 @@ user_weightlog= pjoin( __config_dir, 'weight.txt')
 
 class Config:
 
-
     @staticmethod
     def resolveAllPaths(): # called from main
         Config.resolvePath(user_foodlist)
