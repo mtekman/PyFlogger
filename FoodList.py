@@ -231,15 +231,20 @@ class FoodList:
 		res = len(found)
 
 		if res == 0:
-			print("\nCannot find:", "\"%s\"" % name, end=' ', file=sys.stderr)
-			if Common.ynprompt(", manually insert?"):
+			text_options = ("manually insert", "search online")
+			char_options = ("i", "s")
+
+			res = Common.userSingleListPrompt("\nCannot find: \"%s\"" % name, text_options, char_options)
+
+			if res == 'i':
 				self.insert(name, [arg_name])
 				return name.lower()
-			if Common.ynprompt('Search online? '):
+			elif res == 's':
 				f = MiniFSChecker.FHandler(name).found
 				if f==-1:exit(0)
 				self.insertAll(f, [arg_name,"FS_online"])
 				return f.name
+
 			exit(0)
 
 		# Found something, print
