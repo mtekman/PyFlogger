@@ -6,15 +6,9 @@ from os.path import join as pjoin, exists, sep
 
 __config_dir = pjoin( xdg_config_home, 'foodlogger')
 
-_Config__paths = {
-    'foodlist'  : [ pjoin( __config_dir, 'list.txt' ) , False],  # [ path, has_been_resolved]
-    'foodlog'   : [ pjoin( __config_dir, 'log.txt'  ) , False],
-    'weightlog' : [ pjoin( __config_dir, 'weight.txt'), False]
-}
-
-user_foodlist = ""
-user_foodlog  = ""
-user_weightlog= ""
+user_foodlist = pjoin( __config_dir, 'list.txt'  )
+user_foodlog  = pjoin( __config_dir, 'log.txt'   )
+user_weightlog= pjoin( __config_dir, 'weight.txt')
 
 
 class Config:
@@ -22,21 +16,14 @@ class Config:
 
     @staticmethod
     def resolveAllPaths(): # called from main
-        user_foodlist = Config.__resolvePath('foodlist')
-        user_foodlog  = Config.__resolvePath('foodlog')
-        user_weightlog= Config.__resolvePath('weightlog')
+        Config.resolvePath(user_foodlist)
+        Config.resolvePath(user_foodlog)
+        Config.resolvePath(user_weightlog)
 
 
     @staticmethod
-    def __resolvePath(key):
-        filepath = __paths[key][0]
-
-        if not __paths[key][1]:
-            Config.__touch(filepath)
-            __paths[key][1] = True
-
-        # already resolved
-        return filepath
+    def resolvePath(filepath):
+        Config.__touch(filepath)
 
 
     @staticmethod
@@ -53,3 +40,5 @@ class Config:
             with open(filename,'w') as f:
                 f.write("\n")
                 f.close()
+
+        return filename
