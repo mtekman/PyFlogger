@@ -95,7 +95,7 @@ OPTS:		foodname, lbs, lowcal, tag
 				return
 
 			if self.list:
-				wl.display( list(wl.weightlogmap.keys())[0] )
+				wl.display() # default first
 				return
 
 			if self.plot:
