@@ -2,6 +2,7 @@
 
 from Common import *
 from Config import user_weightlog
+from Convert import WeightCon
 
 
 class Weight:
@@ -67,11 +68,13 @@ class WeightLog:
 		self.weightlogmap={}
 		self.path = user_weightlog
 
-		self.date = localtime()
+		self.convert = WeightCon().convert  # method
+
+		self.date  = localtime()
 		self.today = "%04d/%02d/%02d" % self.date[0:3]
-		self.yesterday= "%04d/%02d/%02d" % localtime(time()-(24*60*60))[0:3]
-		self.yesterday= yesterday()[0:3]
-		self.nighttime= (self.date[3] >= 19)
+		self.yesterday = "%04d/%02d/%02d" % localtime(time()-(24*60*60))[0:3]
+		self.yesterday = yesterday()[0:3]
+		self.nighttime = (self.date[3] >= 19)
 		self.read()
 
 
@@ -103,9 +106,16 @@ class WeightLog:
 		f.close()
 
 
-	def display(self, date, lastSeven=False):
+	def display(self, date=None, lastSeven=False):
 		# Dates in order
 		availdates= sorted(self.weightlogmap.keys())
+
+		if len(availdates) == 0:
+			print("Nothing logged.")
+			return
+
+		if date == None:
+			date = availdates[0]
 
 		#Start point
 		index = availdates.index(date)
@@ -131,6 +141,7 @@ class WeightLog:
 			w = self.weightlogmap[date]
 		else:
 			w = Weight()
+
 		w.set(lbls, ismorning )
 		self.weightlogmap[date] = w
 		self.write()
@@ -147,9 +158,15 @@ class WeightLog:
 		tod= "morning" if isDay else "night"
 
 		#Input
-		lbls= float(input('Please enter input for %s%s: ' % (day,tod)).strip())
+		inp = input('Please enter input for %s%s: ' % (day,tod))
+		lbls = self.__parseUnits2Lbls(inp)
 		self.log(date, lbls, isDay)
 		self.display(date, lastSeven=True)
+
+
+	def __parseUnits2Lbls(self,inp):
+		amount, unit = amountsplit(inp)
+		return amount * self.convert(unit,'lb')
 
 
 	def checkGaps(self):
