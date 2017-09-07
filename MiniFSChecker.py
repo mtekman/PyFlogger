@@ -156,23 +156,33 @@ class FHandler:
 
 
 
+	@staticmethod
+	def __debugDump(text, dest):
+		with open(dest,'w') as file:file.write(str(text));file.close();
+		print(" -> page dumped to", dest, file=sys.stderr)
 
 
 	@staticmethod
 	def getFoodInfo(url):
+
 		try:
 			newurl = FHandler.mobile_url + url
 			tempdata = uopen(newurl).read()
-			##with open('test_foodinfo','w') as file:file.write(str(tempdata));file.close();exit(0);
 			#tempdata = open('test_foodinfo.html','r').read()
 
+			bsobj = bs(tempdata,'html.parser')
+			name = bsobj.body.find('div', attrs={'class':'page-title'}).text.strip(' \\r\\t\\n').lower()
+
+
 		except URLError:
-			print(" stopped, no connection?")
+			print(" stopped, no connection?", file=sys.stderr)
+			FHandler.__debugDump(tempdata, '/tmp/debug_foodinfo.no_connection.html')
 			exit(-1)
 
-
-		bsobj = bs(tempdata,'html.parser')
-		name = bsobj.body.find('div', attrs={'class':'page-title'}).text.strip(' \\r\\t\\n').lower()
+		except AttributeError:
+			print(" stopped, page is being redirected?", file=sys.stderr)
+			FHandler.__debugDump(tempdata, '/tmp/debug_foodinfo.redirected.html')
+			exit(-1)
 
 		food_tagline = bsobj.find('div', attrs={'class':'page-info-text'}).text.strip(' \\r\\t\\n').lower()
 		food_table = bsobj.find('div', attrs={'class':'nutpanel'})
