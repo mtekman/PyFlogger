@@ -54,11 +54,36 @@ def ynprompt(message):
 	return (ans[0].lower()=='y')
 
 
+'''Returns a list of items initially offered to user'''
 def userlistprompt(message, str_array):
 	opts = input("%s : %s\n" % (message,','.join(str_array)))
 	opts = opts.strip()
 	if opts == "":return -1
 	return opts.split(',')
+
+
+'''Returns a single item from an assosciative array'''
+def userSingleListPrompt(pretext, message_array, str_array):
+	opts = None
+	lowr_str_array = [x.lower() for x in str_array]
+
+	max_tries = 3
+	while opts == None and max_tries > 0:
+		inp = input("%s - %s : [%s]? " % (pretext,
+			' / '.join(message_array),
+			'/'.join(str_array)
+			))
+
+		inp += ' '
+		inp = inp[0].lower()
+
+		if inp not in lowr_str_array:
+			print("Invalid input.", end="", file=sys.stderr)
+			max_tries -= 1
+		else:
+			opts = inp
+
+	return inp
 
 
 
