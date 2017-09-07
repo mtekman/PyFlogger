@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from Common import *
+from Config import user_weightlog
 
 
 class Weight:
@@ -18,7 +19,7 @@ class Weight:
 	def __init__(self,morning=-1,night=-1):
 		self.morn = morning
 		self.night = night
-		
+
 
 	@staticmethod
 	def printheader():
@@ -30,14 +31,14 @@ class Weight:
 		resil=""
 		if header:
 			resil=Weight.printheader()+'\n'
-			
+
 		if filler:
 			resil += "             \t"
 
 		p2s=("%s %s" % (Weight.lbs2stone(self.morn), Weight.lbs2stone(self.night))).strip()
 		return resil+("%.1f\t%.1f\t[ %s\t]" % (self.morn, self.night, p2s))
-	
-				
+
+
 	def set(self, lbls, setmorn, finalprint=False):
 		if setmorn:
 			if self.morn!=-1:
@@ -58,14 +59,14 @@ class Weight:
 
 		if finalprint:
 			print(self.printout(True))
-	
-	
+
+
 
 class WeightLog:
-	def __init__(self,file=abspath("../")+"/logs/keto_weightlog.txt"):
+	def __init__(self):
 		self.weightlogmap={}
-		self.path = file
-		
+		self.path = user_weightlog
+
 		self.date = localtime()
 		self.today = "%04d/%02d/%02d" % self.date[0:3]
 		self.yesterday= "%04d/%02d/%02d" % localtime(time()-(24*60*60))[0:3]
@@ -73,7 +74,7 @@ class WeightLog:
 		self.nighttime= (self.date[3] >= 19)
 		self.read()
 
-		
+
 	def read(self):
 		try:
 			f=open(self.path,'r')
@@ -82,7 +83,7 @@ class WeightLog:
 			f.write("")
 			f.close()
 			return
-		
+
 		f.readline()	#Skip header
 		for weight in f:
 			if len(weight)< 5:
@@ -105,16 +106,16 @@ class WeightLog:
 	def display(self, date, lastSeven=False):
 		# Dates in order
 		availdates= sorted(self.weightlogmap.keys())
-		
+
 		#Start point
 		index = availdates.index(date)
-		
+
 		#Last7
 		if lastSeven:
 			index -= 7
 			if index < 0:
 				index = 0
-		
+
 		print(Weight.printheader(), file=sys.stderr)	#print header
 
 		# Print all dates from that day forward
@@ -133,7 +134,7 @@ class WeightLog:
 		w.set(lbls, ismorning )
 		self.weightlogmap[date] = w
 		self.write()
-	
+
 
 	def logprompt(self ,date, isDay):
 		#Get day string
@@ -146,7 +147,7 @@ class WeightLog:
 		tod= "morning" if isDay else "night"
 
 		#Input
-		lbls= float(input('Please enter input for %s%s: ' % (day,tod)).strip())		
+		lbls= float(input('Please enter input for %s%s: ' % (day,tod)).strip())
 		self.log(date, lbls, isDay)
 		self.display(date, lastSeven=True)
 
@@ -154,14 +155,14 @@ class WeightLog:
 	def checkGaps(self):
 		if self.checkLastNight():
 			return
-		
+
 #		if not(self.nighttime):
 		if self.checkThisMorning():
 			return
-			
+
 		self.checkToday()
 
-	
+
 	def checkThisMorning(self):
 		if self.today in self.weightlogmap:
 			w = self.weightlogmap[self.today]
@@ -170,11 +171,11 @@ class WeightLog:
 				if (ynprompt('Set morning? ')):
 					self.logprompt(self.today, isDay=True)
 					return True
-			
+
 			if not(self.nighttime) and w.morn!=-1:
 				self.logprompt(self.today, isDay=True)
 				return True
-		
+
 			return False #nothing changed
 
 		#Else log a new morning at night
@@ -183,7 +184,7 @@ class WeightLog:
 				if (ynprompt('Set morning? ')):
 					self.logprompt(self.today, isDay=True)
 					return True
-		return False #nothing changed		
+		return False #nothing changed
 
 	def checkLastNight(self):
 		if self.yesterday in self.weightlogmap:
@@ -193,7 +194,7 @@ class WeightLog:
 				if (ynprompt('Set last night? ')):
 					self.logprompt(self.yesterday, isDay=False)
 					return True
-					
+
 				print("[Ignoring last night]")
 				if ynprompt('Ignore permanently? '):
 					self.log(self.yesterday, 0, False)
@@ -201,7 +202,7 @@ class WeightLog:
 					return True
 
 				print("[Temporarily ignored last night, moving on..]\n")
-				
+
 		return False #nothing changed
 
 	def checkToday(self):
@@ -223,17 +224,16 @@ class WeightLog:
 #	if startdate=="":
 #		startdate=date
 #		continue
-#		
+#
 #	days_since = wl.daysSince(startdate,date)
 #	total = days_since
-	
+
 #	print date,total
-	
+
 #	w = wl.weightlogmap[date]
 #	if w.morn>0:
 #		xy.addPoint(total,w.morn,"x")
 #	if w.night>0:
 #		xy.addPoint(total+.5,w.night,"x")
-	
-#p = Printer(xy)
 
+#p = Printer(xy)

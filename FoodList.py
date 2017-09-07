@@ -3,14 +3,17 @@
 import sys
 from Yemek import Yemek, Carb, Portion, Tags
 from os.path import abspath
+
+from Config import user_foodlist
+
 import Common
 import MiniFSChecker
 from functools import reduce
 
 class FoodList:
-	def __init__(self,foodlist_file):
+	def __init__(self):
 		self.foodmap={}
-		self.path= foodlist_file
+		self.path= user_foodlist
 		self.read()
 
 	def read(self):

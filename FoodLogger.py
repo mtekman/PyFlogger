@@ -7,16 +7,17 @@ from Yemek import Yemek, Carb
 from copy import copy
 from PieChart import PieChart
 
+from Config import user_foodlog
+
 '''Logs food entered into system with timestamp into foodlog.txt'''
 class FoodLogger:
-    def __init__(self, foodlog, foodlist,
-    targets=None, testmode=0):
+    def __init__(self, targets=None, testmode=0):
         # Test modes:
         # 0 - inactive
         # 1 - log and record @ 1972/01/02-13:00
         # 2 - clear all tests from record
 
-        self.path = foodlog
+        self.path = user_foodlog
 
         if testmode==2:
             self.clearTest()
@@ -28,7 +29,7 @@ class FoodLogger:
 
             self.foodlog=[]
             self.macrofile= targets
-            self.foodlist = FoodList( foodlist )        # i.e. ref FoodList cobj
+            self.foodlist = FoodList()        # i.e. ref FoodList cobj
 
 
 

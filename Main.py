@@ -7,7 +7,8 @@ from Plotter import *
 from Suggest import Suggest
 from Common import daysSince, previousDay
 from os import path,mkdir
-from xdg.BaseDirectory import xdg_config_home
+from Config import Config
+
 
 INFO="[INFO]"
 WARNING="[WARNING]"
@@ -75,37 +76,10 @@ OPTS:		foodname, lbs, lowcal, tag
 		self.opts = " ".join(self.argv[3:])
 
 
-	@staticmethod
-	def __touch(filename):
-		if not path.exists(filename):
-
-			print(INFO, filename, "does not exist -- creating new", file=sys.stderr)
-
-			direc = path.sep.join(filename.split(path.sep)[:-1])
-			if not path.exists(direc):
-				mkdir( direc )
-
-			# Open file and write blank
-			with open(filename,'w') as f:
-				f.write("\n")
-				f.close()
-
-
-
-	def resolveFoodLogPaths(self):
-		direc=path.join( xdg_config_home, 'foodlogger')
-
-		foodlist=path.join( direc, 'list.txt' )
-		foodlog=path.join( direc, 'log.txt' )
-
-		Args.__touch(foodlist)
-		Args.__touch(foodlog)
-
-		return (foodlist, foodlog)
-
-
-
 	def callProgs(self):
+
+		Config.resolveAllPaths()
+
 		#import pdb
 		#pdb.set_trace()
 
@@ -153,9 +127,7 @@ OPTS:		foodname, lbs, lowcal, tag
 
 
 		if self.food:
-			foodlist_path, foodlog_path = self.resolveFoodLogPaths()
-
-			fl = FoodLogger(foodlog_path, foodlist_path, testmode=self.test)
+			fl = FoodLogger(testmode=self.test)
 
 			if self.insert:
 				fl.log(self.opts)
