@@ -36,6 +36,9 @@ class Tags:
 	@staticmethod
 	def tagprompt():
 		get_avail_tags = Tags.popcon()
+		if len(get_avail_tags) == 0:
+			return -1
+
 		return Common.userlistprompt("Attach a tag? Avail:", get_avail_tags)
 
 

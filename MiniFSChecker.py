@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from Messages import INFO
+
 import sys, re, Common
 from Yemek import Yemek, Carb
 from urllib.request import urlopen as uopen
@@ -19,25 +21,25 @@ class HTMLMethods:
 
 
 class FHandler:
-	base_url="http://www.fatsecret.co.uk"
-	mobile_url="http://m.fatsecret.co.uk"
-	query_url=base_url+"/calories-nutrition/search?q="
+	base_url   = "http://www.fatsecret.co.uk"
+	mobile_url = "http://m.fatsecret.co.uk"
+	query_url  = base_url + "/calories-nutrition/search?q="
 
 
 	def __init__(self, query, foodobj=0):
-		INFO("\rChecking online...", end=' ')
+		INFO("\r\tChecking online...", end=' ')
 		self.query = HTMLMethods.toHTMLChars(query)
 
-#		try:
-#			self.pagedata = uopen(FHandler.query_url+self.query).read()
-#		except URLError:
-#			print(" stopped, no connection?")
-#			exit(-1)
+		try:
+			self.pagedata = uopen(FHandler.query_url+self.query).read()
+		except URLError:
+			print(" stopped, no connection?")
+			exit(-1)
 
 #		# offline saved
 #		print(self.pagedata)
 #		exit(0)
-		self.pagedata = open("test_sub.html").read()
+#		self.pagedata = open("test_sub.html").read()
 
 		self.results = self.ParseResults()
 		if foodobj==0:
@@ -92,6 +94,7 @@ class FHandler:
 
 
 	def resHandler(self, max_split=30):
+
 		if len(self.results)==0:
 			RESULT("No matches")
 			return -1
@@ -187,6 +190,8 @@ class FHandler:
 		food_table = bsobj.find('div', attrs={'class':'nutpanel'})
 
 		food_info = FHandler.handleFoodInfo(food_table)
+
+		name = ' '.join(name.split())
 
 		yem = Yemek(name,
 			food_info[0], food_info[1], food_info[2],

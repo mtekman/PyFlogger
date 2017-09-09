@@ -39,7 +39,9 @@ class FoodList:
 			data = dd[1]
 			portions = ""
 			tags=""
-			if len(dd)==3:portions = dd[2]
+
+			if len(dd)==3:
+				portions = dd[2]
 			if len(dd)==4:
 				portions = dd[2]
 				tags = dd[3].strip()
@@ -106,16 +108,16 @@ class FoodList:
 
 
 	def insertAll(self, yem, input_search=[]):
-		#Tag prompt
+		# Tag prompt
 		user_input_tags = Tags.tagprompt()
+
 		if user_input_tags!=-1:
 			yem.tags.insertList(user_input_tags)
 
-#		if input_search!=[]:yem.tags.insertList(input_search)
 
 		name = yem.name.strip().lower()
 		self.foodmap[name] = yem
-		INFO("Inserted", name, file=sys.stderr)
+		INFO("Inserted \"%s\"" % name)
 		self.write()
 
 
@@ -225,6 +227,9 @@ class FoodList:
 
 
 	def info(self,name):
+
+		name = name.strip()
+
 		if name in self.foodmap:
 			print(self.foodmap[name].printout(header=True), file=sys.stderr)
 			return name
@@ -246,8 +251,10 @@ class FoodList:
 				return name.lower()
 			elif res == 's':
 				f = MiniFSChecker.FHandler(name).found
-				if f==-1:exit(0)
-				self.insertAll(f, [arg_name,"FS_online"])
+				if f==-1:
+					exit(0)
+
+				self.insertAll(f, [arg_name,"FS_online"] )
 				return f.name
 
 			exit(0)

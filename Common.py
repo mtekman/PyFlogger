@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from Messages import RESULT
+
 import sys
 from os.path import abspath, expanduser
 from os import stat
@@ -156,7 +158,7 @@ def choice(array, compare_to=0, multiple=False):
 		if isTuple:
 			res = array[ind][0]  # dont want scale
 		print("")
-		RESULT(("Chose: %s" % res) if not isYem else res.printout(pre="Chose: "))
+		print(("Chose: %s" % res) if not isYem else res.printout(pre="Chose: "))
 		return res
 
 	# Main
