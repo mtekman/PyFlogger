@@ -6,6 +6,8 @@ from os.path import abspath
 
 from Config import user_foodlist
 
+from Messages import INFO, RESULT
+
 import Common
 import MiniFSChecker
 from functools import reduce
@@ -113,12 +115,12 @@ class FoodList:
 
 		name = yem.name.strip().lower()
 		self.foodmap[name] = yem
-		print("Inserted", name, file=sys.stderr)
+		INFO("Inserted", name, file=sys.stderr)
 		self.write()
 
 
 	def insert(self,name, input_search=[]):
-		print("Inserting new food:", name)
+		INFO("Inserting new food:", name)
 		per,unit = Common.amountsplit(input("Per Unit (e.g. '100g'): ").strip())
 		kc, carb_total, carb_sugar, carb_fibre , prot, fat = input("kCal Carb Sug Fibr Prot Fat: ").split()
 
@@ -133,9 +135,9 @@ class FoodList:
 
 		if name in self.foodmap:
 			del self.foodmap[name]
-			print("[Removed]", file=sys.stderr)
+			RESULT("[Removed]", file=sys.stderr)
 		else:
-			print("[Does not exist!]", file=sys.stderr)
+			RESULT("[Does not exist!]", file=sys.stderr)
 		self.write()
 
 
@@ -143,7 +145,7 @@ class FoodList:
 		name = input('Food Name: ').strip()
 
 		if name in self.foodmap:
-			print("[Food already exists!]", file=sys.stderr)
+			RESULT("[Food already exists!]", file=sys.stderr)
 			print(self.foodmap[name].printout(header=True), file=sys.stderr)
 			exit(-1)
 		self.insert(name)
@@ -160,7 +162,7 @@ class FoodList:
 			if edit[0].lower() != 'y':
 				exit(-1)
 		else:
-			print("\n[New Food: \"%s\"]" % name, file=sys.stderr)
+			RESULT("\n[New Food: \"%s\"]" % name, file=sys.stderr)
 		self.insert(name)
 
 	def closestMatch(self,name):
@@ -184,7 +186,7 @@ class FoodList:
 
 
 		if len(found)==0:
-			print("Searching tags...")
+			INFO("Searching tags...")
 			for avail_food, obj in self.foodmap.items():
 				word_match = 0
 				for ss in searchname:
@@ -210,7 +212,7 @@ class FoodList:
 
 #			if name != 'chicken drumstick (skin eaten)':continue
 
-			print("Check:")
+			INFO("Check:")
 			print(food.printout(pre="---"))
 			f = MiniFSChecker.FHandler(food.name, food).found
 			if f!=-1:
@@ -251,11 +253,11 @@ class FoodList:
 			exit(0)
 
 		# Found something, print
-		print("\nMatched:", end=' ', file=sys.stderr)
+		INFO("\nMatched:", end=' ')
 		res = Common.choice(found)
 
 		if res==-1:
-			print("None", file=sys.stderr)
+			INFO("None")
 			if Common.ynprompt('Search online? '):
 				f = MiniFSChecker.FHandler(name).found
 				if f==-1:exit(0)

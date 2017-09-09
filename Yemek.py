@@ -113,7 +113,7 @@ class Portion:
 
 		if name in self.avail:
 			if self.avail[name] != calorie:
-				print("Portion contradiction:", name, self.avail[name], calorie, file=sys.stderr)
+				RESULT("Portion contradiction:", name, self.avail[name], calorie, file=sys.stderr)
 		else:
 			self.avail[name] = calorie
 

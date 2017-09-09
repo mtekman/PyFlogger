@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from sys import stderr
+from Messages import INFO
 
 
 class WeightCon:
@@ -22,7 +23,7 @@ class WeightCon:
     def convert(self, fr,to):
 
         if fr == "":
-            print("No unit given, assuming 'lb'", file=stderr)
+            INFO("No unit given, assuming 'lb'", file=stderr)
             fr = 'lb'
 
         fr = self.def_map[fr]

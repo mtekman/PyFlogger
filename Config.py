@@ -1,12 +1,14 @@
 #/usr/bin/env python3
 
+from Messages import INFO
+
 from xdg.BaseDirectory import xdg_config_home
 from os.path import join as pjoin, exists, sep, expanduser, normpath
 from os import mkdir
 
 
 # Defaults
-__config_dir = pjoin( xdg_config_home, 'foodlogger')
+__config_dir  = pjoin( xdg_config_home, 'foodlogger')
 user_foodlist = pjoin( __config_dir, 'list.txt'  )
 user_foodlog  = pjoin( __config_dir, 'log.txt'   )
 user_weightlog= pjoin( __config_dir, 'weight.txt')
@@ -29,9 +31,14 @@ if exists( user_config_file ):
 
         # if not all found, defaults are used
         conf.close()
+else:
+    with open(user_config_file, 'w') as conf:
+        conf.write('user_foodlist = %s\n' % user_foodlist)
+        conf.write('user_foodlog = %s\n' % user_foodlog)
+        conf.write('user_weightlog = %s\n' % user_weightlog)
+        conf.close()
 
-
-
+    INFO("default list, log, weight file locations have been set at: %s" % user_config_file)
 
 
 
@@ -53,7 +60,7 @@ class Config:
     def __touch(filename):
         if not exists(filename):
 
-            print("[INFO]", filename, "does not exist -- creating new")
+            info(filename, "does not exist -- creating new")
 
             direc = sep.join(filename.split(sep)[:-1])
             if not exists(direc):

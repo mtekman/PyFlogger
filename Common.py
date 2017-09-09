@@ -49,8 +49,6 @@ def ynprompt(message):
 		ans = input(message+' (y/n):').strip()[0].lower()
 	return ans == 'y'
 
-
-
 	return (ans[0].lower()=='y')
 
 
@@ -78,7 +76,7 @@ def userSingleListPrompt(pretext, message_array, str_array):
 		inp = inp[0].lower()
 
 		if inp not in lowr_str_array:
-			print("Invalid input.", end="", file=sys.stderr)
+			RESULT("Invalid input.", end="")
 			max_tries -= 1
 		else:
 			opts = inp
@@ -103,12 +101,12 @@ def getIndexInput(max, multiple=False):
 				if ind < max:inRange = True
 				else:
 					inRange = False
-					print("Out of range, please try again")
+					RESULT("Out of range, please try again")
 					break
 
 		except ValueError:
 			isNum = False
-			print("Not a number, please try again")
+			RESULT("Not a number, please try again")
 
 	if len(ind_array)==1:return ind_array[0]
 	return ind_array
@@ -125,7 +123,8 @@ def choice(array, compare_to=0, multiple=False):
 	def def_choice(array, compare_to, isTuple=False, isYem=True):
 
 		choose = 1
-		if isYem:print(Yemek.printFullHeader())
+		if isYem:
+			print(Yemek.printFullHeader())
 
 		for x in array:
 			scale = 1
@@ -146,7 +145,7 @@ def choice(array, compare_to=0, multiple=False):
 			if compare_to!=0:
 				# Whatever is compared MUST have equality method overloaded, else standard type
 				if sobj == compare_to:
-					print("Found definite match!")
+					result("Found definite match!")
 					return x
 			choose +=1
 
@@ -157,14 +156,14 @@ def choice(array, compare_to=0, multiple=False):
 		if isTuple:
 			res = array[ind][0]  # dont want scale
 		print("")
-		print(("Chose: %s" % res) if not isYem else res.printout(pre="Chose: "))
+		RESULT(("Chose: %s" % res) if not isYem else res.printout(pre="Chose: "))
 		return res
 
 	# Main
 	print("")
 
 	if len(array)==0:
-		print("No matches")
+		RESULT("No matches")
 		return -1
 
 	isTuple = isinstance(array[0], tuple)
@@ -192,8 +191,7 @@ def fraction(am_amount):
 def amountsplit(text, resolve_unit=False):
 
 	text = text.split('(')[0]  # handle cases like 100ml (100ml)
-
-	text= text.strip()
+	text = text.strip()
 
 	lower = 46 # 46 = '.'
 
@@ -228,9 +226,7 @@ def amountsplit(text, resolve_unit=False):
 			multi, unit = unit_converter[unit]
 			amount *= multi
 		except KeyError:
-			print("Not encountered", unit, "before", file=sys.stderr)
-			import pdb; pdb.set_trace()
-			exit(-1)
+			error("Not encountered", unit, "before", file=sys.stderr)
 
 	return amount , unit
 
@@ -247,13 +243,13 @@ def backup(path):
 	try:
 		curr_bytes = stat(path).st_size
 	except OSError:
-		print("No file to backup...")
+		RESULT("No file to backup...")
 		return 0
 
 	try:
 		back_bytes = stat(backup_path).st_size
 	except OSError:
-		print("No backup file, creating one")
+		RESULT("No backup file, creating one")
 		b=open(backup_path,'w');b.write("");b.close()
 		back_bytes = stat(backup_path).st_size
 

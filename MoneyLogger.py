@@ -1,15 +1,19 @@
 #!/usr/bin/env python
 
-from Common import *
+# COMPLETELY UNUSED
+#
+#
+#
+
 
 class MoneyLogger:
 
 	period_map = {'day':1, 'week': 5, 'month':20}
 
-	def __init__(self, target=abspath("../")+"/logs/targets.txt", 
+	def __init__(self, target=abspath("../")+"/logs/targets.txt",
 			     file=abspath("../")+"/logs/money_log.txt"):
 		self.logfile = file
-		
+
 		f = open(target,'r')
 		for line in f:
 			if line.startswith("money"):
@@ -37,7 +41,7 @@ class MoneyLogger:
 
 	def printout(self, it_am, buff):
 		print >> sys.stderr, "%*s   %.2f" % (buff, it_am[0], it_am[1])
-		
+
 
 	# any date
 	def read(self,date):
@@ -48,7 +52,7 @@ class MoneyLogger:
 			f.write("Date             \tItem\tAmount\n")
 			f.close()
 			return
-		
+
 #		f.readline()   # Strip Header
 
 		for line in f:
@@ -65,7 +69,7 @@ class MoneyLogger:
 
 	def showTotals(self,date):
 		self.read(date)
-		
+
 		if len(self.mlog)==0:
 			print >> sys.stderr, "nothing logged for that day!"
 			exit(-1)
@@ -86,7 +90,7 @@ class MoneyLogger:
 
 		print >> sys.stderr,""
 		print >> sys.stderr, "Total:\t%f" % total
-		
+
 		#Allowed
 		print >> sys.stderr, "Allowed:\t%f" % (total - self.daily_limit)
 		print >> sys.stderr, "Remain:\t%f with %d days to go" % (self.limit - total, self.period-1)
@@ -95,14 +99,14 @@ class MoneyLogger:
 	def log(self, name=""):
 		if name=="":
 			name = raw_input("Item: ").strip().lower()
-		
+
 		am = float(raw_input("\nCost? ").strip())
 		dater = "%04d/%02d/%02d--%02d:%02d" % localtime()[0:5]
 
 		f=open(self.logfile,'a')
 		print >> f, "%s\t%s\t%.2f" % (dater,name, am)
 		f.close()
-		
+
 		print >> sys.stderr, "\n\n"
 		self.showTotals(self.date)
 

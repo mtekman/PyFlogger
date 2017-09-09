@@ -25,7 +25,7 @@ class FHandler:
 
 
 	def __init__(self, query, foodobj=0):
-		print("\rChecking online...", end=' ', file=sys.stderr)
+		INFO("\rChecking online...", end=' ')
 		self.query = HTMLMethods.toHTMLChars(query)
 
 #		try:
@@ -49,7 +49,7 @@ class FHandler:
 
 	def checkFoodHomology(self,fobj):
 		if len(self.results)==0:
-			print("No matches")
+			RESULT("No matches")
 			return -1
 
 		good_results = []
@@ -93,7 +93,7 @@ class FHandler:
 
 	def resHandler(self, max_split=30):
 		if len(self.results)==0:
-			print("No matches")
+			RESULT("No matches")
 			return -1
 
 		return Common.choice(self.results)
@@ -151,7 +151,6 @@ class FHandler:
 			for tr in portion_data.find_all('tr')\
 				if tr.find('div',{'class':'other-link'})\
 		]
-
 		return res
 
 
@@ -159,7 +158,7 @@ class FHandler:
 	@staticmethod
 	def __debugDump(text, dest):
 		with open(dest,'w') as file:file.write(str(text));file.close();
-		print(" -> page dumped to", dest, file=sys.stderr)
+		RESULT(" -> page dumped to", dest)
 
 
 	@staticmethod
@@ -175,12 +174,12 @@ class FHandler:
 
 
 		except URLError:
-			print(" stopped, no connection?", file=sys.stderr)
+			RESULT(" stopped, no connection?")
 			FHandler.__debugDump(tempdata, '/tmp/debug_foodinfo.no_connection.html')
 			exit(-1)
 
 		except AttributeError:
-			print(" stopped, page is being redirected?", file=sys.stderr)
+			RESULT(" stopped, page is being redirected?")
 			FHandler.__debugDump(tempdata, '/tmp/debug_foodinfo.redirected.html')
 			exit(-1)
 

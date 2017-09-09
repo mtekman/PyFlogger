@@ -86,13 +86,13 @@ class FoodLogger:
         fat_total=0
 
         if len(self.foodlog)==0:
-            print("nothing logged for date: %s" % date, file = sys.stderr)
+            INFO("nothing logged for date: %s" % date)
             prevD = previousDay(ymd2secs(date.split('/')))
             if ynprompt("Print day before that (%s)? " % prevD):
                 return self.makeTotals(prevD, showPie, printme)
 
         if printme:
-            print('\n'*10, file=sys.stderr)
+            INFO('\n'*10)
             Yemek.printFullHeader()
 
 
@@ -169,13 +169,10 @@ class FoodLogger:
                 input("\nAmount consumed (e.g '50 ml'))? ").strip()
             )
             scale = am_amount/equiv_per if am_amount > 30 else am_amount
-
             am = scale * equiv_per
+            #print("unit_set=", unit_set, " am_amount=", am_amount)
 
-
-            print("unit_set=", unit_set, " am_amount=", am_amount)
-
-#        dater = "%04d/%02d/%02d--%02d:%02d" % localtime()[0:5]
+#       dater = "%04d/%02d/%02d--%02d:%02d" % localtime()[0:5]
         dater = self.date
 
         f=open(self.path,'a')

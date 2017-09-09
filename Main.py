@@ -7,10 +7,7 @@ from Plotter import *
 from Suggest import Suggest
 from Common import daysSince, previousDay
 from Config import Config
-
-
-INFO="[INFO]"
-WARNING="[WARNING]"
+from Messages import RESULT
 
 class Args:
 	def usage(self):
@@ -90,7 +87,7 @@ OPTS:		foodname, lbs, lowcal, tag
 				return
 
 			if self.remove:
-				print("Not implemented")
+				RESULT("TODO: Not implemented")
 				return
 
 			if self.list:
@@ -121,7 +118,7 @@ OPTS:		foodname, lbs, lowcal, tag
 				Printer(xy)
 				return
 
-			print("Nothing to do")
+			RESULT("Nothing to do")
 			return
 
 
@@ -133,7 +130,7 @@ OPTS:		foodname, lbs, lowcal, tag
 				return
 
 			if self.remove:
-				print("Not implemented")
+				RESULT("Not implemented")
 				return
 
 			if self.list:
@@ -148,7 +145,7 @@ OPTS:		foodname, lbs, lowcal, tag
 				return
 
 			if self.plot:
-				print("Not implemented")
+				RESULT("Not implemented")
 				return
 
 
@@ -186,5 +183,5 @@ OPTS:		foodname, lbs, lowcal, tag
 try:
 	Args(sys.argv)
 except KeyboardInterrupt:
-	print("\nQuit")
+	RESULT("\nQuit")
 	exit(-1)

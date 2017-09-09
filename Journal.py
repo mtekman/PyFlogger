@@ -1,14 +1,18 @@
 #!/usr/bin/env python
 
+# COMPLETELY UNUSED #
+#
+
+
 from Common import *
 
 class Journal:
 	'''Keep a journal of what you did that was good, and what you that was bad and generate a daily score'''
-	
+
 	def __init__(self, path='../logs/journal.txt'):
 		self.file = path
 		self.read()
-		
+
 
 	def read(self):
 		try:
@@ -44,7 +48,7 @@ class Journal:
 	def logReady(self,stamp,score,activity):
 		f = open(self.file, 'a')
 		strr = Journal.out(stamp,score,activity)
-		print strr
+		print(strr)
 		f.write(strr)
 		f.close()
 
@@ -66,7 +70,7 @@ class Journal:
 					break
 				except ValueError:
 					print "Not a valid integer, try again"
-		
+
 		score = int(score)
 		self.logReady(now(), score, activity.strip())
 
@@ -93,4 +97,3 @@ class Journal:
 
 j = Journal()
 j.log()
-

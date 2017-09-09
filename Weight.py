@@ -3,6 +3,7 @@
 from Common import *
 from Config import user_weightlog
 from Convert import WeightCon
+from Messages import RESULT, INFO
 
 
 class Weight:
@@ -43,7 +44,7 @@ class Weight:
 	def set(self, lbls, setmorn, finalprint=False):
 		if setmorn:
 			if self.morn!=-1:
-				print("Morning already set:")
+				INFO("Morning already set:")
 				print(self.printout(header=True, filler=True))
 				if (ynprompt('Overwrite? ')):
 					self.morn = lbls
@@ -51,7 +52,7 @@ class Weight:
 				self.morn = lbls
 		else:
 			if self.night!=-1:
-				print("Night already set:")
+				INFO("Night already set:")
 				print(self.printout())
 				if (ynprompt('Overwrite? ')):
 					self.night = lbls
@@ -111,7 +112,7 @@ class WeightLog:
 		availdates= sorted(self.weightlogmap.keys())
 
 		if len(availdates) == 0:
-			print("Nothing logged.")
+			RESULT("Nothing logged.")
 			return
 
 		if date == None:
@@ -155,7 +156,7 @@ class WeightLog:
 		elif date==self.yesterday:
 			day="yesterday " if isDay else "last "
 
-		tod= "morning" if isDay else "night"
+		tod = "morning" if isDay else "night"
 
 		#Input
 		inp = input('Please enter input for %s%s: ' % (day,tod))
@@ -184,7 +185,7 @@ class WeightLog:
 		if self.today in self.weightlogmap:
 			w = self.weightlogmap[self.today]
 			if self.nighttime and w.morn==-1:
-				print("Night now, morning not set")
+				INFO("Night now, morning not set. ")
 				if (ynprompt('Set morning? ')):
 					self.logprompt(self.today, isDay=True)
 					return True
@@ -197,7 +198,7 @@ class WeightLog:
 
 		#Else log a new morning at night
 		if self.nighttime:
-				print("Night now, morning not set")
+				INFO("Night now, morning not set. ")
 				if (ynprompt('Set morning? ')):
 					self.logprompt(self.today, isDay=True)
 					return True
@@ -207,18 +208,18 @@ class WeightLog:
 		if self.yesterday in self.weightlogmap:
 			w = self.weightlogmap[self.yesterday]
 			if w.night==-1:
-				print("Last night not set")
+				INFO("Last night not set")
 				if (ynprompt('Set last night? ')):
 					self.logprompt(self.yesterday, isDay=False)
 					return True
 
-				print("[Ignoring last night]")
+				RESULT("[Ignoring last night]")
 				if ynprompt('Ignore permanently? '):
 					self.log(self.yesterday, 0, False)
-					print("[Ignoring last night permanently]")
+					RESULT("[Ignoring last night permanently]")
 					return True
 
-				print("[Temporarily ignored last night, moving on..]\n")
+				RESULT("[Temporarily ignored last night, moving on..]\n")
 
 		return False #nothing changed
 
